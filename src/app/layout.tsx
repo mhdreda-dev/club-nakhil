@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Exo_2, Rajdhani } from "next/font/google";
 
 import "./globals.css";
@@ -16,6 +16,14 @@ const headingFont = Rajdhani({
   display: "swap",
 });
 
+const metadataBase = (() => {
+  try {
+    return new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000");
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+})();
+
 export const metadata: Metadata = {
   title: {
     default: "Club Nakhil · Coach Rabah",
@@ -24,7 +32,7 @@ export const metadata: Metadata = {
   description:
     "Official private training platform for Club Nakhil kickboxing — Coach Rabah.",
   applicationName: "Club Nakhil",
-  themeColor: "#05070c",
+  metadataBase,
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     shortcut: ["/icon.svg"],
@@ -35,6 +43,10 @@ export const metadata: Metadata = {
     description: "Official kickboxing training platform of Club Nakhil.",
     images: ["/club-nakhil-logo.svg"],
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#05070c",
 };
 
 export default function RootLayout({
