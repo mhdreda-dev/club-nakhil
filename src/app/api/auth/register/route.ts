@@ -1,4 +1,4 @@
-import { AccountStatus, Role } from "@prisma/client";
+import { AccountStatus, Prisma, Role } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -11,10 +11,20 @@ import { memberRegistrationSchema } from "@/lib/validation";
 export const runtime = "nodejs";
 
 type FieldErrors = Record<string, string>;
+type RegisterDebugResponse = {
+  step: string;
+  errorName: string;
+  message?: string;
+  code?: string;
+  clientVersion?: string | null;
+  meta?: Record<string, unknown> | null;
+};
+
 type RegisterErrorResponse = {
   ok: false;
   message: string;
   fieldErrors?: FieldErrors;
+  debug?: RegisterDebugResponse;
 };
 
 type RegisterSuccessResponse = {
@@ -86,19 +96,154 @@ function getRegisterValidationSummary(fieldErrors: FieldErrors) {
     : "Please review the required fields.";
 }
 
-function errorResponse(message: string, status: number, fieldErrors?: FieldErrors) {
+function jsonResponse(
+  requestId: string,
+  body: RegisterErrorResponse | RegisterSuccessResponse,
+  status: number,
+) {
+  console.info(`[register:${requestId}] returning response`, {
+    status,
+    body,
+  });
+
+  return NextResponse.json(body, { status });
+}
+
+function errorResponse(
+  requestId: string,
+  message: string,
+  status: number,
+  fieldErrors?: FieldErrors,
+  debug?: RegisterDebugResponse,
+) {
   const body: RegisterErrorResponse = {
     ok: false,
     message,
     ...(fieldErrors ? { fieldErrors } : {}),
+    ...(debug ? { debug } : {}),
   };
 
-  return NextResponse.json(body, { status });
+  return jsonResponse(requestId, body, status);
+}
+
+function serializeRegisterError(step: string, error: unknown): RegisterDebugResponse {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return {
+      step,
+      errorName: error.name,
+      message: error.message,
+      code: error.code,
+      clientVersion: error.clientVersion,
+      meta: (error.meta as Record<string, unknown> | undefined) ?? null,
+    };
+  }
+
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return {
+      step,
+      errorName: error.name,
+      message: error.message,
+      clientVersion: error.clientVersion,
+    };
+  }
+
+  if (error instanceof Prisma.PrismaClientValidationError) {
+    return {
+      step,
+      errorName: error.name,
+      message: error.message,
+    };
+  }
+
+  if (error instanceof Error) {
+    return {
+      step,
+      errorName: error.name,
+      message: error.message,
+    };
+  }
+
+  return {
+    step,
+    errorName: "UnknownError",
+    message: typeof error === "string" ? error : "Unknown error",
+  };
+}
+
+function getRegisterErrorResponse(
+  requestId: string,
+  step: string,
+  error: unknown,
+) {
+  const debug = serializeRegisterError(step, error);
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === "P2002") {
+      return errorResponse(
+        requestId,
+        "This email is already registered.",
+        409,
+        {
+          email: "An account with this email already exists.",
+        },
+        debug,
+      );
+    }
+
+    if (error.code === "P2021" || error.code === "P2022") {
+      return errorResponse(
+        requestId,
+        'Registration is blocked because the production database schema is out of date. Run "npm run prisma:deploy" against the production database, then redeploy.',
+        500,
+        undefined,
+        debug,
+      );
+    }
+  }
+
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return errorResponse(
+      requestId,
+      "Registration could not reach the database. Check DATABASE_URL/DIRECT_URL and database availability.",
+      500,
+      undefined,
+      debug,
+    );
+  }
+
+  if (error instanceof Prisma.PrismaClientValidationError) {
+    return errorResponse(
+      requestId,
+      "Registration failed because the Prisma client and database schema are out of sync.",
+      500,
+      undefined,
+      debug,
+    );
+  }
+
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return errorResponse(
+      requestId,
+      `Registration failed during ${step}: ${error.message.trim()}`,
+      500,
+      undefined,
+      debug,
+    );
+  }
+
+  return errorResponse(
+    requestId,
+    "Unable to complete sign up right now.",
+    500,
+    undefined,
+    debug,
+  );
 }
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID().slice(0, 8);
   const startedAt = Date.now();
+  let currentStep = "route entered";
 
   try {
     logRegisterStep(requestId, "route entered", {
@@ -106,6 +251,7 @@ export async function POST(request: NextRequest) {
       contentType: request.headers.get("content-type"),
     });
 
+    currentStep = "request.formData";
     logRegisterStep(requestId, "before request.formData()");
     const formData = await request.formData();
     logRegisterStep(requestId, "after request.formData()", {
@@ -128,22 +274,27 @@ export async function POST(request: NextRequest) {
     const membershipType = getStringField(formData, "membershipType");
 
     logRegisterStep(requestId, "after extracting fields", {
-      email,
+      parsedFields: {
+        fullName,
+        email,
+        phone,
+        dateOfBirth,
+        gender,
+        address,
+        emergencyContact,
+        sportLevel,
+        membershipType,
+        passwordLength: password.length,
+        confirmPasswordLength: confirmPassword.length,
+      },
       hasAvatar: Boolean(avatarFile),
       avatarName: avatarFile?.name ?? null,
       avatarSize: avatarFile?.size ?? null,
       avatarType: avatarFile?.type ?? null,
-      fullNameLength: fullName.length,
-      phoneLength: phone.length,
-      dateOfBirth,
-      gender,
-      addressLength: address.length,
-      emergencyContactLength: emergencyContact.length,
-      sportLevel,
-      membershipType,
     });
 
     if (avatarFile) {
+      currentStep = "avatar validation";
       const parsedAvatar = validateAvatarFile(avatarFile);
 
       if (!parsedAvatar.success) {
@@ -152,6 +303,7 @@ export async function POST(request: NextRequest) {
         };
 
         return errorResponse(
+          requestId,
           getRegisterValidationSummary(fieldErrors),
           400,
           fieldErrors,
@@ -159,6 +311,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    currentStep = "schema validation";
     logRegisterStep(requestId, "before validation");
     const parsed = memberRegistrationSchema.safeParse({
       fullName,
@@ -175,18 +328,21 @@ export async function POST(request: NextRequest) {
     });
     logRegisterStep(requestId, "after validation", {
       success: parsed.success,
+      issues: parsed.success ? [] : parsed.error.issues,
     });
 
     if (!parsed.success) {
       const fieldErrors = mapIssuesToFieldErrors(parsed.error.issues);
 
       return errorResponse(
+        requestId,
         getRegisterValidationSummary(fieldErrors),
         400,
         fieldErrors,
       );
     }
 
+    currentStep = "existing user lookup";
     logRegisterStep(requestId, "before existing user lookup");
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -203,6 +359,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return errorResponse(
+        requestId,
         "This email is already registered.",
         409,
         {
@@ -211,6 +368,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    currentStep = "password hash";
     logRegisterStep(requestId, "before password hash");
     const passwordHash = await hash(parsed.data.password, 12);
     logRegisterStep(requestId, "after password hash", {
@@ -220,6 +378,7 @@ export async function POST(request: NextRequest) {
     const normalizedDateOfBirth = new Date(`${parsed.data.dateOfBirth}T00:00:00.000Z`);
     const normalizedAddress = parsed.data.address.length ? parsed.data.address : null;
 
+    currentStep = "user create";
     logRegisterStep(requestId, "before user create");
     const user = await prisma.user.create({
       data: {
@@ -267,6 +426,7 @@ export async function POST(request: NextRequest) {
     });
     if (avatarFile) {
       try {
+        currentStep = "avatar upload";
         const avatarPath = buildAvatarStoragePath(user.id, avatarFile.type);
         const avatarUrl = await uploadAvatarObject({
           path: avatarPath,
@@ -274,6 +434,11 @@ export async function POST(request: NextRequest) {
           contentType: avatarFile.type,
         });
 
+        currentStep = "avatar metadata update";
+        logRegisterStep(requestId, "before avatar metadata update", {
+          userId: user.id,
+          avatarPath,
+        });
         await prisma.user.update({
           where: {
             id: user.id,
@@ -287,6 +452,9 @@ export async function POST(request: NextRequest) {
               },
             },
           },
+        });
+        logRegisterStep(requestId, "after avatar metadata update", {
+          userId: user.id,
         });
       } catch (error) {
         console.error("Avatar upload warning during registration:", {
@@ -324,13 +492,17 @@ export async function POST(request: NextRequest) {
       warningCode: avatarWarningCode,
     });
 
-    return NextResponse.json(body, { status: 201 });
+    return jsonResponse(requestId, body, 201);
   } catch (error) {
+    const serializedError = serializeRegisterError(currentStep, error);
+
     console.error(`[register:${requestId}] catch`, {
       durationMs: Date.now() - startedAt,
-      error,
+      step: currentStep,
+      error: serializedError,
+      stack: error instanceof Error ? error.stack : undefined,
     });
 
-    return errorResponse("Unable to complete sign up right now.", 500);
+    return getRegisterErrorResponse(requestId, currentStep, error);
   }
 }

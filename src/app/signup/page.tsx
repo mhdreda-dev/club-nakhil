@@ -52,6 +52,14 @@ type RegistrationPayload = {
   warning?: string | null;
   warningCode?: "avatar-upload-failed" | null;
   fieldErrors?: FieldErrors;
+  debug?: {
+    step?: string;
+    errorName?: string;
+    message?: string;
+    code?: string;
+    clientVersion?: string | null;
+    meta?: Record<string, unknown> | null;
+  };
 };
 
 type SubmitState = "idle" | "submitting" | "submitted";
@@ -218,6 +226,19 @@ function isGenericValidationMessage(message: string) {
 }
 
 function getValidationSummary(fieldErrors: FieldErrors, fallback?: string | null) {
+  const normalizedFallback = fallback?.trim();
+
+  if (
+    normalizedFallback &&
+    !isGenericValidationMessage(normalizedFallback) &&
+    normalizedFallback !== "Please review the required fields." &&
+    normalizedFallback !== "Some information is missing or invalid." &&
+    normalizedFallback !== "Passwords do not match." &&
+    normalizedFallback !== "Please upload a valid image under 3 MB."
+  ) {
+    return normalizedFallback;
+  }
+
   if (fieldErrors.profileImage) {
     return "Please upload a valid image under 3 MB.";
   }
@@ -242,8 +263,7 @@ function getValidationSummary(fieldErrors: FieldErrors, fallback?: string | null
       : "Please review the required fields.";
   }
 
-  if (fallback?.trim()) {
-    const normalizedFallback = fallback.trim();
+  if (normalizedFallback) {
     return isGenericValidationMessage(normalizedFallback)
       ? "Please review the required fields."
       : normalizedFallback;
@@ -506,6 +526,12 @@ export default function SignUpPage() {
         const nextFieldErrors = normalizeFieldErrors(payload.fieldErrors);
         setFieldErrors(nextFieldErrors);
         setSubmitState("idle");
+        console.error("[signup] server error response", {
+          status: response.status,
+          message: payload.message,
+          fieldErrors: nextFieldErrors,
+          debug: payload.debug,
+        });
         setError(getValidationSummary(nextFieldErrors, payload.message ?? null));
         return;
       }
