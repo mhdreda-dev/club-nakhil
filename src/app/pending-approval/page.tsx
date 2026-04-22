@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock3, Home, LogIn, ShieldCheck, Sparkles } from "lucide-react";
+import { AlertTriangle, Clock3, Home, LogIn, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -10,6 +10,11 @@ import { ClubLogo } from "@/components/club-logo";
 export default function PendingApprovalPage() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const warningCode = searchParams.get("warning");
+  const warningMessage =
+    warningCode === "avatar-upload-failed"
+      ? "Your account was created, but the profile image could not be uploaded. You can add it later from your profile after approval."
+      : null;
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -56,6 +61,13 @@ export default function PendingApprovalPage() {
             <p className="mt-3 text-sm text-red-200">
               Registered email: <span className="font-semibold text-white">{email}</span>
             </p>
+          ) : null}
+
+          {warningMessage ? (
+            <div className="mt-5 flex items-start gap-2 rounded-2xl border border-amber-300/30 bg-amber-500/10 px-4 py-3 text-left text-sm text-amber-100">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{warningMessage}</span>
+            </div>
           ) : null}
 
           <div className="mt-7 grid gap-3 sm:grid-cols-2">

@@ -40,20 +40,33 @@ const phoneSchema = z
   .max(40, "Phone number is too long.")
   .regex(/^[0-9+()\-\s]+$/, "Phone number contains invalid characters.");
 
-const memberRegistrationBaseSchema = z.object({
+const requiredAddressSchema = z.string().trim().min(5, "Address is required.").max(240);
+
+const optionalAddressSchema = z.string().trim().max(240, "Address is too long.");
+
+const memberRegistrationCommonFields = {
   fullName: z.string().trim().min(2, "Full name is required.").max(120),
   email: z.string().email("A valid email is required.").trim().toLowerCase(),
   phone: phoneSchema,
   password: z.string().min(8, "Password must be at least 8 characters.").max(128),
   dateOfBirth: z.string().date("Date of birth is required."),
   gender: z.nativeEnum(Gender),
-  address: z.string().trim().min(5, "Address is required.").max(240),
   emergencyContact: z.string().trim().min(3, "Emergency contact is required.").max(240),
   sportLevel: z.nativeEnum(TrainingLevel),
   membershipType: z.nativeEnum(MembershipType),
+} as const;
+
+const memberRegistrationBaseSchema = z.object({
+  ...memberRegistrationCommonFields,
+  address: requiredAddressSchema,
 });
 
-export const memberRegistrationSchema = memberRegistrationBaseSchema
+const selfMemberRegistrationBaseSchema = z.object({
+  ...memberRegistrationCommonFields,
+  address: optionalAddressSchema,
+});
+
+export const memberRegistrationSchema = selfMemberRegistrationBaseSchema
   .extend({
     confirmPassword: z.string().min(8),
   })

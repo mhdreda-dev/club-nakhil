@@ -11,6 +11,29 @@ import { memberRegistrationSchema } from "@/lib/validation";
 export const runtime = "nodejs";
 
 type FieldErrors = Record<string, string>;
+type RegisterErrorResponse = {
+  ok: false;
+  message: string;
+  fieldErrors?: FieldErrors;
+};
+
+type RegisterSuccessResponse = {
+  ok: true;
+  message: string;
+  pending: true;
+  email: string;
+  warning: string | null;
+  warningCode: "avatar-upload-failed" | null;
+};
+
+function logRegisterStep(requestId: string, step: string, details?: Record<string, unknown>) {
+  if (details) {
+    console.info(`[register:${requestId}] ${step}`, details);
+    return;
+  }
+
+  console.info(`[register:${requestId}] ${step}`);
+}
 
 function getStringField(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -36,53 +59,135 @@ function mapIssuesToFieldErrors(
   return fieldErrors;
 }
 
+function getRegisterValidationSummary(fieldErrors: FieldErrors) {
+  if (fieldErrors.profileImage) {
+    return "Please upload a valid image under 3 MB.";
+  }
+
+  if (fieldErrors.confirmPassword?.toLowerCase().includes("match")) {
+    return "Passwords do not match.";
+  }
+
+  const hasFormatIssue = Object.values(fieldErrors).some((message) => {
+    const lowerMessage = message.toLowerCase();
+
+    return (
+      lowerMessage.includes("valid") ||
+      lowerMessage.includes("at least") ||
+      lowerMessage.includes("already exists") ||
+      lowerMessage.includes("invalid") ||
+      lowerMessage.includes("too long") ||
+      lowerMessage.includes("under 3 mb")
+    );
+  });
+
+  return hasFormatIssue
+    ? "Some information is missing or invalid."
+    : "Please review the required fields.";
+}
+
+function errorResponse(message: string, status: number, fieldErrors?: FieldErrors) {
+  const body: RegisterErrorResponse = {
+    ok: false,
+    message,
+    ...(fieldErrors ? { fieldErrors } : {}),
+  };
+
+  return NextResponse.json(body, { status });
+}
+
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID().slice(0, 8);
+  const startedAt = Date.now();
+
   try {
+    logRegisterStep(requestId, "route entered", {
+      method: request.method,
+      contentType: request.headers.get("content-type"),
+    });
+
+    logRegisterStep(requestId, "before request.formData()");
     const formData = await request.formData();
+    logRegisterStep(requestId, "after request.formData()", {
+      durationMs: Date.now() - startedAt,
+    });
+
     const avatarField = formData.get("profileImage");
     const avatarFile =
       avatarField instanceof File && avatarField.size > 0 ? avatarField : null;
+    const fullName = getStringField(formData, "fullName");
+    const email = getStringField(formData, "email");
+    const phone = getStringField(formData, "phone");
+    const password = getStringField(formData, "password");
+    const confirmPassword = getStringField(formData, "confirmPassword");
+    const dateOfBirth = getStringField(formData, "dateOfBirth");
+    const gender = getStringField(formData, "gender");
+    const address = getStringField(formData, "address");
+    const emergencyContact = getStringField(formData, "emergencyContact");
+    const sportLevel = getStringField(formData, "sportLevel");
+    const membershipType = getStringField(formData, "membershipType");
+
+    logRegisterStep(requestId, "after extracting fields", {
+      email,
+      hasAvatar: Boolean(avatarFile),
+      avatarName: avatarFile?.name ?? null,
+      avatarSize: avatarFile?.size ?? null,
+      avatarType: avatarFile?.type ?? null,
+      fullNameLength: fullName.length,
+      phoneLength: phone.length,
+      dateOfBirth,
+      gender,
+      addressLength: address.length,
+      emergencyContactLength: emergencyContact.length,
+      sportLevel,
+      membershipType,
+    });
 
     if (avatarFile) {
       const parsedAvatar = validateAvatarFile(avatarFile);
 
       if (!parsedAvatar.success) {
-        return NextResponse.json(
-          {
-            message: "Invalid profile image.",
-            fieldErrors: {
-              profileImage: parsedAvatar.error.issues[0]?.message ?? "Invalid image file.",
-            },
-          },
-          { status: 400 },
+        const fieldErrors = {
+          profileImage: parsedAvatar.error.issues[0]?.message ?? "Invalid image file.",
+        };
+
+        return errorResponse(
+          getRegisterValidationSummary(fieldErrors),
+          400,
+          fieldErrors,
         );
       }
     }
 
+    logRegisterStep(requestId, "before validation");
     const parsed = memberRegistrationSchema.safeParse({
-      fullName: getStringField(formData, "fullName"),
-      email: getStringField(formData, "email"),
-      phone: getStringField(formData, "phone"),
-      password: getStringField(formData, "password"),
-      confirmPassword: getStringField(formData, "confirmPassword"),
-      dateOfBirth: getStringField(formData, "dateOfBirth"),
-      gender: getStringField(formData, "gender"),
-      address: getStringField(formData, "address"),
-      emergencyContact: getStringField(formData, "emergencyContact"),
-      sportLevel: getStringField(formData, "sportLevel"),
-      membershipType: getStringField(formData, "membershipType"),
+      fullName,
+      email,
+      phone,
+      password,
+      confirmPassword,
+      dateOfBirth,
+      gender,
+      address,
+      emergencyContact,
+      sportLevel,
+      membershipType,
+    });
+    logRegisterStep(requestId, "after validation", {
+      success: parsed.success,
     });
 
     if (!parsed.success) {
-      return NextResponse.json(
-        {
-          message: "Please correct the highlighted fields.",
-          fieldErrors: mapIssuesToFieldErrors(parsed.error.issues),
-        },
-        { status: 400 },
+      const fieldErrors = mapIssuesToFieldErrors(parsed.error.issues);
+
+      return errorResponse(
+        getRegisterValidationSummary(fieldErrors),
+        400,
+        fieldErrors,
       );
     }
 
+    logRegisterStep(requestId, "before existing user lookup");
     const existingUser = await prisma.user.findUnique({
       where: {
         email: parsed.data.email,
@@ -91,67 +196,75 @@ export async function POST(request: NextRequest) {
         id: true,
       },
     });
+    logRegisterStep(requestId, "after existing user lookup", {
+      exists: Boolean(existingUser),
+      durationMs: Date.now() - startedAt,
+    });
 
     if (existingUser) {
-      return NextResponse.json(
+      return errorResponse(
+        "This email is already registered.",
+        409,
         {
-          message: "This email is already registered.",
-          fieldErrors: {
-            email: "An account with this email already exists.",
-          },
+          email: "An account with this email already exists.",
         },
-        { status: 409 },
       );
     }
 
+    logRegisterStep(requestId, "before password hash");
     const passwordHash = await hash(parsed.data.password, 12);
-    const dateOfBirth = new Date(`${parsed.data.dateOfBirth}T00:00:00.000Z`);
+    logRegisterStep(requestId, "after password hash", {
+      durationMs: Date.now() - startedAt,
+    });
 
-    const user = await prisma.$transaction(async (tx) => {
-      const createdUser = await tx.user.create({
-        data: {
-          name: parsed.data.fullName,
-          fullName: parsed.data.fullName,
-          email: parsed.data.email,
-          passwordHash,
-          role: Role.MEMBER,
-          status: AccountStatus.PENDING,
-          phone: parsed.data.phone,
-          dateOfBirth,
-          gender: parsed.data.gender,
-          address: parsed.data.address,
-          emergencyContact: parsed.data.emergencyContact,
-          sportLevel: parsed.data.sportLevel,
-          membershipType: parsed.data.membershipType,
+    const normalizedDateOfBirth = new Date(`${parsed.data.dateOfBirth}T00:00:00.000Z`);
+    const normalizedAddress = parsed.data.address.length ? parsed.data.address : null;
+
+    logRegisterStep(requestId, "before user create");
+    const user = await prisma.user.create({
+      data: {
+        name: parsed.data.fullName,
+        fullName: parsed.data.fullName,
+        email: parsed.data.email,
+        passwordHash,
+        role: Role.MEMBER,
+        status: AccountStatus.PENDING,
+        phone: parsed.data.phone,
+        dateOfBirth: normalizedDateOfBirth,
+        gender: parsed.data.gender,
+        address: normalizedAddress,
+        emergencyContact: parsed.data.emergencyContact,
+        sportLevel: parsed.data.sportLevel,
+        membershipType: parsed.data.membershipType,
+        profile: {
+          create: {
+            fullName: parsed.data.fullName,
+            displayName: parsed.data.fullName,
+            phone: parsed.data.phone,
+            dateOfBirth: normalizedDateOfBirth,
+            gender: parsed.data.gender,
+            address: normalizedAddress,
+            emergencyContact: parsed.data.emergencyContact,
+            memberProfile: {
+              create: {
+                trainingLevel: parsed.data.sportLevel,
+              },
+            },
+          },
         },
-      });
-
-      await tx.userProfile.create({
-        data: {
-          userId: createdUser.id,
-          fullName: parsed.data.fullName,
-          displayName: parsed.data.fullName,
-          phone: parsed.data.phone,
-          dateOfBirth,
-          gender: parsed.data.gender,
-          address: parsed.data.address,
-          emergencyContact: parsed.data.emergencyContact,
-          joinedAt: createdUser.createdAt,
-        },
-      });
-
-      await tx.memberProfile.create({
-        data: {
-          userId: createdUser.id,
-          trainingLevel: parsed.data.sportLevel,
-        },
-      });
-
-      return createdUser;
+      },
+    });
+    logRegisterStep(requestId, "after user create", {
+      userId: user.id,
+      durationMs: Date.now() - startedAt,
     });
 
     let avatarWarning: string | null = null;
+    let avatarWarningCode: RegisterSuccessResponse["warningCode"] = null;
 
+    logRegisterStep(requestId, "before avatar logic", {
+      hasAvatar: Boolean(avatarFile),
+    });
     if (avatarFile) {
       try {
         const avatarPath = buildAvatarStoragePath(user.id, avatarFile.type);
@@ -161,28 +274,31 @@ export async function POST(request: NextRequest) {
           contentType: avatarFile.type,
         });
 
-        await prisma.$transaction([
-          prisma.user.update({
-            where: {
-              id: user.id,
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            profileImage: avatarUrl,
+            profile: {
+              update: {
+                avatarUrl,
+                avatarPath,
+              },
             },
-            data: {
-              profileImage: avatarUrl,
-            },
-          }),
-          prisma.userProfile.update({
-            where: {
-              userId: user.id,
-            },
-            data: {
-              avatarUrl,
-              avatarPath,
-            },
-          }),
-        ]);
+          },
+        });
       } catch (error) {
-        console.error("Avatar upload warning during registration:", error);
+        console.error("Avatar upload warning during registration:", {
+          userId: user.id,
+          email: user.email,
+          fileName: avatarFile.name,
+          fileSize: avatarFile.size,
+          fileType: avatarFile.type,
+          error,
+        });
         avatarWarning = "Your account was created, but the profile image could not be uploaded.";
+        avatarWarningCode = "avatar-upload-failed";
       }
     }
 
@@ -194,23 +310,27 @@ export async function POST(request: NextRequest) {
       console.error("Admin notification warning after registration:", notificationError);
     });
 
-    return NextResponse.json(
-      {
-        message: "Registration submitted. Your account is waiting for admin approval.",
-        pending: true,
-        email: user.email,
-        warning: avatarWarning,
-      },
-      { status: 201 },
-    );
-  } catch (error) {
-    console.error(error);
+    const body: RegisterSuccessResponse = {
+      ok: true,
+      message: "Registration submitted. Your account is waiting for admin approval.",
+      pending: true,
+      email: user.email,
+      warning: avatarWarning,
+      warningCode: avatarWarningCode,
+    };
 
-    return NextResponse.json(
-      {
-        message: "Unable to complete sign up right now.",
-      },
-      { status: 500 },
-    );
+    logRegisterStep(requestId, "before final return", {
+      durationMs: Date.now() - startedAt,
+      warningCode: avatarWarningCode,
+    });
+
+    return NextResponse.json(body, { status: 201 });
+  } catch (error) {
+    console.error(`[register:${requestId}] catch`, {
+      durationMs: Date.now() - startedAt,
+      error,
+    });
+
+    return errorResponse("Unable to complete sign up right now.", 500);
   }
 }

@@ -1,4 +1,7 @@
-import { AVATAR_STORAGE_BUCKET } from "@/features/profiles/avatar.constants";
+import {
+  AVATAR_STORAGE_BUCKET,
+  AVATAR_STORAGE_REQUEST_TIMEOUT_MS,
+} from "@/features/profiles/avatar.constants";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 
 type UploadAvatarObjectInput = {
@@ -14,7 +17,9 @@ async function ensureAvatarBucketExists() {
     return;
   }
 
-  const supabase = getSupabaseServiceClient();
+  const supabase = getSupabaseServiceClient({
+    timeoutMs: AVATAR_STORAGE_REQUEST_TIMEOUT_MS,
+  });
   const { data, error } = await supabase.storage.getBucket(AVATAR_STORAGE_BUCKET);
 
   if (error || !data) {
@@ -30,7 +35,9 @@ async function ensureAvatarBucketExists() {
 export async function uploadAvatarObject(input: UploadAvatarObjectInput) {
   await ensureAvatarBucketExists();
 
-  const supabase = getSupabaseServiceClient();
+  const supabase = getSupabaseServiceClient({
+    timeoutMs: AVATAR_STORAGE_REQUEST_TIMEOUT_MS,
+  });
 
   const { error } = await supabase.storage.from(AVATAR_STORAGE_BUCKET).upload(input.path, input.data, {
     contentType: input.contentType,
@@ -56,7 +63,9 @@ export async function removeAvatarObject(path: string) {
 
   await ensureAvatarBucketExists();
 
-  const supabase = getSupabaseServiceClient();
+  const supabase = getSupabaseServiceClient({
+    timeoutMs: AVATAR_STORAGE_REQUEST_TIMEOUT_MS,
+  });
   const { error } = await supabase.storage.from(AVATAR_STORAGE_BUCKET).remove([normalizedPath]);
 
   if (error) {
