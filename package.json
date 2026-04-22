@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "prisma": "^6.19.0"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6"
+  }
+}
