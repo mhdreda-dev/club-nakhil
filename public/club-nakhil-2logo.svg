@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Club Nakhil Kickboxing — Coach Rabah">
+  <defs>
+    <path id="cn-top-arc" d="M 62 200 A 138 138 0 0 1 338 200" />
+    <path id="cn-bot-arc" d="M 70 216 A 132 132 0 0 0 330 216" />
+    <radialGradient id="cn-red" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#e02638" />
+      <stop offset="70%" stop-color="#c8102e" />
+      <stop offset="100%" stop-color="#9a0a22" />
+    </radialGradient>
+  </defs>
+
+  <!-- Outer black ring -->
+  <circle cx="200" cy="200" r="198" fill="#0b0b0b" />
+  <circle cx="200" cy="200" r="191" fill="#ffffff" />
+  <circle cx="200" cy="200" r="155" fill="none" stroke="#0b0b0b" stroke-width="2.5" />
+
+  <!-- Red inner disc -->
+  <circle cx="200" cy="200" r="152" fill="url(#cn-red)" />
+  <circle cx="200" cy="200" r="152" fill="none" stroke="#0b0b0b" stroke-width="2" />
+
+  <!-- Arc text: KICK  BOXING -->
+  <text font-family="'Arial Black','Helvetica Neue',sans-serif" font-size="34" font-weight="900" fill="#0b0b0b" letter-spacing="4">
+    <textPath href="#cn-top-arc" startOffset="50%" text-anchor="middle">KICK  ·  BOXING</textPath>
+  </text>
+
+  <!-- Arc text: COACH RABAH (bottom) -->
+  <text font-family="'Arial Black','Helvetica Neue',sans-serif" font-size="32" font-weight="900" fill="#0b0b0b" letter-spacing="5">
+    <textPath href="#cn-bot-arc" startOffset="50%" text-anchor="middle">COACH RABAH</textPath>
+  </text>
+
+  <!-- Side stars -->
+  <g fill="#c8102e">
+    <polygon points="47,200 53,211 65,213 56,222 59,234 47,228 35,234 38,222 29,213 41,211" />
+    <polygon points="353,200 359,211 371,213 362,222 365,234 353,228 341,234 344,222 335,213 347,211" />
+  </g>
+
+  <!-- Arabic text جمعية النخيل (decorative band under center) -->
+  <text x="200" y="262" text-anchor="middle" font-family="'Segoe UI','Arial',sans-serif" font-size="16" font-weight="900" fill="#ffffff" letter-spacing="1">جمعية النخيل</text>
+
+  <!-- Stylized kickboxer silhouette (centered, facing right) -->
+  <g fill="#0b0b0b" transform="translate(200,192)">
+    <!-- Head -->
+    <circle cx="-6" cy="-72" r="14" />
+    <!-- Neck + torso -->
+    <path d="M -14 -58 Q -8 -54 -2 -54 Q 6 -54 10 -58 L 18 -30 Q 22 -12 14 4 L 6 10 L 2 30 L 10 46 L 22 52 L 10 56 L -2 50 L -6 36 L -12 18 L -22 20 L -30 16 L -28 6 L -18 -8 L -20 -26 L -18 -42 Z" />
+    <!-- Kicking leg raised -->
+    <path d="M 2 -18 Q 26 -28 46 -30 Q 62 -30 72 -22 L 70 -14 Q 56 -16 42 -14 Q 28 -12 14 -4 Z" />
+    <!-- Back leg supporting -->
+    <path d="M -6 24 L -12 48 L -18 60 L -6 62 L 2 50 L 4 32 Z" />
+    <!-- Front glove (punch) -->
+    <path d="M -22 -30 Q -38 -26 -42 -14 Q -42 -6 -34 -4 Q -26 -6 -24 -14 Z" />
+  </g>
+</svg>

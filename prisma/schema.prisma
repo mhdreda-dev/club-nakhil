@@ -1,0 +1,338 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  COACH
+  MEMBER
+}
+
+enum AccountStatus {
+  PENDING
+  ACTIVE
+  BLOCKED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum MembershipType {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+enum TrainingType {
+  CARDIO
+  TECHNIQUE
+  SPARRING
+  CONDITIONING
+}
+
+enum TrainingLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CommunityPostType {
+  PHOTO
+  ACHIEVEMENT
+  TEXT
+  SUPPORT
+}
+
+enum CommunityPostCategory {
+  ACHIEVEMENTS
+  TRAINING
+  EVENTS
+}
+
+enum CommunityPostStatus {
+  VISIBLE
+  HIDDEN
+  DELETED
+}
+
+enum CommunityReactionType {
+  LIKE
+  FIRE
+  CLAP
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  fullName     String?
+  email        String   @unique
+  passwordHash String
+  role         Role
+  status       AccountStatus   @default(ACTIVE)
+  phone        String?
+  dateOfBirth  DateTime?
+  gender       Gender?
+  address      String?
+  emergencyContact String?
+  sportLevel      TrainingLevel?
+  membershipType  MembershipType?
+  profileImage    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  coachedSessions       TrainingSession[] @relation("SessionCoach")
+  attendances           Attendance[]      @relation("AttendanceMember")
+  givenRatings          Rating[]          @relation("RatingMember")
+  receivedRatings       Rating[]          @relation("RatingCoach")
+  authoredAnnouncements Announcement[]    @relation("AnnouncementCoach")
+  progressNotesGiven    ProgressNote[]    @relation("ProgressCoach")
+  progressNotesReceived ProgressNote[]    @relation("ProgressMember")
+  pointsLogs            PointsLog[]
+  memberBadges          MemberBadge[]
+  profile               UserProfile?
+  communityPostsAuthored  CommunityPost[]     @relation("CommunityPostAuthor")
+  communityPostsModerated CommunityPost[]     @relation("CommunityPostModerator")
+  communityComments       CommunityComment[]  @relation("CommunityCommentAuthor")
+  communityReactions      CommunityReaction[] @relation("CommunityReactionUser")
+
+  @@index([role])
+  @@index([status])
+  @@index([role, status])
+}
+
+model UserProfile {
+  userId           String    @id
+  fullName         String
+  displayName      String
+  phone            String?
+  dateOfBirth      DateTime?
+  gender           Gender?
+  city             String?
+  address          String?
+  bio              String?
+  emergencyContact String?
+  avatarUrl        String?
+  avatarPath       String?
+  joinedAt         DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coachProfile  CoachProfile?
+  memberProfile MemberProfile?
+}
+
+model CoachProfile {
+  userId            String   @id
+  specialization    String?
+  yearsOfExperience Int?
+  certifications    String[] @default([])
+  coachingStyle     String?
+  achievements      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  userProfile UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+}
+
+model MemberProfile {
+  userId                String        @id
+  trainingLevel         TrainingLevel @default(BEGINNER)
+  preferredTrainingType TrainingType?
+  attendanceCount       Int           @default(0)
+  totalPoints           Int           @default(0)
+  currentStreak         Int           @default(0)
+  overallRating         Float         @default(0)
+  currentRank           Int?
+  previousRank          Int?
+  rankChange            Int           @default(0)
+  leaderboardUpdatedAt  DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  userProfile UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([currentRank])
+}
+
+model TrainingSession {
+  id           String        @id @default(cuid())
+  title        String
+  sessionDate  DateTime
+  startTime    String
+  endTime      String
+  trainingType TrainingType
+  level        TrainingLevel
+  notes        String?
+  qrToken      String        @unique
+  coachId      String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  coach       User         @relation("SessionCoach", fields: [coachId], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+  ratings     Rating[]
+  pointsLogs  PointsLog[]
+
+  @@index([sessionDate])
+  @@index([coachId, sessionDate])
+}
+
+model Attendance {
+  id          String   @id @default(cuid())
+  sessionId   String
+  memberId    String
+  checkedInAt DateTime @default(now())
+
+  session TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  member  User            @relation("AttendanceMember", fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, memberId])
+  @@index([memberId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  sessionId String
+  memberId  String
+  coachId   String
+  score     Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  session TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  member  User            @relation("RatingMember", fields: [memberId], references: [id], onDelete: Cascade)
+  coach   User            @relation("RatingCoach", fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, memberId])
+  @@index([coachId])
+}
+
+model ProgressNote {
+  id        String   @id @default(cuid())
+  memberId  String
+  coachId   String
+  note      String
+  createdAt DateTime @default(now())
+
+  member User @relation("ProgressMember", fields: [memberId], references: [id], onDelete: Cascade)
+  coach  User @relation("ProgressCoach", fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@index([memberId, createdAt])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  coachId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  coach User @relation("AnnouncementCoach", fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+}
+
+model CommunityPost {
+  id           String                @id @default(cuid())
+  authorId     String
+  postType     CommunityPostType
+  category     CommunityPostCategory
+  caption      String
+  imageUrl     String?
+  imagePath    String?
+  status       CommunityPostStatus   @default(VISIBLE)
+  pinnedByCoach Boolean              @default(false)
+  shareCount   Int                   @default(0)
+  moderatedById String?
+  moderatedAt  DateTime?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  author      User               @relation("CommunityPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  moderatedBy User?              @relation("CommunityPostModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  comments    CommunityComment[]
+  reactions   CommunityReaction[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([category, createdAt(sort: Desc)])
+  @@index([authorId, createdAt(sort: Desc)])
+}
+
+model CommunityComment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User          @relation("CommunityCommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt(sort: Asc)])
+  @@index([authorId])
+}
+
+model CommunityReaction {
+  id           String                @id @default(cuid())
+  postId        String
+  userId        String
+  reactionType  CommunityReactionType
+  createdAt     DateTime             @default(now())
+
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User          @relation("CommunityReactionUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId, reactionType])
+  @@index([postId, reactionType])
+  @@index([userId])
+}
+
+model PointsLog {
+  id        String   @id @default(cuid())
+  memberId  String
+  sessionId String?
+  points    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  member  User             @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  session TrainingSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([memberId, createdAt])
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+
+  memberBadges MemberBadge[]
+}
+
+model MemberBadge {
+  id        String   @id @default(cuid())
+  memberId  String
+  badgeId   String
+  awardedAt DateTime @default(now())
+
+  member User  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  badge  Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, badgeId])
+  @@index([memberId])
+}

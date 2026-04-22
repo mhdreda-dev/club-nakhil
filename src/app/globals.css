@@ -1,0 +1,680 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Club Nakhil — Premium Combat Sport Design System
+   ========================================================================== */
+
+:root {
+  /* Base canvas */
+  --club-base: #05070c;
+  --club-base-raised: #0a0f18;
+  --club-surface: #0f1622;
+  --club-surface-soft: #141d2c;
+  --club-surface-alt: #1a2434;
+  --club-surface-hi: #1f2a3d;
+
+  /* Text hierarchy */
+  --club-text: #f1f6ff;
+  --club-text-soft: #cfd8ea;
+  --club-muted: #8b9ab4;
+  --club-muted-soft: #5d6a82;
+
+  /* Brand accents */
+  --club-red: #dc2626;
+  --club-red-glow: #ef4444;
+  --club-red-deep: #9b1c1c;
+  --club-red-ink: #1e0306;
+  --club-gold: #f5c865;
+  --club-gold-deep: #c29128;
+  --club-cyan: #5ad8ff;
+  --club-rose: #ff6b7b;
+
+  /* Legacy aliases (keep for Tailwind theme compatibility) */
+  --club-green: #dc2626;
+  --club-green-glow: #ef4444;
+  --club-green-deep: #9b1c1c;
+  --club-green-ink: #1e0306;
+
+  /* Borders */
+  --club-border: rgba(255, 255, 255, 0.08);
+  --club-border-strong: rgba(255, 255, 255, 0.14);
+  --club-border-accent: rgba(220, 38, 38, 0.28);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 22px 60px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 32px 90px rgba(0, 0, 0, 0.55);
+  --shadow-glow-red: 0 0 40px rgba(220, 38, 38, 0.22);
+  --shadow-glow-gold: 0 0 40px rgba(245, 200, 101, 0.2);
+  --shadow-glow-cyan: 0 0 40px rgba(90, 216, 255, 0.18);
+
+  /* Radii */
+  --r-sm: 0.5rem;
+  --r-md: 0.75rem;
+  --r-lg: 1rem;
+  --r-xl: 1.25rem;
+  --r-2xl: 1.75rem;
+  --r-pill: 999px;
+}
+
+@theme inline {
+  --color-club-base: var(--club-base);
+  --color-club-base-raised: var(--club-base-raised);
+  --color-club-surface: var(--club-surface);
+  --color-club-surface-soft: var(--club-surface-soft);
+  --color-club-surface-alt: var(--club-surface-alt);
+  --color-club-surface-hi: var(--club-surface-hi);
+  --color-club-text: var(--club-text);
+  --color-club-text-soft: var(--club-text-soft);
+  --color-club-muted: var(--club-muted);
+  --color-club-muted-soft: var(--club-muted-soft);
+  --color-club-green: var(--club-green);
+  --color-club-green-glow: var(--club-green-glow);
+  --color-club-green-deep: var(--club-green-deep);
+  --color-club-gold: var(--club-gold);
+  --color-club-gold-deep: var(--club-gold-deep);
+  --color-club-cyan: var(--club-cyan);
+  --color-club-rose: var(--club-rose);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  color: var(--club-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background-color: var(--club-base);
+  background-image:
+    radial-gradient(
+      ellipse 80% 55% at 8% -10%,
+      rgba(220, 38, 38, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 60% 45% at 95% 5%,
+      rgba(90, 216, 255, 0.14),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 75% 100%,
+      rgba(245, 200, 101, 0.12),
+      transparent 55%
+    ),
+    linear-gradient(180deg, rgba(5, 7, 12, 0) 0%, rgba(5, 7, 12, 0.6) 100%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.018) 0px,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+  background-attachment: fixed;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(220, 38, 38, 0.28);
+  color: #f9fffc;
+}
+
+/* ==========================================================================
+   Premium scrollbar
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(220, 38, 38, 0.55),
+    rgba(155, 28, 28, 0.35)
+  );
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(239, 68, 68, 0.75),
+    rgba(220, 38, 38, 0.55)
+  );
+}
+
+/* ==========================================================================
+   Focus rings
+   ========================================================================== */
+*:focus {
+  outline: none;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  border-color: rgba(220, 38, 38, 0.55) !important;
+  box-shadow:
+    0 0 0 3px rgba(220, 38, 38, 0.18),
+    inset 0 0 0 1px rgba(220, 38, 38, 0.35);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(220, 38, 38, 0.55);
+  outline-offset: 2px;
+  border-radius: var(--r-md);
+}
+
+/* ==========================================================================
+   Form elements — consistent look
+   ========================================================================== */
+input,
+textarea,
+select {
+  color-scheme: dark;
+  transition: border-color 180ms ease, box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(139, 154, 180, 0.6);
+}
+
+/* ==========================================================================
+   Utility components (native CSS; Tailwind compatible)
+   ========================================================================== */
+.cn-surface {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.035),
+    rgba(255, 255, 255, 0.008) 45%,
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid var(--club-border);
+  border-radius: var(--r-xl);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.cn-surface-raised {
+  background:
+    radial-gradient(
+      120% 100% at 0% 0%,
+      rgba(220, 38, 38, 0.05),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.01) 60%,
+      rgba(255, 255, 255, 0.025) 100%
+    ),
+    var(--club-surface);
+  border: 1px solid var(--club-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.cn-hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.14) 30%,
+    rgba(255, 255, 255, 0.14) 70%,
+    transparent
+  );
+}
+
+.cn-divider-glow {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(220, 38, 38, 0.5),
+    rgba(245, 200, 101, 0.35),
+    transparent
+  );
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
+}
+
+.cn-text-gradient {
+  background: linear-gradient(
+    115deg,
+    #f1f6ff 0%,
+    #c4cfff 28%,
+    #5ad8ff 65%,
+    #ffd98a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.cn-text-red-gradient {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #9b1c1c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Legacy alias */
+.cn-text-green-gradient {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #9b1c1c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Buttons */
+.cn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--r-md);
+  padding: 0.65rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition:
+    transform 150ms ease,
+    box-shadow 200ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+  will-change: transform;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cn-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.cn-btn:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
+.cn-btn-primary {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #9b1c1c 120%);
+  color: #ffffff;
+  box-shadow:
+    0 8px 22px rgba(220, 38, 38, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+.cn-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 32px rgba(220, 38, 38, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.cn-btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.975);
+}
+
+.cn-btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--club-text-soft);
+  border: 1px solid var(--club-border-strong);
+}
+.cn-btn-ghost:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.35);
+  color: var(--club-text);
+}
+
+.cn-btn-outline {
+  background: transparent;
+  color: var(--club-text-soft);
+  border: 1px solid rgba(220, 38, 38, 0.45);
+}
+.cn-btn-outline:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.7);
+  color: var(--club-text);
+}
+
+.cn-btn-danger {
+  background: linear-gradient(135deg, #ff8d97 0%, #ff5a6d 100%);
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(255, 91, 112, 0.28);
+}
+.cn-btn-danger:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(255, 91, 112, 0.4);
+}
+.cn-btn-danger:active:not(:disabled) {
+  transform: translateY(0) scale(0.975);
+}
+
+/* Inputs */
+.cn-input {
+  width: 100%;
+  border-radius: var(--r-md);
+  border: 1px solid var(--club-border-strong);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35),
+    rgba(0, 0, 0, 0.18)
+  );
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--club-text);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.cn-input::placeholder {
+  color: rgba(139, 154, 180, 0.55);
+}
+.cn-input:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Chips */
+.cn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--r-pill);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--club-border-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--club-text-soft);
+}
+
+.cn-chip-red {
+  border-color: rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.1);
+  color: #ffc4c4;
+}
+/* Legacy alias */
+.cn-chip-green {
+  border-color: rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.1);
+  color: #ffc4c4;
+}
+.cn-chip-gold {
+  border-color: rgba(245, 200, 101, 0.4);
+  background: rgba(245, 200, 101, 0.1);
+  color: #ffe6ad;
+}
+.cn-chip-cyan {
+  border-color: rgba(90, 216, 255, 0.4);
+  background: rgba(90, 216, 255, 0.1);
+  color: #b3ecff;
+}
+.cn-chip-rose {
+  border-color: rgba(255, 107, 123, 0.4);
+  background: rgba(255, 107, 123, 0.1);
+  color: #ffc4ca;
+}
+
+/* Premium glow card */
+.cn-glow-border {
+  position: relative;
+  border-radius: var(--r-2xl);
+}
+.cn-glow-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.5),
+    rgba(90, 216, 255, 0.28),
+    rgba(245, 200, 101, 0.4)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Subtle grid texture overlay */
+.cn-grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+/* Success / feedback badge */
+.cn-badge-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: var(--r-pill);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.1);
+  color: #a7f3d0;
+}
+
+/* Empty state utility */
+.cn-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: var(--r-xl);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.18);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--club-muted);
+  font-size: 0.875rem;
+}
+
+/* Animations */
+@keyframes cn-pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(220, 38, 38, 0);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(220, 38, 38, 0.35);
+  }
+}
+.cn-pulse-glow {
+  animation: cn-pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes cn-gold-glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 28px 70px rgba(0, 0, 0, 0.7),
+      0 0 0 rgba(245, 200, 101, 0);
+  }
+  50% {
+    box-shadow:
+      0 28px 70px rgba(0, 0, 0, 0.7),
+      0 0 70px rgba(245, 200, 101, 0.5);
+  }
+}
+.cn-gold-glow-pulse {
+  animation: cn-gold-glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes cn-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+.cn-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: cn-shimmer 2.4s infinite linear;
+}
+
+@keyframes cn-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.cn-rise {
+  animation: cn-rise 420ms ease-out both;
+}
+
+/* FIFA-card metallic diagonal shimmer */
+@keyframes cn-card-shimmer {
+  0% {
+    background-position: -200% -200%;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
+.cn-card-shimmer {
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.12) 48%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.12) 52%,
+    transparent 70%
+  );
+  background-size: 250% 250%;
+  animation: cn-card-shimmer 4s ease-in-out infinite;
+}
+
+/* XP bar tier pulse */
+@keyframes cn-xp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.cn-xp-pulse {
+  animation: cn-xp-pulse 2.5s ease-in-out infinite;
+}
+
+/* Logo splash / hero float + ring spinner */
+@keyframes cn-logo-float {
+  0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 14px rgba(220, 38, 38, 0.35)); }
+  50% { transform: translateY(-4px); filter: drop-shadow(0 0 24px rgba(220, 38, 38, 0.6)); }
+}
+.cn-logo-float {
+  animation: cn-logo-float 3.8s ease-in-out infinite;
+}
+
+@keyframes cn-logo-ring-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.cn-logo-ring-spin {
+  animation: cn-logo-ring-spin 2.4s linear infinite;
+}
+
+.cn-logo-spin-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Skeleton loading */
+@keyframes cn-skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+.cn-skeleton {
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.07);
+  animation: cn-skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+/* Line clamp helpers */
+.cn-line-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@keyframes cn-feed-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cn-feed-stagger {
+  opacity: 0;
+  animation: cn-feed-fade-up 460ms ease forwards;
+  animation-delay: var(--cn-stagger-delay, 0ms);
+}
+
+@keyframes cn-reaction-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.14);
+  }
+  70% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cn-reaction-bounce {
+  animation: cn-reaction-pop 360ms ease;
+}
