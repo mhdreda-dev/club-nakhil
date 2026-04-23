@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "sessions": "Sessions",
+    "attendance": "Attendance",
+    "leaderboard": "Leaderboard",
+    "activityFeed": "Activity Feed",
+    "announcements": "Announcements",
+    "progress": "Progress",
+    "ratings": "Ratings",
+    "profile": "Profile"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "welcomeBack": "Welcome Back"
+  },
+  "roles": {
+    "admin": "Admin",
+    "coach": "Coach",
+    "member": "Member"
+  }
+}

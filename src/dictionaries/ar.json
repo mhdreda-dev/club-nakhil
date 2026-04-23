@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "members": "الأعضاء",
+    "sessions": "الجلسات",
+    "attendance": "الحضور",
+    "leaderboard": "لوحة الصدارة",
+    "activityFeed": "سجل النشاطات",
+    "announcements": "الإعلانات",
+    "progress": "التقدم",
+    "ratings": "التقييمات",
+    "profile": "الملف الشخصي"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "welcomeBack": "مرحباً بعودتك"
+  },
+  "roles": {
+    "admin": "مسؤول",
+    "coach": "مدرب",
+    "member": "عضو"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "members": "Membres",
+    "sessions": "Séances",
+    "attendance": "Présence",
+    "leaderboard": "Classement",
+    "activityFeed": "Fil d'activité",
+    "announcements": "Annonces",
+    "progress": "Progression",
+    "ratings": "Évaluations",
+    "profile": "Profil"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "welcomeBack": "Bon retour"
+  },
+  "roles": {
+    "admin": "Administrateur",
+    "coach": "Entraîneur",
+    "member": "Membre"
+  }
+}
