@@ -4,6 +4,8 @@ import { Camera, Loader2, QrCode } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useTranslations } from "@/components/providers/translations-provider";
+
 const SCANNER_REGION_ID = "club-nakhil-scanner";
 
 function extractToken(rawValue: string) {
@@ -31,6 +33,7 @@ type AttendanceRewardDetails = {
 
 export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const scannerRef = useRef<{
     stop: () => Promise<void>;
     clear: () => void | Promise<void>;
@@ -46,7 +49,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
     async (rawToken: string) => {
       const qrToken = extractToken(rawToken.trim());
       if (!qrToken) {
-        setError("Please scan a valid QR code or enter token.");
+        setError(t("attendanceScanner.errors.invalidToken"));
         return;
       }
 
@@ -66,7 +69,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
       const payload = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        setError(payload.message ?? "Unable to mark attendance");
+        setError(payload.message ?? t("attendanceScanner.errors.submit"));
         setLoading(false);
         return;
       }
@@ -104,11 +107,11 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
         });
       }
 
-      setMessage(payload.message ?? "Attendance confirmed! +2 points earned.");
+      setMessage(payload.message ?? t("attendanceScanner.success"));
       setLoading(false);
       router.refresh();
     },
-    [router],
+    [router, t],
   );
 
   useEffect(() => {
@@ -119,12 +122,12 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
     const timeoutId = window.setTimeout(() => {
       submitToken(initialToken).catch((unknownError) => {
         console.error(unknownError);
-        setError("Auto check-in failed. Please try scanning again.");
+        setError(t("attendanceScanner.errors.autoCheckIn"));
       });
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, [initialToken, submitToken]);
+  }, [initialToken, submitToken, t]);
 
   useEffect(() => {
     if (!scanning) {
@@ -158,14 +161,14 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
         );
       } catch (scannerError) {
         console.error(scannerError);
-        setError("Could not access camera. You can still enter token manually.");
+        setError(t("attendanceScanner.errors.camera"));
         setScanning(false);
       }
     }
 
     startScanner().catch((unknownError) => {
       console.error(unknownError);
-      setError("Scanner initialization failed.");
+      setError(t("attendanceScanner.errors.scannerInit"));
       setScanning(false);
     });
 
@@ -184,7 +187,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
           });
       }
     };
-  }, [scanning, submitToken]);
+  }, [scanning, submitToken, t]);
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-club-surface/85 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-6">
@@ -202,10 +205,10 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
         </div>
         <div>
           <h2 className="font-heading text-2xl uppercase leading-none tracking-[0.04em] text-white">
-            QR Attendance Check-In
+            {t("attendanceScanner.title")}
           </h2>
           <p className="mt-1 text-sm text-club-muted">
-            Scan the session QR code or paste the token manually.
+            {t("attendanceScanner.subtitle")}
           </p>
         </div>
       </div>
@@ -213,13 +216,13 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
       <div className="relative mt-5 space-y-3">
         <label className="space-y-2 block">
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-            Session Token
+            {t("attendanceScanner.fieldLabel")}
           </span>
           <input
             value={tokenInput}
             onChange={(event) => setTokenInput(event.target.value)}
             className="cn-input"
-            placeholder="Paste QR token"
+            placeholder={t("attendanceScanner.fieldPlaceholder")}
           />
         </label>
 
@@ -235,7 +238,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
             ) : (
               <QrCode className="h-4 w-4" />
             )}
-            Mark Attendance
+            {loading ? t("attendanceScanner.submitting") : t("attendanceScanner.submit")}
           </button>
 
           <button
@@ -244,7 +247,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
             className="cn-btn cn-btn-ghost"
           >
             <Camera className="h-4 w-4" />
-            {scanning ? "Stop Camera" : "Open Scanner"}
+            {scanning ? t("common.close") : t("attendanceScanner.scan")}
           </button>
         </div>
 
@@ -265,15 +268,15 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
               className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-300/40 to-transparent"
             />
             <p className="font-heading text-lg uppercase tracking-[0.04em] text-red-50">
-              +{rewardDetails.pointsAwarded} points earned
+              +{rewardDetails.pointsAwarded} {t("pages.memberDashboard.highlights.points").toLowerCase()}
             </p>
             <p className="mt-1 text-sm text-red-100/80">
-              Attendance confirmed. Your rank metrics just updated.
+              {t("attendanceScanner.success")}
             </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div className="rounded-lg border border-red-300/25 bg-black/25 px-3 py-2">
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-200/75">
-                  Total points
+                  {t("pages.memberDashboard.metric.totalPoints")}
                 </p>
                 <p className="mt-0.5 font-heading text-xl text-white">
                   {rewardDetails.totalPoints}
@@ -281,7 +284,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
               </div>
               <div className="rounded-lg border border-red-300/25 bg-black/25 px-3 py-2">
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-200/75">
-                  Attendance count
+                  {t("pages.memberDashboard.highlights.attendance")}
                 </p>
                 <p className="mt-0.5 font-heading text-xl text-white">
                   {rewardDetails.attendanceCount}
@@ -289,7 +292,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
               </div>
               <div className="rounded-lg border border-red-300/25 bg-black/25 px-3 py-2">
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-200/75">
-                  Current streak
+                  {t("pages.memberDashboard.metric.currentStreak")}
                 </p>
                 <p className="mt-0.5 font-heading text-xl text-white">
                   {rewardDetails.currentStreak}
@@ -297,7 +300,7 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
               </div>
               <div className="rounded-lg border border-red-300/25 bg-black/25 px-3 py-2">
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-200/75">
-                  Current rank
+                  {t("pages.memberDashboard.metric.currentRank")}
                 </p>
                 <p className="mt-0.5 font-heading text-xl text-white">
                   {rewardDetails.currentRank
@@ -306,10 +309,10 @@ export function AttendanceScanner({ initialToken }: AttendanceScannerProps) {
                 </p>
                 <p className="mt-1 text-[11px] font-semibold text-red-200/80">
                   {rewardDetails.trend === "up"
-                    ? `↑ Up ${rewardDetails.rankChange}`
+                    ? `↑ ${t("sports.rankTrend.up", { count: rewardDetails.rankChange })}`
                     : rewardDetails.trend === "down"
-                      ? `↓ Down ${Math.abs(rewardDetails.rankChange)}`
-                      : "— Steady"}
+                      ? `↓ ${t("sports.rankTrend.down", { count: Math.abs(rewardDetails.rankChange) })}`
+                      : `— ${t("sports.rankTrend.stable")}`}
                 </p>
               </div>
             </div>

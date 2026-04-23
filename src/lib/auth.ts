@@ -1,6 +1,7 @@
 import { AccountStatus, Role } from "@prisma/client";
 import { compare } from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 
@@ -111,3 +112,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
+
+// ============ ADD THIS EXPORT ============
+export async function getAuthSession() {
+  return getServerSession(authOptions);
+}

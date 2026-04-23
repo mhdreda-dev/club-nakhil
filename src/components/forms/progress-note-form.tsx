@@ -4,12 +4,15 @@ import { Loader2, NotebookPen } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useTranslations } from "@/components/providers/translations-provider";
+
 type ProgressNoteFormProps = {
   memberId: string;
 };
 
 export function ProgressNoteForm({ memberId }: ProgressNoteFormProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -30,14 +33,14 @@ export function ProgressNoteForm({ memberId }: ProgressNoteFormProps) {
 
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
-      setMessage(payload.message ?? "Unable to add progress note.");
+      setMessage(payload.message ?? t("forms.progressNote.errors.save"));
       setLoading(false);
       return;
     }
 
     setNote("");
     setLoading(false);
-    setMessage("Progress note saved.");
+    setMessage(t("forms.progressNote.success"));
     router.refresh();
   }
 
@@ -49,7 +52,7 @@ export function ProgressNoteForm({ memberId }: ProgressNoteFormProps) {
         value={note}
         onChange={(event) => setNote(event.target.value)}
         className="cn-input resize-none"
-        placeholder="Add a coaching observation for this member"
+        placeholder={t("forms.progressNote.placeholder")}
       />
       <div className="flex flex-wrap items-center gap-3">
         <button
@@ -58,7 +61,9 @@ export function ProgressNoteForm({ memberId }: ProgressNoteFormProps) {
           className="cn-btn cn-btn-outline"
         >
           {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <NotebookPen className="h-3.5 w-3.5" />}
-          Save Note
+          {loading
+            ? t("forms.progressNote.actions.saving")
+            : t("forms.progressNote.actions.save")}
         </button>
         {message ? (
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-amber-200">

@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Exo_2, Rajdhani } from "next/font/google";
+import { Cairo, Exo_2, Rajdhani } from "next/font/google";
 
 import "./globals.css";
+
+import { TranslationsProvider } from "@/components/providers/translations-provider";
+import { getServerTranslations } from "@/lib/server-translations";
 
 const bodyFont = Exo_2({
   subsets: ["latin"],
@@ -16,13 +19,15 @@ const headingFont = Rajdhani({
   display: "swap",
 });
 
-const metadataBase = (() => {
-  try {
-    return new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000");
-  } catch {
-    return new URL("http://localhost:3000");
-  }
-})();
+const arabicFont = Cairo({
+  subsets: ["arabic"],
+  variable: "--font-arabic",
+  display: "swap",
+});
+
+const metadataBase = process.env.NEXTAUTH_URL
+  ? new URL(process.env.NEXTAUTH_URL)
+  : new URL("http://localhost:3000");
 
 export const metadata: Metadata = {
   title: {
@@ -49,14 +54,29 @@ export const viewport: Viewport = {
   themeColor: "#05070c",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { locale, dir, messages } = await getServerTranslations();
+
   return (
-    <html lang="en">
-      <body className={`${bodyFont.variable} ${headingFont.variable}`}>{children}</body>
+    <html lang={locale} dir={dir} suppressHydrationWarning>
+      <body
+        className={[
+          bodyFont.variable,
+          headingFont.variable,
+          arabicFont.variable,
+          locale === "ar" ? "cn-rtl" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <TranslationsProvider locale={locale} dictionary={messages}>
+          {children}
+        </TranslationsProvider>
+      </body>
     </html>
   );
 }

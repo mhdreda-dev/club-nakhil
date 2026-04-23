@@ -1,6 +1,9 @@
+"use client";
+
 import { Role } from "@prisma/client";
 import { ShieldCheck, UserRound } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/translations-provider";
 import { cn } from "@/lib/utils";
 
 type RoleBadgeProps = {
@@ -9,6 +12,7 @@ type RoleBadgeProps = {
 };
 
 export function RoleBadge({ role, className }: RoleBadgeProps) {
+  const { t } = useTranslations();
   const isAdmin = role === Role.ADMIN;
   const isCoach = role === Role.COACH;
 
@@ -25,7 +29,7 @@ export function RoleBadge({ role, className }: RoleBadgeProps) {
       )}
     >
       {isAdmin || isCoach ? <ShieldCheck className="h-3 w-3" /> : <UserRound className="h-3 w-3" />}
-      {isAdmin ? "Admin" : isCoach ? "Coach" : "Member"}
+      {isAdmin ? t("roles.admin") : isCoach ? t("roles.coach") : t("roles.member")}
     </span>
   );
 }

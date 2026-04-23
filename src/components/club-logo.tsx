@@ -19,7 +19,7 @@ export function ClubLogo({
   const img = (
     <Image
       src="/club-nakhil-logo.png"
-      alt="Club Nakhil Logo"
+      alt="Club Nakhil"
       width={size}
       height={size}
       priority={priority}

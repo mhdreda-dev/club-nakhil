@@ -678,3 +678,37 @@ textarea::placeholder {
 .cn-reaction-bounce {
   animation: cn-reaction-pop 360ms ease;
 }
+
+/* ==========================================================================
+   RTL support
+   ========================================================================== */
+body.cn-rtl {
+  font-family: var(--font-arabic), system-ui, sans-serif;
+}
+
+body.cn-rtl .font-heading {
+  font-family: var(--font-arabic), system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+body.cn-rtl input,
+body.cn-rtl textarea,
+body.cn-rtl select {
+  text-align: right;
+}
+
+body.cn-rtl .uppercase {
+  letter-spacing: normal;
+}
+
+body.cn-rtl [data-rtl-align="start"] {
+  text-align: right;
+}
+
+body.cn-rtl [data-rtl-align="end"] {
+  text-align: left;
+}
+
+body.cn-rtl .cn-rtl-pill-row {
+  justify-content: flex-start;
+}

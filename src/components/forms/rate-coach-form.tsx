@@ -4,6 +4,8 @@ import { Loader2, Star } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useTranslations } from "@/components/providers/translations-provider";
+
 type RateCoachFormProps = {
   sessionId: string;
   defaultScore?: number;
@@ -16,6 +18,7 @@ export function RateCoachForm({
   defaultComment = "",
 }: RateCoachFormProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const [score, setScore] = useState(defaultScore);
   const [comment, setComment] = useState(defaultComment ?? "");
   const [loading, setLoading] = useState(false);
@@ -37,12 +40,12 @@ export function RateCoachForm({
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      setMessage(payload.message ?? "Unable to submit rating");
+      setMessage(payload.message ?? t("forms.rateCoach.errors.submit"));
       setLoading(false);
       return;
     }
 
-    setMessage("Coach feedback submitted.");
+    setMessage(t("forms.rateCoach.success"));
     setLoading(false);
     router.refresh();
   }
@@ -57,7 +60,7 @@ export function RateCoachForm({
           className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft"
           htmlFor={`score-${sessionId}`}
         >
-          Rating
+          {t("forms.rateCoach.fields.rating")}
         </label>
         <div className="flex items-center gap-1.5">
           {[1, 2, 3, 4, 5].map((value) => {
@@ -72,7 +75,7 @@ export function RateCoachForm({
                     ? "border-amber-300/55 bg-amber-400/15 text-amber-200 shadow-[0_0_18px_rgba(255,193,64,0.25)]"
                     : "border-white/10 bg-black/25 text-zinc-500 hover:border-amber-300/35 hover:text-amber-200"
                 }`}
-                aria-label={`Rate ${value} star${value === 1 ? "" : "s"}`}
+                aria-label={t("forms.rateCoach.aria.rateStars", { count: value })}
               >
                 <Star
                   className={`h-4 w-4 transition ${active ? "fill-amber-300/80" : ""}`}
@@ -82,20 +85,20 @@ export function RateCoachForm({
           })}
         </div>
         <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-amber-200/85">
-          {score} / 5
+          {t("forms.rateCoach.score", { value: score })}
         </span>
       </div>
 
       <label className="space-y-2 block">
         <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-          Optional comment
+          {t("forms.rateCoach.fields.comment")}
         </span>
         <textarea
           rows={2}
           value={comment}
           onChange={(event) => setComment(event.target.value)}
           className="cn-input resize-none"
-          placeholder="What helped you most in this session?"
+          placeholder={t("forms.rateCoach.placeholder")}
         />
       </label>
 
@@ -110,7 +113,9 @@ export function RateCoachForm({
           ) : (
             <Star className="h-3.5 w-3.5" />
           )}
-          Submit Rating
+          {loading
+            ? t("forms.rateCoach.actions.submitting")
+            : t("forms.rateCoach.actions.submit")}
         </button>
 
         {message ? (

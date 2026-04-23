@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "@/components/providers/translations-provider";
 import { cn } from "@/lib/utils";
 import type { TierInfo } from "@/lib/tier";
 
@@ -8,6 +11,7 @@ type XpProgressBarProps = {
 };
 
 export function XpProgressBar({ tier, rating, className }: XpProgressBarProps) {
+  const { t } = useTranslations();
   const pointsInTier = rating - tier.min;
   const tierRange = tier.max - tier.min;
 
@@ -21,26 +25,32 @@ export function XpProgressBar({ tier, rating, className }: XpProgressBarProps) {
               tier.badgeText,
             )}
           >
-            {tier.name} Tier
+            {t("sports.playerRating.tierLabel", { tier: tier.name })}
           </span>
           <span className="text-[9px] text-white/30">
-            {pointsInTier}/{tierRange} XP
+            {t("sports.xpProgress.current", {
+              points: pointsInTier,
+              total: tierRange,
+            })}
           </span>
         </div>
         {tier.nextTier ? (
           <span className="text-[9px] font-semibold text-white/40">
-            {tier.nextThreshold! - rating} pts → {tier.nextTier}
+            {t("sports.xpProgress.nextTier", {
+              points: tier.nextThreshold! - rating,
+              tier: tier.nextTier,
+            })}
           </span>
         ) : (
           <span className="text-[9px] font-black uppercase tracking-[0.18em] text-yellow-300">
-            ★ Max Tier
+            {t("sports.xpProgress.maxTier")}
           </span>
         )}
       </div>
       <div className="relative h-2.5 overflow-hidden rounded-full border border-white/10 bg-black/50">
         <div
           className={cn(
-            "absolute inset-y-0 left-0 rounded-full bg-gradient-to-r transition-all duration-700",
+            "absolute inset-y-0 start-0 rounded-full bg-gradient-to-r transition-all duration-700",
             tier.barGradient,
           )}
           style={{ width: `${tier.progress}%` }}

@@ -8,20 +8,26 @@ import { ProfileSection } from "@/features/profiles/components/profile-section";
 import { ProfileStatCard } from "@/features/profiles/components/profile-stat-card";
 import { getCoachProfilePageData } from "@/features/profiles/profiles.service";
 import { formatSessionDate } from "@/lib/format";
+import { translateGender } from "@/lib/i18n";
 import { requirePageAuth } from "@/lib/page-auth";
+import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
 
 export default async function CoachProfilePage() {
   const session = await requirePageAuth(Role.COACH);
+  const { intlLocale, t } = await getServerTranslations();
   const pageData = await getCoachProfilePageData(session.user.id)
     .then((data) => ({ ok: true as const, data }))
     .catch(() => ({ ok: false as const }));
 
   if (!pageData.ok) {
     return (
-      <ProfileSection title="Profile Unavailable" description="We could not load your profile right now.">
-        <p className="text-sm text-red-200">Please refresh the page and try again.</p>
+      <ProfileSection
+        title={t("pages.coachProfile.unavailableTitle")}
+        description={t("pages.coachProfile.unavailableDescription")}
+      >
+        <p className="text-sm text-red-200">{t("pages.coachProfile.refresh")}</p>
       </ProfileSection>
     );
   }
@@ -42,51 +48,54 @@ export default async function CoachProfilePage() {
 
       <ProfileMetricGrid>
         <ProfileStatCard
-          label="Average Rating"
+          label={t("pages.coachProfile.averageRating")}
           value={stats.averageRating.toFixed(2)}
-          hint="From member reviews"
+          hint={t("pages.coachProfile.averageRatingHint")}
           icon={<Star className="h-4 w-4" />}
         />
         <ProfileStatCard
-          label="Total Reviews"
+          label={t("pages.coachProfile.totalReviews")}
           value={stats.totalReviews}
-          hint="Member feedback submitted"
+          hint={t("pages.coachProfile.totalReviewsHint")}
           icon={<ShieldCheck className="h-4 w-4" />}
         />
         <ProfileStatCard
-          label="Sessions Coached"
+          label={t("pages.coachProfile.sessionsCoached")}
           value={stats.totalSessionsCoached}
-          hint="Total planned sessions"
+          hint={t("pages.coachProfile.sessionsCoachedHint")}
           icon={<Activity className="h-4 w-4" />}
         />
         <ProfileStatCard
-          label="Experience"
+          label={t("pages.coachProfile.experience")}
           value={profile.coachProfile?.yearsOfExperience ?? 0}
-          hint="Years"
+          hint={t("pages.coachProfile.experienceHint")}
           icon={<Medal className="h-4 w-4" />}
         />
       </ProfileMetricGrid>
 
       <div className="grid gap-5 xl:grid-cols-2">
-        <ProfileSection title="Coach Identity" description="Your coaching specialization and style.">
+        <ProfileSection
+          title={t("pages.coachProfile.identityTitle")}
+          description={t("pages.coachProfile.identityDescription")}
+        >
           <div className="space-y-3 text-sm">
             <div>
-              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">Specialization</p>
-              <p className="mt-1 text-zinc-100">{profile.coachProfile?.specialization ?? "Not specified"}</p>
+              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("pages.coachProfile.specialization")}</p>
+              <p className="mt-1 text-zinc-100">{profile.coachProfile?.specialization ?? t("common.notProvided")}</p>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">Coaching Style</p>
-              <p className="mt-1 text-zinc-100">{profile.coachProfile?.coachingStyle ?? "Not specified"}</p>
+              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("pages.coachProfile.coachingStyle")}</p>
+              <p className="mt-1 text-zinc-100">{profile.coachProfile?.coachingStyle ?? t("common.notProvided")}</p>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">Achievements</p>
-              <p className="mt-1 text-zinc-100">{profile.coachProfile?.achievements ?? "Not specified"}</p>
+              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("pages.coachProfile.achievements")}</p>
+              <p className="mt-1 text-zinc-100">{profile.coachProfile?.achievements ?? t("common.notProvided")}</p>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">Certifications</p>
+              <p className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("pages.coachProfile.certifications")}</p>
               {profile.coachProfile?.certifications?.length ? (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {profile.coachProfile.certifications.map((certification) => (
@@ -99,43 +108,46 @@ export default async function CoachProfilePage() {
                   ))}
                 </div>
               ) : (
-                <p className="mt-1 text-zinc-100">No certifications added yet.</p>
+                <p className="mt-1 text-zinc-100">{t("pages.coachProfile.noCertifications")}</p>
               )}
             </div>
           </div>
         </ProfileSection>
 
-        <ProfileSection title="Contact" description="Private contact details for internal club use.">
+        <ProfileSection
+          title={t("pages.coachProfile.contactTitle")}
+          description={t("pages.coachProfile.contactDescription")}
+        >
           <div className="space-y-3 text-sm text-zinc-100">
             <p>
-              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">Email</span>
+              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("auth.email")}</span>
               <br />
               {profile.email}
             </p>
             <p>
-              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">Phone</span>
+              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("profile.editor.fields.phone")}</span>
               <br />
-              {profile.phone ?? "Not provided"}
+              {profile.phone ?? t("common.notProvided")}
             </p>
             <p>
-              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">Address</span>
+              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("profile.editor.fields.address")}</span>
               <br />
-              {profile.address ?? "Not provided"}
+              {profile.address ?? t("common.notProvided")}
             </p>
             <p>
-              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">Emergency Contact</span>
+              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("profile.editor.fields.emergencyContact")}</span>
               <br />
-              {profile.emergencyContact ?? "Not provided"}
+              {profile.emergencyContact ?? t("common.notProvided")}
             </p>
             <p>
-              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">Gender</span>
+              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("profile.editor.fields.gender")}</span>
               <br />
-              {profile.gender ?? "Not provided"}
+              {profile.gender ? translateGender(t, profile.gender) : t("common.notProvided")}
             </p>
             <p>
-              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">Date of Birth</span>
+              <span className="text-xs uppercase tracking-[0.12em] text-club-muted">{t("profile.editor.fields.dateOfBirth")}</span>
               <br />
-              {profile.dateOfBirth ? formatSessionDate(new Date(profile.dateOfBirth)) : "Not provided"}
+              {profile.dateOfBirth ? formatSessionDate(new Date(profile.dateOfBirth), intlLocale) : t("common.notProvided")}
             </p>
           </div>
         </ProfileSection>

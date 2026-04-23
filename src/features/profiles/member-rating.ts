@@ -34,6 +34,19 @@ function normalizedWithCap(value: number, cap: number) {
 }
 
 export function calculateMemberOverallRating(input: MemberRatingInput) {
+  const hasTrackedProgress =
+    input.attendanceCount > 0 ||
+    input.totalPoints > 0 ||
+    input.currentStreak > 0 ||
+    input.badgeCount > 0 ||
+    input.progressNotesCount > 0 ||
+    input.recentAttendanceCount > 0 ||
+    input.ratingsGivenCount > 0;
+
+  if (!hasTrackedProgress) {
+    return 0;
+  }
+
   const consistencyRatio =
     input.recentSessionCount > 0
       ? clamp(input.recentAttendanceCount / input.recentSessionCount, 0, 1)

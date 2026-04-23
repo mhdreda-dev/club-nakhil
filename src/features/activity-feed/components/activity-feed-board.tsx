@@ -33,9 +33,11 @@ import {
 } from "react";
 
 import { SectionHeader } from "@/components/sports/section-header";
+import { useTranslations } from "@/components/providers/translations-provider";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Tag } from "@/components/ui/tag";
+import { getIntlLocale, type MessageKey, type Translate } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type ViewerRole = "ADMIN" | "COACH" | "MEMBER";
@@ -149,13 +151,13 @@ type CommunityPostsResponse = {
 
 type ModerationAction = "HIDE" | "DELETE" | "PIN" | "UNPIN";
 
-const filters: Array<{ id: FeedFilter; label: string }> = [
-  { id: "ALL", label: "All" },
-  { id: "ACHIEVEMENTS", label: "Achievements" },
-  { id: "TRAINING", label: "Training" },
-  { id: "MATCHES", label: "Matches" },
-  { id: "COACH_POSTS", label: "Coach Posts" },
-  { id: "EVENTS", label: "Events" },
+const filters: Array<{ id: FeedFilter; labelKey: MessageKey }> = [
+  { id: "ALL", labelKey: "activityFeed.filters.all" },
+  { id: "ACHIEVEMENTS", labelKey: "activityFeed.filters.achievements" },
+  { id: "TRAINING", labelKey: "activityFeed.filters.training" },
+  { id: "MATCHES", labelKey: "activityFeed.filters.matches" },
+  { id: "COACH_POSTS", labelKey: "activityFeed.filters.coachPosts" },
+  { id: "EVENTS", labelKey: "activityFeed.filters.events" }
 ];
 
 function minutesAgo(value: number) {
@@ -170,129 +172,163 @@ function daysAgo(value: number) {
   return Date.now() - value * 24 * 60 * 60 * 1000;
 }
 
-const officialDemoPosts: OfficialPost[] = [
-  {
-    id: "official-achievement-rank-1",
-    source: "OFFICIAL",
-    kind: "ACHIEVEMENT",
-    category: "ACHIEVEMENTS",
-    actorName: "Ayoub El Idrissi",
-    actorAvatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
-    title: "Reached Rank #1",
-    description: "Dominated this week with clean combinations and elite consistency.",
-    createdAt: minutesAgo(24),
-    reactions: { like: 48, fire: 33, clap: 29 },
-    reacted: { like: false, fire: true, clap: false },
-    comments: [
-      { id: "c1", authorName: "Salma", text: "Well deserved champ.", createdAt: minutesAgo(20) },
-      { id: "c2", authorName: "Coach Rabah", text: "Keep that discipline.", createdAt: minutesAgo(14) },
-    ],
-    shareCount: 6,
-  },
-  {
-    id: "official-training-elite",
-    source: "OFFICIAL",
-    kind: "TRAINING",
-    category: "TRAINING",
-    actorName: "Coach Rabah",
-    actorAvatar:
-      "https://images.unsplash.com/photo-1541534401786-2077eed87a72?w=300&q=80",
-    title: "Elite Sparring Session Completed",
-    description: "High-pressure rounds focused on control, distance, and ring IQ.",
-    membersAttended: 14,
-    duration: "01h 35m",
-    createdAt: hoursAgo(1),
-    reactions: { like: 31, fire: 24, clap: 15 },
-    reacted: { like: true, fire: false, clap: false },
-    comments: [
-      { id: "c3", authorName: "Nour", text: "Insane pace tonight.", createdAt: minutesAgo(55) },
-    ],
-    shareCount: 4,
-  },
-  {
-    id: "official-match-result",
-    source: "OFFICIAL",
-    kind: "MATCH",
-    category: "MATCHES",
-    title: "Club Nakhil vs Titans Club",
-    description: "Clinical team execution and sharp defense secured the victory.",
-    score: "3 - 1",
-    mvpPlayer: "Salma Naji",
-    createdAt: daysAgo(1),
-    reactions: { like: 62, fire: 44, clap: 28 },
-    reacted: { like: false, fire: true, clap: true },
-    comments: [
-      { id: "c4", authorName: "Hamza", text: "Proud of the team.", createdAt: hoursAgo(22) },
-    ],
-    shareCount: 11,
-  },
-  {
-    id: "official-announcement",
-    source: "OFFICIAL",
-    kind: "ANNOUNCEMENT",
-    category: "COACH_POSTS",
-    actorName: "Coach Rabah",
-    actorAvatar:
-      "https://images.unsplash.com/photo-1541534401786-2077eed87a72?w=300&q=80",
-    title: "Tomorrow training starts at 18:00",
-    description: "Arrive 15 minutes early for mobility warm-up and tactical briefing.",
-    pinned: true,
-    createdAt: hoursAgo(2),
-    reactions: { like: 39, fire: 14, clap: 21 },
-    reacted: { like: false, fire: false, clap: false },
-    comments: [
-      { id: "c5", authorName: "Ayoub", text: "Ready coach.", createdAt: hoursAgo(1) },
-    ],
-    shareCount: 7,
-  },
-  {
-    id: "official-motivation",
-    source: "OFFICIAL",
-    kind: "MOTIVATION",
-    category: "COACH_POSTS",
-    title: "Daily Mindset",
-    quote: "Discipline beats motivation.",
-    description: "Consistency under pressure is what separates contenders from champions.",
-    createdAt: hoursAgo(5),
-    reactions: { like: 52, fire: 20, clap: 41 },
-    reacted: { like: false, fire: false, clap: true },
-    comments: [
-      { id: "c6", authorName: "Nour", text: "Needed this today.", createdAt: hoursAgo(4) },
-    ],
-    shareCount: 8,
-  },
-  {
-    id: "official-event",
-    source: "OFFICIAL",
-    kind: "EVENT",
-    category: "EVENTS",
-    title: "Regional Tournament",
-    description: "Club Nakhil fighters will compete across lightweight and middleweight divisions.",
-    eventDate: "Sunday 18:00",
-    countdown: "In 4d 07h",
-    createdAt: hoursAgo(8),
-    reactions: { like: 34, fire: 27, clap: 14 },
-    reacted: { like: false, fire: false, clap: false },
-    comments: [],
-    shareCount: 3,
-  },
-  {
-    id: "official-progress",
-    source: "OFFICIAL",
-    kind: "PROGRESS",
-    category: "TRAINING",
-    title: "This Week Progress",
-    description: "Strong club momentum and attendance consistency this week.",
-    sessionsCompleted: 3,
-    pointsEarned: 12,
-    createdAt: hoursAgo(3),
-    reactions: { like: 22, fire: 10, clap: 16 },
-    reacted: { like: false, fire: false, clap: false },
-    comments: [],
-    shareCount: 2,
-  },
-];
+function buildOfficialDemoPosts(t: Translate): OfficialPost[] {
+  const coachName = `${t("roles.coach")} Rabah`;
+
+  return [
+    {
+      id: "official-achievement-rank-1",
+      source: "OFFICIAL",
+      kind: "ACHIEVEMENT",
+      category: "ACHIEVEMENTS",
+      actorName: "Ayoub El Idrissi",
+      actorAvatar:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
+      title: t("activityFeed.demo.achievementRank1.title"),
+      description: t("activityFeed.demo.achievementRank1.description"),
+      createdAt: minutesAgo(24),
+      reactions: { like: 48, fire: 33, clap: 29 },
+      reacted: { like: false, fire: true, clap: false },
+      comments: [
+        {
+          id: "c1",
+          authorName: "Salma",
+          text: t("activityFeed.demo.achievementRank1.comment1"),
+          createdAt: minutesAgo(20),
+        },
+        {
+          id: "c2",
+          authorName: coachName,
+          text: t("activityFeed.demo.achievementRank1.comment2"),
+          createdAt: minutesAgo(14),
+        },
+      ],
+      shareCount: 6,
+    },
+    {
+      id: "official-training-elite",
+      source: "OFFICIAL",
+      kind: "TRAINING",
+      category: "TRAINING",
+      actorName: coachName,
+      actorAvatar:
+        "https://images.unsplash.com/photo-1541534401786-2077eed87a72?w=300&q=80",
+      title: t("activityFeed.demo.trainingElite.title"),
+      description: t("activityFeed.demo.trainingElite.description"),
+      membersAttended: 14,
+      duration: "01h 35m",
+      createdAt: hoursAgo(1),
+      reactions: { like: 31, fire: 24, clap: 15 },
+      reacted: { like: true, fire: false, clap: false },
+      comments: [
+        {
+          id: "c3",
+          authorName: "Nour",
+          text: t("activityFeed.demo.trainingElite.comment"),
+          createdAt: minutesAgo(55),
+        },
+      ],
+      shareCount: 4,
+    },
+    {
+      id: "official-match-result",
+      source: "OFFICIAL",
+      kind: "MATCH",
+      category: "MATCHES",
+      title: t("activityFeed.demo.matchResult.title"),
+      description: t("activityFeed.demo.matchResult.description"),
+      score: "3 - 1",
+      mvpPlayer: "Salma Naji",
+      createdAt: daysAgo(1),
+      reactions: { like: 62, fire: 44, clap: 28 },
+      reacted: { like: false, fire: true, clap: true },
+      comments: [
+        {
+          id: "c4",
+          authorName: "Hamza",
+          text: t("activityFeed.demo.matchResult.comment"),
+          createdAt: hoursAgo(22),
+        },
+      ],
+      shareCount: 11,
+    },
+    {
+      id: "official-announcement",
+      source: "OFFICIAL",
+      kind: "ANNOUNCEMENT",
+      category: "COACH_POSTS",
+      actorName: coachName,
+      actorAvatar:
+        "https://images.unsplash.com/photo-1541534401786-2077eed87a72?w=300&q=80",
+      title: t("activityFeed.demo.announcement.title"),
+      description: t("activityFeed.demo.announcement.description"),
+      pinned: true,
+      createdAt: hoursAgo(2),
+      reactions: { like: 39, fire: 14, clap: 21 },
+      reacted: { like: false, fire: false, clap: false },
+      comments: [
+        {
+          id: "c5",
+          authorName: "Ayoub",
+          text: t("activityFeed.demo.announcement.comment"),
+          createdAt: hoursAgo(1),
+        },
+      ],
+      shareCount: 7,
+    },
+    {
+      id: "official-motivation",
+      source: "OFFICIAL",
+      kind: "MOTIVATION",
+      category: "COACH_POSTS",
+      title: t("activityFeed.demo.motivation.title"),
+      quote: t("activityFeed.demo.motivation.quote"),
+      description: t("activityFeed.demo.motivation.description"),
+      createdAt: hoursAgo(5),
+      reactions: { like: 52, fire: 20, clap: 41 },
+      reacted: { like: false, fire: false, clap: true },
+      comments: [
+        {
+          id: "c6",
+          authorName: "Nour",
+          text: t("activityFeed.demo.motivation.comment"),
+          createdAt: hoursAgo(4),
+        },
+      ],
+      shareCount: 8,
+    },
+    {
+      id: "official-event",
+      source: "OFFICIAL",
+      kind: "EVENT",
+      category: "EVENTS",
+      title: t("activityFeed.demo.event.title"),
+      description: t("activityFeed.demo.event.description"),
+      eventDate: t("activityFeed.demo.event.eventDate"),
+      countdown: t("activityFeed.demo.event.countdown"),
+      createdAt: hoursAgo(8),
+      reactions: { like: 34, fire: 27, clap: 14 },
+      reacted: { like: false, fire: false, clap: false },
+      comments: [],
+      shareCount: 3,
+    },
+    {
+      id: "official-progress",
+      source: "OFFICIAL",
+      kind: "PROGRESS",
+      category: "TRAINING",
+      title: t("activityFeed.demo.progress.title"),
+      description: t("activityFeed.demo.progress.description"),
+      sessionsCompleted: 3,
+      pointsEarned: 12,
+      createdAt: hoursAgo(3),
+      reactions: { like: 22, fire: 10, clap: 16 },
+      reacted: { like: false, fire: false, clap: false },
+      comments: [],
+      shareCount: 2,
+    },
+  ];
+}
 
 function mapCommunityApiPostToLocal(post: CommunityApiPost): CommunityPost {
   return {
@@ -319,25 +355,28 @@ function mapCommunityApiPostToLocal(post: CommunityApiPost): CommunityPost {
   };
 }
 
-function formatRelativeTime(createdAt: number) {
+function formatRelativeTime(createdAt: number, locale: "en" | "fr" | "ar") {
   const delta = Date.now() - createdAt;
   const minute = 60 * 1000;
   const hour = 60 * minute;
   const day = 24 * hour;
+  const formatter = new Intl.RelativeTimeFormat(getIntlLocale(locale), {
+    numeric: "auto",
+  });
 
   if (delta < minute) {
-    return "Just now";
+    return formatter.format(0, "second");
   }
 
   if (delta < hour) {
-    return `${Math.max(1, Math.floor(delta / minute))} min ago`;
+    return formatter.format(-Math.max(1, Math.floor(delta / minute)), "minute");
   }
 
   if (delta < day) {
-    return `${Math.floor(delta / hour)} hour${Math.floor(delta / hour) > 1 ? "s" : ""} ago`;
+    return formatter.format(-Math.floor(delta / hour), "hour");
   }
 
-  return `${Math.floor(delta / day)} day${Math.floor(delta / day) > 1 ? "s" : ""} ago`;
+  return formatter.format(-Math.floor(delta / day), "day");
 }
 
 function filterPost(post: ActivityPost, activeFilter: FeedFilter) {
@@ -368,10 +407,12 @@ function LoadingSkeleton() {
 function FilterTabs({
   activeFilter,
   onSelect,
+  t,
   compact = false,
 }: {
   activeFilter: FeedFilter;
   onSelect: (filter: FeedFilter) => void;
+  t: Translate;
   compact?: boolean;
 }) {
   return (
@@ -388,23 +429,26 @@ function FilterTabs({
               : "border-white/12 bg-white/5 text-club-muted hover:border-emerald-300/35 hover:text-emerald-100",
           )}
         >
-          {filter.label}
+          {t(filter.labelKey)}
         </button>
       ))}
     </div>
   );
 }
 
-function reactionButtonMeta(key: ReactionKey): { label: string; icon: ReactNode } {
+function reactionButtonMeta(
+  key: ReactionKey,
+  t: Translate,
+): { label: string; icon: ReactNode } {
   if (key === "like") {
-    return { label: "Like", icon: <Heart className="h-3.5 w-3.5" /> };
+    return { label: t("activityFeed.reactions.like"), icon: <Heart className="h-3.5 w-3.5" /> };
   }
 
   if (key === "fire") {
-    return { label: "Fire", icon: <Flame className="h-3.5 w-3.5" /> };
+    return { label: t("activityFeed.reactions.fire"), icon: <Flame className="h-3.5 w-3.5" /> };
   }
 
-  return { label: "Clap", icon: <Hand className="h-3.5 w-3.5" /> };
+  return { label: t("activityFeed.reactions.clap"), icon: <Hand className="h-3.5 w-3.5" /> };
 }
 
 function ReactionBar({
@@ -412,18 +456,20 @@ function ReactionBar({
   pulseKey,
   onToggleReaction,
   onShare,
+  t,
 }: {
   post: ActivityPost;
   pulseKey: string | null;
   onToggleReaction: (post: ActivityPost, reaction: ReactionKey) => void;
   onShare: (post: ActivityPost) => void;
+  t: Translate;
 }) {
   const keys: ReactionKey[] = ["like", "fire", "clap"];
 
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/10 pt-3">
       {keys.map((key) => {
-        const meta = reactionButtonMeta(key);
+        const meta = reactionButtonMeta(key, t);
         const isActive = post.reacted[key];
         const reactionPulseKey = `${post.id}-${key}`;
 
@@ -453,13 +499,13 @@ function ReactionBar({
         className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-xs text-club-muted transition hover:border-emerald-300/35 hover:text-emerald-100"
       >
         <Share2 className="h-3.5 w-3.5" />
-        Share
+        {t("activityFeed.actions.share")}
         <span>{post.shareCount}</span>
       </button>
 
-      <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-club-muted">
+      <span className="ms-auto inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-club-muted">
         <MessageCircle className="h-3.5 w-3.5" />
-        {post.comments.length} comments
+        {t("activityFeed.comments.count", { count: post.comments.length })}
       </span>
     </div>
   );
@@ -470,11 +516,15 @@ function CommentsPanel({
   draft,
   onDraft,
   onSubmit,
+  locale,
+  t,
 }: {
   post: ActivityPost;
   draft: string;
   onDraft: (value: string) => void;
   onSubmit: () => void;
+  locale: "en" | "fr" | "ar";
+  t: Translate;
 }) {
   return (
     <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
@@ -483,7 +533,9 @@ function CommentsPanel({
           <div key={comment.id} className="rounded-lg border border-white/8 bg-white/[0.03] px-2.5 py-2">
             <p className="text-xs font-semibold text-white">{comment.authorName}</p>
             <p className="mt-0.5 text-xs text-club-text-soft">{comment.text}</p>
-            <p className="mt-1 text-[10px] text-club-muted">{formatRelativeTime(comment.createdAt)}</p>
+            <p className="mt-1 text-[10px] text-club-muted">
+              {formatRelativeTime(comment.createdAt, locale)}
+            </p>
           </div>
         ))}
       </div>
@@ -493,7 +545,7 @@ function CommentsPanel({
           value={draft}
           onChange={(event) => onDraft(event.target.value)}
           className="cn-input h-9 px-3 text-sm"
-          placeholder="Write a comment..."
+          placeholder={t("activityFeed.comments.placeholder")}
         />
         <button
           type="button"
@@ -507,25 +559,37 @@ function CommentsPanel({
   );
 }
 
-function communityTypeMeta(type: CommunityPostType): { label: string; tone: TagTone } {
-  if (type === "PHOTO") return { label: "Training Selfie", tone: "cyan" };
-  if (type === "ACHIEVEMENT") return { label: "Achievement", tone: "gold" };
-  if (type === "SUPPORT") return { label: "Support", tone: "green" };
-  return { label: "Text Post", tone: "slate" };
+function communityTypeMeta(
+  type: CommunityPostType,
+  t: Translate,
+): { label: string; tone: TagTone } {
+  if (type === "PHOTO") {
+    return { label: t("activityFeed.community.postTypes.photo"), tone: "cyan" };
+  }
+  if (type === "ACHIEVEMENT") {
+    return { label: t("activityFeed.community.postTypes.achievement"), tone: "gold" };
+  }
+  if (type === "SUPPORT") {
+    return { label: t("activityFeed.community.postTypes.support"), tone: "green" };
+  }
+  return { label: t("activityFeed.community.postTypes.text"), tone: "slate" };
 }
 
 export function ActivityFeedBoard({
   viewerRole = "MEMBER",
-  userName = "Club Member",
+  userName,
   userAvatar = null,
 }: ActivityFeedBoardProps) {
+  const { locale, t } = useTranslations();
   const canModerate = viewerRole === "ADMIN" || viewerRole === "COACH";
   const canCreateCommunityPost = viewerRole === "MEMBER";
+  const localizedOfficialDemoPosts = useMemo(() => buildOfficialDemoPosts(t), [t]);
+  const resolvedUserName = userName ?? t("sports.leaderboard.memberFallback");
 
   const [activeFilter, setActiveFilter] = useState<FeedFilter>("ALL");
   const [isLoading, setIsLoading] = useState(true);
 
-  const [officialPosts, setOfficialPosts] = useState<OfficialPost[]>(officialDemoPosts);
+  const [officialPosts, setOfficialPosts] = useState<OfficialPost[]>(localizedOfficialDemoPosts);
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
   const [pulseKey, setPulseKey] = useState<string | null>(null);
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
@@ -542,6 +606,10 @@ export function ActivityFeedBoard({
     postId: string;
     action: ModerationAction;
   } | null>(null);
+
+  useEffect(() => {
+    setOfficialPosts(localizedOfficialDemoPosts);
+  }, [localizedOfficialDemoPosts]);
 
   const loadCommunityPosts = useCallback(async () => {
     setIsLoading(true);
@@ -561,7 +629,7 @@ export function ActivityFeedBoard({
 
       if (!response.ok || !("posts" in payload) || !Array.isArray(payload.posts)) {
         setFeedError(
-          ("message" in payload && payload.message) || "Unable to load community posts.",
+          ("message" in payload && payload.message) || t("activityFeed.errors.loadPosts"),
         );
         setCommunityPosts([]);
         return;
@@ -570,7 +638,7 @@ export function ActivityFeedBoard({
       setCommunityPosts(payload.posts.map(mapCommunityApiPostToLocal));
     } catch (error) {
       console.error(error);
-      setFeedError("Unable to load community posts.");
+      setFeedError(t("activityFeed.errors.loadPosts"));
       setCommunityPosts([]);
     } finally {
       setIsLoading(false);
@@ -643,7 +711,7 @@ export function ActivityFeedBoard({
         };
 
         if (!response.ok) {
-          setPostError(payload.message ?? "Unable to update reaction.");
+          setPostError(payload.message ?? t("activityFeed.errors.updateReaction"));
         } else {
           withUpdatedPost(post, (current) => ({
             ...current,
@@ -659,7 +727,7 @@ export function ActivityFeedBoard({
         }
       } catch (error) {
         console.error(error);
-        setPostError("Unable to update reaction.");
+        setPostError(t("activityFeed.errors.updateReaction"));
       }
     }
 
@@ -688,7 +756,7 @@ export function ActivityFeedBoard({
       };
 
       if (!response.ok) {
-        setPostError(payload.message ?? "Unable to share this post.");
+        setPostError(payload.message ?? t("activityFeed.errors.share"));
         return;
       }
 
@@ -701,7 +769,7 @@ export function ActivityFeedBoard({
       }));
     } catch (error) {
       console.error(error);
-      setPostError("Unable to share this post.");
+      setPostError(t("activityFeed.errors.share"));
     }
   }
 
@@ -722,7 +790,7 @@ export function ActivityFeedBoard({
     if (post.source === "OFFICIAL") {
       const comment: CommentItem = {
         id: crypto.randomUUID(),
-        authorName: userName,
+        authorName: resolvedUserName,
         text,
         createdAt: Date.now(),
       };
@@ -756,7 +824,7 @@ export function ActivityFeedBoard({
       };
 
       if (!response.ok || !payload.comment) {
-        setPostError(payload.message ?? "Unable to post comment.");
+        setPostError(payload.message ?? t("activityFeed.errors.comment"));
         return;
       }
 
@@ -773,7 +841,7 @@ export function ActivityFeedBoard({
       }));
     } catch (error) {
       console.error(error);
-      setPostError("Unable to post comment.");
+      setPostError(t("activityFeed.errors.comment"));
       return;
     }
 
@@ -806,7 +874,7 @@ export function ActivityFeedBoard({
       };
 
       if (!response.ok) {
-        setPostError(payload.message ?? "Unable to update moderation action.");
+        setPostError(payload.message ?? t("activityFeed.errors.moderation"));
         return;
       }
 
@@ -824,7 +892,7 @@ export function ActivityFeedBoard({
       }
     } catch (error) {
       console.error(error);
-      setPostError("Unable to update moderation action.");
+      setPostError(t("activityFeed.errors.moderation"));
     } finally {
       setModerationAction(null);
     }
@@ -850,7 +918,7 @@ export function ActivityFeedBoard({
 
   async function createCommunityPost() {
     if (!canCreateCommunityPost) {
-      setPostError("Only members can create community posts.");
+      setPostError(t("activityFeed.community.onlyMembers"));
       return;
     }
 
@@ -860,12 +928,12 @@ export function ActivityFeedBoard({
     const needsImage = composerType === "PHOTO";
 
     if (!caption.length) {
-      setPostError("Please add a caption before posting.");
+      setPostError(t("activityFeed.community.errors.caption"));
       return;
     }
 
     if (needsImage && !composerImageFile) {
-      setPostError("Please add a training selfie or gym photo.");
+      setPostError(t("activityFeed.community.errors.imageRequired"));
       return;
     }
 
@@ -906,7 +974,7 @@ export function ActivityFeedBoard({
         setPostError(
           payload.fieldErrors?.image ??
             payload.message ??
-            "Unable to publish community post.",
+            t("activityFeed.community.errors.publish"),
         );
         return;
       }
@@ -920,7 +988,7 @@ export function ActivityFeedBoard({
       setComposerType("TEXT");
     } catch (error) {
       console.error(error);
-      setPostError("Unable to publish community post.");
+      setPostError(t("activityFeed.community.errors.publish"));
     } finally {
       setIsPosting(false);
     }
@@ -948,18 +1016,18 @@ export function ActivityFeedBoard({
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Club Pulse"
-        title="Club Activity Feed"
-        subtitle="Latest news, achievements, sessions and club updates."
+        eyebrow={t("activityFeed.section.eyebrow")}
+        title={t("activityFeed.section.title")}
+        subtitle={t("activityFeed.section.subtitle")}
         action={
           <div className="hidden md:block">
-            <FilterTabs activeFilter={activeFilter} onSelect={setActiveFilter} />
+            <FilterTabs activeFilter={activeFilter} onSelect={setActiveFilter} t={t} />
           </div>
         }
       />
 
       <div className="sticky top-20 z-30 -mx-1 rounded-xl border border-white/10 bg-club-base/85 p-2 backdrop-blur-xl md:hidden">
-        <FilterTabs activeFilter={activeFilter} onSelect={setActiveFilter} compact />
+        <FilterTabs activeFilter={activeFilter} onSelect={setActiveFilter} compact t={t} />
       </div>
 
       {isLoading ? (
@@ -969,14 +1037,14 @@ export function ActivityFeedBoard({
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <h3 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">
-                Official Club Updates
+                {t("activityFeed.official.title")}
               </h3>
-              <Tag label="Admin / Coach" tone="slate" />
+              <Tag label={t("activityFeed.official.tag")} tone="slate" />
             </div>
 
             {visibleOfficialPosts.length === 0 ? (
               <Card className="border-dashed border-white/15 bg-black/20 py-10 text-center">
-                <p className="text-sm text-club-muted">New activities will appear here soon.</p>
+                <p className="text-sm text-club-muted">{t("activityFeed.empty")}</p>
               </Card>
             ) : (
               <div className="space-y-4">
@@ -993,13 +1061,13 @@ export function ActivityFeedBoard({
 
                         <div className="relative flex flex-wrap items-start justify-between gap-3">
                           <div className="flex items-center gap-3">
-                            <Avatar name={post.actorName ?? "Member"} avatarUrl={post.actorAvatar} size="md" />
+                            <Avatar name={post.actorName ?? t("roles.member")} avatarUrl={post.actorAvatar} size="md" />
                             <div>
                               <p className="text-sm font-semibold text-white">{post.actorName}</p>
-                              <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt)}</p>
+                              <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt, locale)}</p>
                             </div>
                           </div>
-                          <Tag label="Gold Badge" tone="gold" />
+                          <Tag label={t("activityFeed.official.badges.gold")} tone="gold" />
                         </div>
 
                         <h3 className="mt-4 font-heading text-2xl uppercase tracking-[0.05em] text-white">
@@ -1007,12 +1075,14 @@ export function ActivityFeedBoard({
                         </h3>
                         <p className="mt-2 text-sm text-club-text-soft">{post.description}</p>
 
-                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                         <CommentsPanel
                           post={post}
                           draft={commentDrafts[post.id] ?? ""}
                           onDraft={(value) => setDraft(post.id, value)}
                           onSubmit={() => submitComment(post)}
+                          locale={locale}
+                          t={t}
                         />
                       </Card>
                     );
@@ -1027,13 +1097,13 @@ export function ActivityFeedBoard({
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div className="flex items-center gap-3">
-                            <Avatar name={post.actorName ?? "Coach"} avatarUrl={post.actorAvatar} size="md" />
+                            <Avatar name={post.actorName ?? t("roles.coach")} avatarUrl={post.actorAvatar} size="md" />
                             <div>
                               <p className="text-sm font-semibold text-white">{post.actorName}</p>
-                              <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt)}</p>
+                              <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt, locale)}</p>
                             </div>
                           </div>
-                          <Tag label="Training" tone="green" />
+                          <Tag label={t("activityFeed.official.labels.training")} tone="green" />
                         </div>
 
                         <h3 className="mt-4 text-xl font-semibold text-white">{post.title}</h3>
@@ -1042,20 +1112,24 @@ export function ActivityFeedBoard({
                         <div className="mt-3 grid gap-2 sm:grid-cols-2">
                           <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-club-muted">
                             <Users className="h-3.5 w-3.5 text-emerald-200" />
-                            {post.membersAttended} members attended
+                            {t("activityFeed.official.membersAttended", {
+                              count: post.membersAttended ?? 0,
+                            })}
                           </div>
                           <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs text-club-muted">
                             <Timer className="h-3.5 w-3.5 text-emerald-200" />
-                            Duration {post.duration}
+                            {t("activityFeed.official.duration", { value: post.duration ?? "" })}
                           </div>
                         </div>
 
-                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                         <CommentsPanel
                           post={post}
                           draft={commentDrafts[post.id] ?? ""}
                           onDraft={(value) => setDraft(post.id, value)}
                           onSubmit={() => submitComment(post)}
+                          locale={locale}
+                          t={t}
                         />
                       </Card>
                     );
@@ -1071,23 +1145,27 @@ export function ActivityFeedBoard({
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/35 bg-cyan-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-100">
                             <Swords className="h-3.5 w-3.5" />
-                            Match Result
+                            {t("activityFeed.official.labels.matchResult")}
                           </div>
-                          <Tag label="Win" tone="green" />
+                          <Tag label={t("activityFeed.official.labels.win")} tone="green" />
                         </div>
 
                         <h3 className="mt-4 text-xl font-semibold text-white">{post.title}</h3>
                         <p className="mt-2 text-4xl font-heading font-black tracking-[0.06em] text-emerald-200">{post.score}</p>
-                        <p className="mt-1 text-sm text-club-text-soft">MVP Player: {post.mvpPlayer}</p>
+                        <p className="mt-1 text-sm text-club-text-soft">
+                          {t("activityFeed.official.mvp", { name: post.mvpPlayer ?? "" })}
+                        </p>
                         <p className="mt-2 text-sm text-club-muted">{post.description}</p>
-                        <p className="mt-1 text-xs text-club-muted">{formatRelativeTime(post.createdAt)}</p>
+                        <p className="mt-1 text-xs text-club-muted">{formatRelativeTime(post.createdAt, locale)}</p>
 
-                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                         <CommentsPanel
                           post={post}
                           draft={commentDrafts[post.id] ?? ""}
                           onDraft={(value) => setDraft(post.id, value)}
                           onSubmit={() => submitComment(post)}
+                          locale={locale}
+                          t={t}
                         />
                       </Card>
                     );
@@ -1103,28 +1181,30 @@ export function ActivityFeedBoard({
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/45 bg-emerald-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-100">
                             <Pin className="h-3.5 w-3.5" />
-                            Pinned
+                            {t("activityFeed.official.labels.pinned")}
                           </div>
-                          <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt)}</p>
+                          <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt, locale)}</p>
                         </div>
 
                         <div className="mt-4 flex items-center gap-3">
-                          <Avatar name={post.actorName ?? "Coach"} avatarUrl={post.actorAvatar} size="md" />
+                          <Avatar name={post.actorName ?? t("roles.coach")} avatarUrl={post.actorAvatar} size="md" />
                           <div>
                             <p className="text-sm font-semibold text-white">{post.actorName}</p>
-                            <p className="text-xs text-club-muted">Official coach post</p>
+                            <p className="text-xs text-club-muted">{t("activityFeed.official.labels.coachPost")}</p>
                           </div>
                         </div>
 
                         <h3 className="mt-4 text-xl font-semibold text-white">{post.title}</h3>
                         <p className="mt-2 text-sm text-club-text-soft">{post.description}</p>
 
-                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                         <CommentsPanel
                           post={post}
                           draft={commentDrafts[post.id] ?? ""}
                           onDraft={(value) => setDraft(post.id, value)}
                           onSubmit={() => submitComment(post)}
+                          locale={locale}
+                          t={t}
                         />
                       </Card>
                     );
@@ -1139,7 +1219,7 @@ export function ActivityFeedBoard({
                       >
                         <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-emerald-300/35 bg-emerald-500/12 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-100">
                           <Megaphone className="h-3.5 w-3.5" />
-                          Coach Message
+                          {t("activityFeed.official.labels.coachMessage")}
                         </div>
 
                         <div className="relative mx-auto mt-4 max-w-xl">
@@ -1148,14 +1228,16 @@ export function ActivityFeedBoard({
                         </div>
 
                         <p className="mt-3 text-sm text-club-text-soft">{post.description}</p>
-                        <p className="mt-2 text-xs text-club-muted">{formatRelativeTime(post.createdAt)}</p>
+                        <p className="mt-2 text-xs text-club-muted">{formatRelativeTime(post.createdAt, locale)}</p>
 
-                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                         <CommentsPanel
                           post={post}
                           draft={commentDrafts[post.id] ?? ""}
                           onDraft={(value) => setDraft(post.id, value)}
                           onSubmit={() => submitComment(post)}
+                          locale={locale}
+                          t={t}
                         />
                       </Card>
                     );
@@ -1183,12 +1265,14 @@ export function ActivityFeedBoard({
                           {post.eventDate}
                         </div>
 
-                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                        <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                         <CommentsPanel
                           post={post}
                           draft={commentDrafts[post.id] ?? ""}
                           onDraft={(value) => setDraft(post.id, value)}
                           onSubmit={() => submitComment(post)}
+                          locale={locale}
+                          t={t}
                         />
                       </Card>
                     );
@@ -1205,30 +1289,32 @@ export function ActivityFeedBoard({
                           <h3 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">{post.title}</h3>
                           <p className="mt-2 text-sm text-club-text-soft">{post.description}</p>
                         </div>
-                        <Tag label="Weekly" tone="cyan" />
+                        <Tag label={t("activityFeed.official.labels.weekly")} tone="cyan" />
                       </div>
 
                       <div className="mt-4 grid gap-3 sm:grid-cols-2">
                         <div className="rounded-xl border border-emerald-300/25 bg-emerald-500/10 px-3 py-3">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-100">Sessions</p>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-100">{t("activityFeed.official.labels.sessions")}</p>
                           <p className="mt-1 text-2xl font-black text-white">{post.sessionsCompleted}</p>
-                          <p className="text-xs text-club-muted">completed this week</p>
+                          <p className="text-xs text-club-muted">{t("activityFeed.official.labels.completedThisWeek")}</p>
                         </div>
                         <div className="rounded-xl border border-cyan-300/25 bg-cyan-500/10 px-3 py-3">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-100">Points Earned</p>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-100">{t("activityFeed.official.labels.pointsEarned")}</p>
                           <p className="mt-1 text-2xl font-black text-white">+{post.pointsEarned}</p>
-                          <p className="text-xs text-club-muted">performance gain</p>
+                          <p className="text-xs text-club-muted">{t("activityFeed.official.labels.performanceGain")}</p>
                         </div>
                       </div>
 
-                      <p className="mt-3 text-xs text-club-muted">{formatRelativeTime(post.createdAt)}</p>
+                      <p className="mt-3 text-xs text-club-muted">{formatRelativeTime(post.createdAt, locale)}</p>
 
-                      <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                      <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                       <CommentsPanel
                         post={post}
                         draft={commentDrafts[post.id] ?? ""}
                         onDraft={(value) => setDraft(post.id, value)}
                         onSubmit={() => submitComment(post)}
+                        locale={locale}
+                        t={t}
                       />
                     </Card>
                   );
@@ -1240,9 +1326,9 @@ export function ActivityFeedBoard({
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <h3 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">
-                Community Posts
+                {t("activityFeed.community.title")}
               </h3>
-              <Tag label="Members" tone="green" />
+              <Tag label={t("activityFeed.community.tag")} tone="green" />
             </div>
 
             {feedError ? (
@@ -1253,11 +1339,11 @@ export function ActivityFeedBoard({
 
             <Card className="sticky top-20 z-20 border-emerald-300/30 bg-[linear-gradient(145deg,rgba(34,229,132,0.12),rgba(10,16,26,0.9)_45%,rgba(0,0,0,0.85))] md:static">
               <div className="flex items-start gap-3">
-                <Avatar name={userName} avatarUrl={userAvatar} size="md" />
+                <Avatar name={resolvedUserName} avatarUrl={userAvatar} size="md" />
                 <div className="flex-1 space-y-3">
                   <div>
-                    <p className="text-sm font-semibold text-white">Create Post</p>
-                    <p className="text-xs text-club-muted">Share your progress with the club...</p>
+                    <p className="text-sm font-semibold text-white">{t("activityFeed.community.createTitle")}</p>
+                    <p className="text-xs text-club-muted">{t("activityFeed.community.createSubtitle")}</p>
                   </div>
 
                   <textarea
@@ -1268,8 +1354,8 @@ export function ActivityFeedBoard({
                     className="cn-input min-h-[86px] disabled:cursor-not-allowed disabled:opacity-70"
                     placeholder={
                       canCreateCommunityPost
-                        ? "Share your progress with the club..."
-                        : "Community post creation is available for members."
+                        ? t("activityFeed.community.createSubtitle")
+                        : t("activityFeed.community.onlyMembers")
                     }
                   />
 
@@ -1301,7 +1387,7 @@ export function ActivityFeedBoard({
                       )}
                     >
                       <Camera className="mr-1 inline-flex h-3.5 w-3.5" />
-                      Photo
+                      {t("activityFeed.community.actions.photo")}
                     </button>
                     <button
                       type="button"
@@ -1315,7 +1401,7 @@ export function ActivityFeedBoard({
                       )}
                     >
                       <Trophy className="mr-1 inline-flex h-3.5 w-3.5" />
-                      Achievement
+                      {t("activityFeed.community.actions.achievement")}
                     </button>
                     <button
                       type="button"
@@ -1328,13 +1414,13 @@ export function ActivityFeedBoard({
                           : "border-white/15 bg-white/5 text-club-muted hover:border-cyan-300/35 hover:text-cyan-100",
                       )}
                     >
-                      <Sparkles className="mr-1 inline-flex h-3.5 w-3.5" />
-                      Text Post
+                      <Sparkles className="me-1 inline-flex h-3.5 w-3.5" />
+                      {t("activityFeed.community.actions.text")}
                     </button>
 
                     {composerType === "PHOTO" ? (
-                      <label className="ml-auto cursor-pointer rounded-full border border-emerald-300/35 bg-emerald-500/12 px-3 py-1.5 text-xs font-semibold text-emerald-100 transition hover:bg-emerald-500/20">
-                        Add Image
+                      <label className="ms-auto cursor-pointer rounded-full border border-emerald-300/35 bg-emerald-500/12 px-3 py-1.5 text-xs font-semibold text-emerald-100 transition hover:bg-emerald-500/20">
+                        {t("activityFeed.community.actions.addImage")}
                         <input
                           type="file"
                           accept="image/*"
@@ -1355,7 +1441,7 @@ export function ActivityFeedBoard({
                         disabled={!canCreateCommunityPost}
                         className="h-3.5 w-3.5 rounded border-white/20 bg-white/10"
                       />
-                      Mark as support / motivation message
+                      {t("activityFeed.community.actions.support")}
                     </label>
                   ) : null}
 
@@ -1367,7 +1453,9 @@ export function ActivityFeedBoard({
                       className="cn-btn cn-btn-primary !px-4 !py-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isPosting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                      {isPosting ? "Posting..." : "Post to Community"}
+                      {isPosting
+                        ? t("activityFeed.community.actions.posting")
+                        : t("activityFeed.community.actions.post")}
                     </button>
                   </div>
                 </div>
@@ -1376,12 +1464,12 @@ export function ActivityFeedBoard({
 
             {visibleCommunityPosts.length === 0 ? (
               <Card className="border-dashed border-white/15 bg-black/20 py-10 text-center">
-                <p className="text-sm text-club-muted">New activities will appear here soon.</p>
+                <p className="text-sm text-club-muted">{t("activityFeed.empty")}</p>
               </Card>
             ) : (
               <div className="space-y-4">
                 {visibleCommunityPosts.map((post, index) => {
-                  const postMeta = communityTypeMeta(post.postType);
+                  const postMeta = communityTypeMeta(post.postType, t);
                   const isModeratingPost = moderationAction?.postId === post.id;
 
                   return (
@@ -1395,7 +1483,7 @@ export function ActivityFeedBoard({
                           <Avatar name={post.authorName} avatarUrl={post.authorAvatar} size="md" />
                           <div>
                             <p className="text-sm font-semibold text-white">{post.authorName}</p>
-                            <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt)}</p>
+                            <p className="text-xs text-club-muted">{formatRelativeTime(post.createdAt, locale)}</p>
                           </div>
                         </div>
 
@@ -1420,12 +1508,14 @@ export function ActivityFeedBoard({
                         </div>
                       ) : null}
 
-                      <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} />
+                      <ReactionBar post={post} pulseKey={pulseKey} onToggleReaction={handleToggleReaction} onShare={handleShare} t={t} />
                       <CommentsPanel
                         post={post}
                         draft={commentDrafts[post.id] ?? ""}
                         onDraft={(value) => setDraft(post.id, value)}
                         onSubmit={() => submitComment(post)}
+                        locale={locale}
+                        t={t}
                       />
 
                       {canModerate ? (

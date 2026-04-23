@@ -1,0 +1,893 @@
+{
+  "locale": {
+    "switcher": "Changer de langue",
+    "english": "Anglais",
+    "french": "Français",
+    "arabic": "Arabe"
+  },
+  "common": {
+    "close": "Fermer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "notSet": "Non défini",
+    "notProvided": "Non renseigné",
+    "none": "Aucun",
+    "by": "en",
+    "and": "et",
+    "termsOfService": "Conditions d’utilisation",
+    "privacyPolicy": "Politique de confidentialité",
+    "units": {
+      "session": {
+        "one": "séance",
+        "other": "séances"
+      }
+    }
+  },
+  "brand": {
+    "tagline": "Kickboxing · Coach Rabah · Maroc",
+    "homeAriaLabel": "Accueil Club Nakhil"
+  },
+  "splash": {
+    "loading": "Chargement"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "members": "Membres",
+    "sessions": "Séances",
+    "attendance": "Présence",
+    "leaderboard": "Classement",
+    "activityFeed": "Fil d’activité",
+    "announcements": "Annonces",
+    "progress": "Progression",
+    "ratings": "Évaluations",
+    "profile": "Profil"
+  },
+  "roles": {
+    "admin": "Administrateur",
+    "coach": "Entraîneur",
+    "member": "Membre"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "S’inscrire",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "welcomeBack": "Bon retour",
+    "createAccount": "Créez votre compte",
+    "fullName": "Nom complet",
+    "confirmPassword": "Confirmer le mot de passe",
+    "role": "Rôle",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Vous n’avez pas de compte ?",
+    "hasAccount": "Vous avez déjà un compte ?",
+    "creatingAccount": "créant votre compte",
+    "placeholders": {
+      "fullName": "Saisissez votre nom complet",
+      "email": "nom@exemple.com",
+      "password": "Saisissez votre mot de passe",
+      "confirmPassword": "Répétez votre mot de passe"
+    },
+    "notes": {
+      "accountReview": "Les nouveaux comptes sont vérifiés avant leur activation."
+    },
+    "errors": {
+      "pendingApproval": "Votre compte est en attente de validation par un administrateur.",
+      "accountBlocked": "Votre compte est bloqué. Contactez un administrateur.",
+      "invalidCredentials": "Identifiants invalides. Vérifiez votre e-mail et votre mot de passe.",
+      "unauthorized": "Connectez-vous pour continuer.",
+      "forbidden": "Vous n’avez pas accès à cette action."
+    }
+  },
+  "layout": {
+    "mobileNav": {
+      "open": "Ouvrir la navigation",
+      "close": "Fermer la navigation"
+    },
+    "logout": {
+      "ariaLabel": "Se déconnecter",
+      "label": "Déconnexion"
+    },
+    "admin": {
+      "title": "Centre de pilotage admin",
+      "subtitle": "Validez les inscriptions, gérez les statuts et gardez l’effectif propre."
+    },
+    "coach": {
+      "title": "Portail entraîneur",
+      "subtitle": "Gérez vos athlètes, suivez les séances et surveillez les progrès."
+    },
+    "member": {
+      "title": "Espace membre",
+      "subtitle": "Suivez vos séances, votre progression et vos performances.",
+      "nav": {
+        "profile": "Mon profil",
+        "sessions": "Mes séances",
+        "attendance": "Ma présence",
+        "progress": "Ma progression",
+        "rateCoach": "Évaluer le coach"
+      }
+    }
+  },
+  "forms": {
+    "announcement": {
+      "title": "Publier une annonce",
+      "subtitle": "Envoyez des rappels, des changements de planning et des notes motivantes.",
+      "fields": {
+        "title": "Titre",
+        "message": "Message"
+      },
+      "placeholders": {
+        "title": "Exemple : l’échauffement du lundi commence 10 min plus tôt",
+        "message": "Rédigez votre note pour tous les membres..."
+      },
+      "actions": {
+        "publish": "Publier",
+        "publishing": "Publication..."
+      },
+      "success": "Annonce publiée.",
+      "errors": {
+        "publish": "Impossible de publier l’annonce."
+      }
+    },
+    "progressNote": {
+      "placeholder": "Ajoutez une observation de coaching pour ce membre",
+      "actions": {
+        "save": "Enregistrer la note",
+        "saving": "Enregistrement..."
+      },
+      "success": "Note de progression enregistrée.",
+      "errors": {
+        "save": "Impossible d’ajouter la note de progression."
+      }
+    },
+    "rateCoach": {
+      "fields": {
+        "rating": "Note",
+        "comment": "Commentaire facultatif"
+      },
+      "placeholder": "Qu’est-ce qui vous a le plus aidé pendant cette séance ?",
+      "score": "{value} / 5",
+      "actions": {
+        "submit": "Envoyer l’évaluation",
+        "submitting": "Envoi..."
+      },
+      "success": "Retour envoyé au coach.",
+      "errors": {
+        "submit": "Impossible d’envoyer l’évaluation."
+      },
+      "aria": {
+        "rateStars": "Attribuer {count} étoiles"
+      }
+    },
+    "coachSessionManager": {
+      "title": {
+        "create": "Créer une nouvelle séance",
+        "edit": "Modifier la séance"
+      },
+      "subtitle": "Définissez la date, le type d’entraînement, le niveau et les notes. Le QR est généré automatiquement.",
+      "badges": {
+        "editing": "Modification"
+      },
+      "fields": {
+        "title": "Titre",
+        "date": "Date",
+        "start": "Début",
+        "end": "Fin",
+        "trainingType": "Type d’entraînement",
+        "level": "Niveau",
+        "notes": "Notes du coach"
+      },
+      "placeholders": {
+        "title": "Exemple : Masterclass technique",
+        "notes": "Focus, rappels ou notes de préparation facultatives"
+      },
+      "actions": {
+        "create": "Créer la séance",
+        "saveChanges": "Enregistrer les changements",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler"
+      },
+      "success": {
+        "created": "Séance créée.",
+        "updated": "Séance mise à jour.",
+        "deleted": "Séance supprimée."
+      },
+      "errors": {
+        "save": "Impossible d’enregistrer la séance.",
+        "delete": "Impossible de supprimer la séance."
+      },
+      "confirmDelete": "Supprimer cette séance et les présences/évaluations associées ?",
+      "list": {
+        "title": "Séances existantes",
+        "count": "{count} {noun} au total",
+        "empty": "Aucune séance créée pour le moment. Lancez la première ci-dessus.",
+        "attendance": "Présence : {count}",
+        "qr": "QR",
+        "qrAlt": "QR pour {title}"
+      }
+    }
+  },
+  "profile": {
+    "avatar": {
+      "actions": {
+        "choose": "Choisir une image",
+        "upload": "Téléverser l’avatar",
+        "uploading": "Téléversement..."
+      },
+      "selected": "Sélectionné :",
+      "current": "Actuel :",
+      "helpText": "JPG, PNG ou WEBP. Max {size}.",
+      "success": "Avatar téléversé avec succès.",
+      "errors": {
+        "unsupportedFormat": "Format d’image non pris en charge. Utilisez JPG, PNG ou WEBP.",
+        "maxSize": "L’image est trop volumineuse. Taille max : {size}.",
+        "chooseImage": "Choisissez une image avant de téléverser.",
+        "uploadFailed": "Échec du téléversement de l’avatar.",
+        "metadataMissing": "Téléversement terminé, mais les métadonnées de l’avatar sont manquantes.",
+        "unavailable": "Impossible de téléverser l’avatar pour le moment.",
+        "bucketMissing": "Le stockage des avatars n’est pas encore prêt. Réessayez plus tard."
+      }
+    },
+    "header": {
+      "joined": "Inscrit le {date}"
+    },
+    "editor": {
+      "actions": {
+        "save": "Enregistrer le profil",
+        "saving": "Enregistrement..."
+      },
+      "success": {
+        "updated": "Profil mis à jour avec succès.",
+        "avatarUpdated": "Avatar mis à jour avec succès."
+      },
+      "errors": {
+        "update": "Impossible de mettre à jour le profil."
+      },
+      "sections": {
+        "editProfile": {
+          "title": "Modifier le profil",
+          "description": "Mettez à jour votre identité, vos coordonnées et les détails liés à votre rôle."
+        },
+        "avatar": {
+          "title": "Paramètres d’avatar",
+          "description": "Définissez votre identité visuelle sur Club Nakhil."
+        },
+        "coach": {
+          "title": "Profil coach",
+          "description": "Mettez en avant votre identité et votre parcours de coach."
+        },
+        "member": {
+          "title": "Préférences membre",
+          "description": "Personnalisez votre profil d’entraînement."
+        }
+      },
+      "fields": {
+        "fullName": "Nom complet",
+        "displayName": "Nom affiché",
+        "phone": "Téléphone",
+        "dateOfBirth": "Date de naissance",
+        "gender": "Genre",
+        "city": "Ville",
+        "address": "Adresse",
+        "bio": "Bio",
+        "emergencyContact": "Contact d’urgence",
+        "specialization": "Spécialisation",
+        "yearsOfExperience": "Années d’expérience",
+        "certifications": "Certifications",
+        "coachingStyle": "Style de coaching",
+        "achievements": "Réalisations",
+        "trainingLevel": "Niveau d’entraînement",
+        "preferredTrainingType": "Type d’entraînement préféré"
+      },
+      "placeholders": {
+        "fullName": "Votre nom complet légal",
+        "displayName": "Nom affiché dans les tableaux de bord",
+        "phone": "+212...",
+        "gender": "Sélectionner le genre",
+        "city": "Casablanca",
+        "address": "Rue, quartier, ville",
+        "bio": "Partagez un court résumé de profil",
+        "emergencyContact": "Nom + téléphone",
+        "specialization": "Technique, sparring, conditionnement...",
+        "yearsOfExperience": "10",
+        "certifications": "Liste séparée par des virgules",
+        "coachingStyle": "Comment vous structurez les séances et motivez les athlètes",
+        "achievements": "Titres, étapes clés, résultats des athlètes"
+      }
+    }
+  },
+  "sports": {
+    "athleteSummary": {
+      "unranked": "Non classé",
+      "latestCoachNote": "Dernière note du coach",
+      "emptyNote": "Aucune note de progression pour le moment.",
+      "stats": {
+        "rating": "Note",
+        "points": "Points",
+        "attendance": "Présence",
+        "badges": "Badges"
+      },
+      "badges": {
+        "topPerformer": "Top performer",
+        "needsAttention": "À surveiller",
+        "inProgress": "En progression"
+      }
+    },
+    "rankTrend": {
+      "up": "Hausse +{count}",
+      "down": "Baisse {count}",
+      "stable": "Stable",
+      "compactUp": "+{count}",
+      "compactDown": "{count}",
+      "compactStable": "0"
+    },
+    "playerRating": {
+      "athleteProfile": "Profil athlète",
+      "tierLabel": "Niveau {tier}",
+      "welcomeBack": "Bon retour",
+      "athleteAttributes": "Attributs de l’athlète"
+    },
+    "xpProgress": {
+      "current": "{points}/{total} XP",
+      "nextTier": "{points} pts → {tier}",
+      "maxTier": "★ Palier max"
+    },
+    "leaderboard": {
+      "you": "Vous",
+      "memberFallback": "Membre Club Nakhil",
+      "empty": {
+        "title": "Aucun athlète classé pour le moment",
+        "subtitle": "Entraînez-vous régulièrement pour gagner votre place au classement."
+      },
+      "filters": {
+        "week": "Cette semaine",
+        "month": "Ce mois-ci",
+        "all": "Depuis toujours",
+        "allTimeNote": "Affichage des données globales"
+      },
+      "columns": {
+        "rank": "Rang",
+        "move": "Écart",
+        "athlete": "Athlète",
+        "tier": "Palier",
+        "ovr": "OVR",
+        "pts": "PTS"
+      },
+      "stats": {
+        "rating": "Note",
+        "points": "Points"
+      },
+      "podium": {
+        "champion": "Champion",
+        "runnerUp": "Vice-champion",
+        "thirdPlace": "Troisième place"
+      }
+    }
+  },
+  "activityFeed": {
+    "section": {
+      "eyebrow": "Vie du club",
+      "title": "Fil d’activité du club",
+      "subtitle": "Dernières nouvelles, exploits, séances et mises à jour du club."
+    },
+    "filters": {
+      "all": "Tout",
+      "achievements": "Exploits",
+      "training": "Entraînement",
+      "matches": "Matchs",
+      "coachPosts": "Posts du coach",
+      "events": "Événements"
+    },
+    "empty": "De nouvelles activités apparaîtront bientôt ici.",
+    "actions": {
+      "share": "Partager"
+    },
+    "reactions": {
+      "like": "J’aime",
+      "fire": "Feu",
+      "clap": "Bravo"
+    },
+    "comments": {
+      "count": "{count} commentaires",
+      "placeholder": "Écrire un commentaire..."
+    },
+    "errors": {
+      "loadPosts": "Impossible de charger les posts communautaires.",
+      "updateReaction": "Impossible de mettre à jour la réaction.",
+      "share": "Impossible de partager ce post.",
+      "comment": "Impossible de publier le commentaire.",
+      "moderation": "Impossible de mettre à jour l’action de modération."
+    },
+    "official": {
+      "title": "Mises à jour officielles du club",
+      "tag": "Admin / Coach",
+      "badges": {
+        "gold": "Badge Or"
+      },
+      "labels": {
+        "training": "Entraînement",
+        "matchResult": "Résultat du match",
+        "win": "Victoire",
+        "pinned": "Épinglé",
+        "coachPost": "Post officiel du coach",
+        "coachMessage": "Message du coach",
+        "weekly": "Hebdo",
+        "sessions": "Séances",
+        "completedThisWeek": "terminées cette semaine",
+        "pointsEarned": "Points gagnés",
+        "performanceGain": "gain de performance"
+      },
+      "membersAttended": "{count} membres présents",
+      "duration": "Durée {value}",
+      "mvp": "Joueur MVP : {name}"
+    },
+    "community": {
+      "title": "Posts de la communauté",
+      "tag": "Membres",
+      "createTitle": "Créer un post",
+      "createSubtitle": "Partagez votre progression avec le club...",
+      "onlyMembers": "La création de posts communautaires est réservée aux membres.",
+      "postTypes": {
+        "photo": "Selfie d’entraînement",
+        "achievement": "Exploit",
+        "support": "Soutien",
+        "text": "Post texte"
+      },
+      "actions": {
+        "photo": "Photo",
+        "achievement": "Exploit",
+        "text": "Post texte",
+        "addImage": "Ajouter une image",
+        "support": "Marquer comme message de soutien / motivation",
+        "post": "Publier dans la communauté",
+        "posting": "Publication..."
+      },
+      "errors": {
+        "caption": "Ajoutez une légende avant de publier.",
+        "imageRequired": "Ajoutez un selfie d’entraînement ou une photo de salle.",
+        "publish": "Impossible de publier le post communautaire."
+      }
+    },
+    "demo": {
+      "achievementRank1": {
+        "title": "A atteint le rang n°1",
+        "description": "Une semaine dominée par des enchaînements propres et une régularité de haut niveau.",
+        "comment1": "Mérité, champion.",
+        "comment2": "Garde cette discipline."
+      },
+      "trainingElite": {
+        "title": "Séance de sparring élite terminée",
+        "description": "Des rounds sous pression axés sur le contrôle, la distance et l’intelligence de ring.",
+        "comment": "Le rythme était fou ce soir."
+      },
+      "matchResult": {
+        "title": "Club Nakhil vs Titans Club",
+        "description": "Une exécution clinique et une défense solide ont assuré la victoire.",
+        "comment": "Fier de l’équipe."
+      },
+      "announcement": {
+        "title": "L’entraînement de demain commence à 18 h 00",
+        "description": "Arrivez 15 minutes plus tôt pour la mobilité et le briefing tactique.",
+        "comment": "Prêt coach."
+      },
+      "motivation": {
+        "title": "État d’esprit du jour",
+        "quote": "La discipline bat la motivation.",
+        "description": "La constance sous pression sépare les prétendants des champions.",
+        "comment": "J’avais besoin d’entendre ça aujourd’hui."
+      },
+      "event": {
+        "title": "Tournoi régional",
+        "description": "Les combattants du Club Nakhil concourront en poids léger et moyen.",
+        "eventDate": "Dimanche 18 h 00",
+        "countdown": "Dans 4 j 07 h"
+      },
+      "progress": {
+        "title": "Progression de la semaine",
+        "description": "Belle dynamique du club et présence régulière cette semaine."
+      }
+    }
+  },
+  "pendingApproval": {
+    "approvalRequired": "Validation requise",
+    "accountPending": "Compte en attente",
+    "title": "En attente de validation admin",
+    "description": "Votre compte membre a bien été créé et il est actuellement en cours d’examen. Vous pourrez vous connecter dès qu’un administrateur l’activera.",
+    "registeredEmail": "E-mail enregistré",
+    "warningAvatar": "Votre compte a été créé, mais la photo de profil n’a pas pu être téléversée. Vous pourrez l’ajouter plus tard depuis votre profil après validation.",
+    "backToLogin": "Retour à la connexion",
+    "returnHome": "Retour à l’accueil",
+    "nextTitle": "Ce qui va se passer",
+    "step1": "Un administrateur examine votre demande d’inscription.",
+    "step2": "Le statut de votre compte passe à Actif.",
+    "step3": "Vous pouvez vous connecter et accéder à votre espace membre."
+  },
+  "attendanceScanner": {
+    "title": "Pointage QR de présence",
+    "subtitle": "Scannez le QR de la séance ou collez le jeton manuellement.",
+    "fieldLabel": "Jeton de séance",
+    "fieldPlaceholder": "Collez un jeton ou scannez un QR code",
+    "scan": "Ouvrir la caméra",
+    "scanning": "Scan en cours...",
+    "submit": "Confirmer la présence",
+    "submitting": "Pointage en cours...",
+    "success": "Présence confirmée ! +2 points gagnés.",
+    "errors": {
+      "invalidToken": "Scannez un QR code valide ou saisissez un jeton.",
+      "submit": "Impossible d’enregistrer la présence.",
+      "autoCheckIn": "Le pointage automatique a échoué. Réessayez en scannant.",
+      "camera": "Impossible d’accéder à la caméra. Vous pouvez toujours saisir le jeton manuellement.",
+      "scannerInit": "L’initialisation du scanner a échoué."
+    }
+  },
+  "pages": {
+    "adminDashboard": {
+      "eyebrow": "Vue admin",
+      "title": "Pipeline de validation des membres",
+      "subtitle": "Suivez les demandes en attente, les membres actifs et les comptes bloqués en temps réel.",
+      "openManager": "Ouvrir la gestion des membres",
+      "pendingApproval": "En attente de validation",
+      "pendingHint": "En attente d’une décision admin",
+      "activeMembers": "Membres actifs",
+      "activeHint": "Ont accès à la plateforme",
+      "blockedMembers": "Membres bloqués",
+      "blockedHint": "Accès révoqué",
+      "newThisWeek": "Nouveaux cette semaine",
+      "newThisWeekHint": "Inscriptions sur les 7 derniers jours",
+      "newApprovalsTitle": "Nouvelles validations",
+      "newApprovalsSubtitle": "Passez rapidement en revue les nouveaux membres auto-inscrits.",
+      "reviewPending": "Voir les en attente",
+      "empty": "Aucune inscription en attente pour le moment."
+    },
+    "adminMembers": {
+      "eyebrow": "Membres admin",
+      "title": "Validations des nouveaux utilisateurs",
+      "subtitle": "Traitez d’abord les membres en attente, puis approuvez, refusez, bloquez ou consultez leur profil complet.",
+      "pendingBadge": "En attente {count}",
+      "queueTitle": "File de validation",
+      "queueSubtitle": "Les profils en attente apparaissent en premier. Utilisez la recherche et les filtres pour affiner.",
+      "showing": "{count} membres affichés",
+      "searchPlaceholder": "Rechercher par nom, e-mail ou téléphone",
+      "filterAll": "Tous",
+      "empty": "Aucun membre trouvé pour ce filtre ou cette recherche.",
+      "table": {
+        "member": "Membre",
+        "phone": "Téléphone",
+        "registered": "Inscrit le",
+        "level": "Niveau",
+        "membership": "Abonnement",
+        "age": "Âge",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "mobile": {
+        "phone": "Téléphone",
+        "registered": "Inscrit le",
+        "level": "Niveau sportif",
+        "membership": "Abonnement",
+        "age": "Âge"
+      },
+      "actions": {
+        "approve": "Approuver",
+        "block": "Bloquer",
+        "reject": "Refuser",
+        "activate": "Activer",
+        "view": "Voir",
+        "viewProfile": "Voir le profil",
+        "cancel": "Annuler",
+        "confirmReject": "Confirmer le refus"
+      },
+      "manual": {
+        "title": "Création manuelle d’un membre",
+        "subtitle": "Créez un compte membre directement depuis l’admin si nécessaire.",
+        "profileImageUrl": "URL de photo de profil (facultatif)",
+        "profileImagePlaceholder": "https://...",
+        "create": "Créer le membre",
+        "creating": "Création du membre..."
+      },
+      "detailsTitle": "Détails du profil membre",
+      "confirmRejectTitle": "Confirmer le refus",
+      "confirmRejectText": "Refuser cette inscription en attente supprimera définitivement la demande.",
+      "pendingVisible": "Validations en attente visibles : {count}",
+      "errors": {
+        "load": "Impossible de charger les membres.",
+        "updateStatus": "Impossible de mettre à jour le statut du membre.",
+        "reject": "Impossible de refuser ce membre en attente.",
+        "create": "Impossible de créer le compte membre.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas."
+      },
+      "success": {
+        "approved": "Membre approuvé avec succès.",
+        "blocked": "Membre bloqué avec succès.",
+        "updated": "Statut du membre mis à jour avec succès.",
+        "rejected": "Membre en attente refusé avec succès.",
+        "created": "Compte membre créé avec succès."
+      }
+    },
+    "coachDashboard": {
+      "eyebrow": "Centre coach",
+      "title": "Vue performance",
+      "subtitle": "Suivez le rythme des séances, la présence de l’équipe et les retours en un coup d’œil.",
+      "live": "En direct",
+      "upcomingSessions": "Séances à venir",
+      "upcomingSessionsHint": "Planifiées et visibles pour les membres",
+      "activeMembers": "Membres actifs",
+      "activeMembersHint": "Votre roster privé",
+      "attendance": "Présence (7 jours)",
+      "attendanceHint": "Check-ins récents",
+      "coachRating": "Note coach",
+      "coachRatingHint": "{count} avis membres",
+      "recentFeedbackTitle": "Retours récents",
+      "recentFeedbackSubtitle": "Dernières évaluations laissées par vos membres.",
+      "reviewsBadge": "{count} avis au total",
+      "empty": "Aucun retour pour le moment. Les membres peuvent noter vos séances après y avoir participé.",
+      "noComment": "Aucun commentaire écrit."
+    },
+    "coachMembers": {
+      "eyebrow": "Lecture coach",
+      "title": "Performance des membres",
+      "subtitle": "Analysez la progression, le mouvement au classement et les priorités de coaching.",
+      "totalMembers": "Total membres",
+      "totalMembersHint": "Roster actif sous votre supervision.",
+      "averageRating": "Note moyenne",
+      "averageRatingHint": "Niveau actuel du groupe.",
+      "topPerformers": "Meilleurs performeurs",
+      "topPerformersHint": "Athlètes actuellement en tête.",
+      "needsAttention": "À surveiller",
+      "needsAttentionHint": "Membres nécessitant un suivi rapproché.",
+      "topPerformersEmpty": "Aucune donnée de performance pour le moment.",
+      "needsAttentionEmpty": "Tous les athlètes suivis sont stables pour l’instant.",
+      "rank": "Rang",
+      "rating": "Note",
+      "attendance": "Présence",
+      "monitor": "Surveiller"
+    },
+    "coachAnnouncements": {
+      "title": "Annonces récentes",
+      "empty": "Aucune annonce pour le moment."
+    },
+    "coachAttendance": {
+      "title": "Présence par séance",
+      "subtitle": "Suivez qui a pointé à chaque séance d’entraînement.",
+      "count": "{count} séances",
+      "empty": "Aucune séance pour le moment. Créez-en une pour commencer à suivre la présence.",
+      "checkedIn": "{count} pointés",
+      "noAttendance": "Aucune présence enregistrée pour l’instant.",
+      "table": {
+        "member": "Membre",
+        "email": "E-mail",
+        "checkedIn": "Pointé à"
+      }
+    },
+    "coachRatings": {
+      "averageRating": "Note moyenne",
+      "averageRatingHint": "Sur 5",
+      "totalReviews": "Nombre d’avis",
+      "totalReviewsHint": "Tous envoyés par les membres",
+      "title": "Évaluations récentes",
+      "subtitle": "Les retours envoyés par vos membres.",
+      "count": "{count} avis",
+      "empty": "Aucune évaluation pour le moment. Les retours apparaîtront ici après les séances.",
+      "noComment": "Aucun commentaire fourni."
+    },
+    "coachProfile": {
+      "unavailableTitle": "Profil indisponible",
+      "unavailableDescription": "Nous ne pouvons pas charger votre profil pour le moment.",
+      "refresh": "Actualisez la page puis réessayez.",
+      "averageRating": "Note moyenne",
+      "averageRatingHint": "À partir des avis membres",
+      "totalReviews": "Total des avis",
+      "totalReviewsHint": "Retours envoyés par les membres",
+      "sessionsCoached": "Séances encadrées",
+      "sessionsCoachedHint": "Séances planifiées au total",
+      "experience": "Expérience",
+      "experienceHint": "Années",
+      "identityTitle": "Identité coach",
+      "identityDescription": "Votre spécialisation et votre style d’encadrement.",
+      "contactTitle": "Contact",
+      "contactDescription": "Coordonnées privées pour l’usage interne du club.",
+      "specialization": "Spécialisation",
+      "coachingStyle": "Style de coaching",
+      "achievements": "Réalisations",
+      "certifications": "Certifications",
+      "noCertifications": "Aucune certification ajoutée pour le moment."
+    },
+    "memberDashboard": {
+      "eyebrow": "Tableau athlète",
+      "title": "Centre de performance",
+      "subtitle": "Suivez votre niveau de compétition entre rang, régularité et retours du coach.",
+      "leaderboardUpdated": "Classement mis à jour {date}",
+      "athleteFallback": "Athlète",
+      "rankLabel": "Rang actuel n°{rank}",
+      "notRanked": "Pas encore classé",
+      "attributes": {
+        "attendance": "Présence",
+        "power": "Puissance",
+        "discipline": "Discipline",
+        "speed": "Vitesse",
+        "technique": "Technique",
+        "cardio": "Cardio"
+      },
+      "trend": {
+        "locked": "Vos données de performance se débloqueront après vos premières séances complétées.",
+        "up": "La dynamique monte avec +{count} place(s).",
+        "down": "Le classement a reculé de {count}. Une bonne séance peut vite relancer la progression.",
+        "stable": "Votre performance reste stable. Une séance de qualité peut vous faire grimper."
+      },
+      "highlights": {
+        "points": "Points",
+        "attendance": "Présence",
+        "streak": "Série",
+        "badges": "Badges"
+      },
+      "metric": {
+        "currentRank": "Rang actuel",
+        "currentRankHint": "Commencez à vous entraîner pour débloquer le classement",
+        "previousRank": "Précédent n°{rank}",
+        "overallRating": "Note globale",
+        "overallRatingHint": "Pondérée par la présence, les points, la série, les badges et les retours",
+        "totalPoints": "Total points",
+        "totalPointsHint": "Gagnés via la présence et l’activité",
+        "sessionsAttended": "Séances suivies",
+        "sessionsAttendedHint": "Historique total de présence",
+        "currentStreak": "Série actuelle",
+        "currentStreakHint": "Jours d’entraînement actifs consécutifs"
+      },
+      "upcomingSessionsTitle": "Séances à venir",
+      "upcomingSessionsSubtitle": "Vos prochaines opportunités d’entraînement et affectations coach.",
+      "upcomingSessionsEmpty": "Aucune séance à venir pour le moment.",
+      "coachPrefix": "Coach {name}",
+      "recentNotesTitle": "Dernières notes de progression",
+      "recentNotesSubtitle": "Les retours du coach qui influencent votre prochain palier.",
+      "recentNotesEmpty": "Votre coach n’a pas encore ajouté de note.",
+      "summaryTitle": "Résumé de performance",
+      "summaryLabels": {
+        "trendSignal": "Signal de tendance",
+        "sessionOutlook": "Vue des séances",
+        "badgeProgress": "Progression badges"
+      },
+      "sessionOutlookBooked": "{count} séance(s) à venir planifiée(s).",
+      "sessionOutlookEmpty": "Aucune séance réservée pour l’instant. Rapprochez-vous de votre coach pour le prochain créneau."
+    },
+    "memberLeaderboard": {
+      "eyebrow": "Classement compétition",
+      "title": "Classement des membres",
+      "subtitle": "Le classement est calculé à partir de la note globale réelle, des points, de la présence et des critères d’égalité.",
+      "updated": "Mis à jour {date}",
+      "position": "Votre position n°{rank}",
+      "notRanked": "Pas encore classé",
+      "status": {
+        "locked": "Complétez vos premières séances pour débloquer votre position au classement.",
+        "up": "Vous avez gagné {count} place(s).",
+        "down": "Vous avez perdu {count} place(s).",
+        "stable": "Votre position reste stable."
+      },
+      "highlights": {
+        "points": "Points",
+        "attendance": "Présence",
+        "city": "Ville",
+        "trend": "Tendance",
+        "cityFallback": "N/D"
+      },
+      "podium": {
+        "label": "Podium",
+        "subtitle": "Top 3 des athlètes selon les données de performance réellement enregistrées."
+      },
+      "fullRankingTitle": "Classement complet",
+      "fullRankingSubtitle": "Tous les athlètes classés triés par note globale puis points.",
+      "memberCount": "{count} membres"
+    },
+    "memberRateCoach": {
+      "title": "Évaluer le coach",
+      "subtitle": "Partagez votre retour après les séances terminées pour aider à améliorer la qualité des entraînements.",
+      "count": "{rated}/{total} évaluées",
+      "empty": "Participez d’abord à des séances pour débloquer l’évaluation.",
+      "rated": "Évaluée",
+      "pending": "En attente",
+      "coachPrefix": "Coach {name}"
+    },
+    "memberProgress": {
+      "notesTitle": "Notes de progression du coach",
+      "notesCount": "{count} notes de votre coach",
+      "notesEmpty": "Aucune note de progression pour l’instant. Votre coach ajoutera ses observations ici.",
+      "pointsTitle": "Journal des points",
+      "pointsCount": "{count} gain(s) récents",
+      "pointsEmpty": "Aucun point gagné pour le moment. Participez aux séances pour commencer à cumuler.",
+      "badgesTitle": "Badges obtenus",
+      "badgesCount": "{count} réussite(s) débloquée(s)",
+      "badgesEmpty": "Aucun badge pour le moment. Continuez à vous entraîner pour débloquer des réussites."
+    },
+    "memberAttendance": {
+      "title": "Historique de présence",
+      "subtitle": "Toutes les séances où vous avez pointé.",
+      "count": "{count} séances",
+      "empty": "Aucune présence enregistrée pour le moment. Scannez un QR code pour pointer.",
+      "coachPrefix": "Coach {name}"
+    },
+    "memberSessions": {
+      "title": "Mes séances",
+      "subtitle": "Toutes les séances d’entraînement et votre statut de présence.",
+      "count": "{count} séances",
+      "empty": "Aucune séance disponible pour le moment.",
+      "table": {
+        "session": "Séance",
+        "schedule": "Horaire",
+        "coach": "Coach",
+        "status": "Statut"
+      },
+      "status": {
+        "attended": "Présent",
+        "notCheckedIn": "Non pointé",
+        "absent": "Absent",
+        "rated": "Évaluée",
+        "pending": "En attente"
+      },
+      "coachPrefix": "Coach {name}"
+    },
+    "memberAnnouncements": {
+      "title": "Annonces",
+      "subtitle": "Restez informé des changements de planning et des rappels.",
+      "count": "{count} annonces",
+      "empty": "Aucune annonce pour le moment. Revenez bientôt.",
+      "coachPrefix": "Coach {name}"
+    },
+    "memberProfile": {
+      "unavailableTitle": "Profil indisponible",
+      "unavailableDescription": "Nous ne pouvons pas charger votre profil pour le moment.",
+      "refresh": "Actualisez la page puis réessayez.",
+      "attendance": "Présence",
+      "points": "Points",
+      "currentStreak": "Série actuelle",
+      "overallRating": "Note globale",
+      "overallRatingHint": "La présence, les points, la série, les badges et la progression coach influencent ce score",
+      "currentRank": "Rang actuel",
+      "currentRankHint": "Commencez à vous entraîner pour débloquer le classement",
+      "previousRank": "Précédent n°{rank}",
+      "trainingProfileTitle": "Profil d’entraînement",
+      "trainingProfileDescription": "Vos réglages et préférences de membre actuels.",
+      "progressSummaryTitle": "Résumé de progression",
+      "progressSummaryDescription": "Un aperçu rapide de votre parcours.",
+      "personalDetailsTitle": "Informations personnelles",
+      "personalDetailsDescription": "Votre identité membre et vos coordonnées.",
+      "badgesTitle": "Résumé des badges",
+      "badgesDescription": "Des paliers débloqués grâce à la régularité.",
+      "progressNotes": "Notes de progression",
+      "lastAttendance": "Dernière présence",
+      "lastAttendanceEmpty": "Aucune présence pour le moment",
+      "latestCoachNote": "Dernière note du coach",
+      "latestCoachNoteEmpty": "Aucune note du coach pour le moment.",
+      "badgesEarned": "{count} badge(s) obtenu(s)",
+      "badgesEmpty": "Aucun badge obtenu pour le moment. Continuez à vous entraîner pour débloquer des paliers.",
+      "awarded": "Attribué le {date}"
+    }
+  },
+  "enums": {
+    "accountStatus": {
+      "pending": "En attente",
+      "active": "Actif",
+      "blocked": "Bloqué"
+    },
+    "gender": {
+      "male": "Homme",
+      "female": "Femme",
+      "other": "Autre",
+      "preferNotToSay": "Préfère ne pas répondre"
+    },
+    "trainingLevel": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    },
+    "trainingType": {
+      "cardio": "Cardio",
+      "technique": "Technique",
+      "sparring": "Sparring",
+      "conditioning": "Conditionnement"
+    },
+    "membershipType": {
+      "monthly": "Mensuel",
+      "quarterly": "Trimestriel",
+      "annual": "Annuel"
+    }
+  }
+}

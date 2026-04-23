@@ -22,10 +22,18 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+import { useTranslations } from "@/components/providers/translations-provider";
 import { SectionHeader } from "@/components/sports/section-header";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Tag } from "@/components/ui/tag";
+import {
+  getIntlLocale,
+  translateAccountStatus,
+  translateGender,
+  translateMembershipType,
+  translateTrainingLevel,
+} from "@/lib/i18n";
 
 type FieldErrors = Record<string, string>;
 
@@ -140,8 +148,8 @@ function calculateAge(dateOfBirth: string | null) {
   return age >= 0 ? age : null;
 }
 
-function formatRegistrationDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
+function formatRegistrationDate(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -150,6 +158,8 @@ function formatRegistrationDate(value: string) {
 
 export default function AdminMembersPage() {
   const searchParams = useSearchParams();
+  const { locale, t } = useTranslations();
+  const intlLocale = getIntlLocale(locale);
 
   const initialFilter = useMemo<StatusFilter>(() => {
     const status = searchParams.get("status");
@@ -220,7 +230,7 @@ export default function AdminMembersPage() {
       };
 
       if (!response.ok) {
-        setError(payload.message ?? "Unable to load members.");
+        setError(payload.message ?? t("pages.adminMembers.errors.load"));
         setLoadingMembers(false);
         return;
       }
@@ -249,7 +259,7 @@ export default function AdminMembersPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadMembers(statusFilter, debouncedSearch).catch((loadError) => {
       console.error(loadError);
-      setError("Unable to load members.");
+      setError(t("pages.adminMembers.errors.load"));
       setLoadingMembers(false);
     });
   }, [statusFilter, debouncedSearch, loadMembers]);
@@ -286,8 +296,8 @@ export default function AdminMembersPage() {
     const payload = (await response.json().catch(() => ({}))) as { message?: string };
 
     if (!response.ok) {
-      setError(payload.message ?? "Unable to update member status.");
-      pushToast("error", payload.message ?? "Unable to update member status.");
+      setError(payload.message ?? t("pages.adminMembers.errors.updateStatus"));
+      pushToast("error", payload.message ?? t("pages.adminMembers.errors.updateStatus"));
       setActionLoading(null);
       return;
     }
@@ -297,16 +307,16 @@ export default function AdminMembersPage() {
     setActionLoading(null);
 
     if (status === AccountStatus.ACTIVE && member.status === "PENDING") {
-      pushToast("success", "Member approved successfully");
+      pushToast("success", t("pages.adminMembers.success.approved"));
       return;
     }
 
     if (status === AccountStatus.BLOCKED) {
-      pushToast("success", "Member blocked successfully");
+      pushToast("success", t("pages.adminMembers.success.blocked"));
       return;
     }
 
-    pushToast("success", payload.message ?? "Member status updated successfully");
+    pushToast("success", payload.message ?? t("pages.adminMembers.success.updated"));
   }
 
   async function rejectPendingMember(member: MemberRecord) {
@@ -320,8 +330,8 @@ export default function AdminMembersPage() {
     const payload = (await response.json().catch(() => ({}))) as { message?: string };
 
     if (!response.ok) {
-      setError(payload.message ?? "Unable to reject pending member.");
-      pushToast("error", payload.message ?? "Unable to reject pending member.");
+      setError(payload.message ?? t("pages.adminMembers.errors.reject"));
+      pushToast("error", payload.message ?? t("pages.adminMembers.errors.reject"));
       setActionLoading(null);
       return;
     }
@@ -330,7 +340,7 @@ export default function AdminMembersPage() {
     setLoadingMembers(true);
     await loadMembers(statusFilter, debouncedSearch);
     setActionLoading(null);
-    pushToast("success", "Pending member rejected successfully");
+    pushToast("success", t("pages.adminMembers.success.rejected"));
   }
 
   async function handleManualCreate(event: React.FormEvent<HTMLFormElement>) {
@@ -342,7 +352,7 @@ export default function AdminMembersPage() {
 
     if (manualForm.password !== manualForm.confirmPassword) {
       setFieldErrors({
-        confirmPassword: "Passwords do not match.",
+        confirmPassword: t("pages.adminMembers.errors.passwordMismatch"),
       });
       setCreateLoading(false);
       return;
@@ -378,8 +388,8 @@ export default function AdminMembersPage() {
       if (payload.fieldErrors) {
         setFieldErrors(payload.fieldErrors);
       }
-      setError(payload.message ?? "Unable to create member account.");
-      pushToast("error", payload.message ?? "Unable to create member account.");
+      setError(payload.message ?? t("pages.adminMembers.errors.create"));
+      pushToast("error", payload.message ?? t("pages.adminMembers.errors.create"));
       setCreateLoading(false);
       return;
     }
@@ -388,7 +398,7 @@ export default function AdminMembersPage() {
     setCreateLoading(false);
     setLoadingMembers(true);
     await loadMembers(statusFilter, debouncedSearch);
-    pushToast("success", payload.message ?? "Member account created successfully");
+    pushToast("success", payload.message ?? t("pages.adminMembers.success.created"));
   }
 
   const pendingVisibleCount = sortedMembers.filter((member) => member.status === "PENDING").length;
@@ -396,13 +406,13 @@ export default function AdminMembersPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Admin Members"
-        title="New User Approvals"
-        subtitle="Review pending members first, then approve, reject, block, or inspect full profile details."
+        eyebrow={t("pages.adminMembers.eyebrow")}
+        title={t("pages.adminMembers.title")}
+        subtitle={t("pages.adminMembers.subtitle")}
         action={
           <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-300/35 bg-rose-500/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-rose-100">
             <Users className="h-3.5 w-3.5" />
-            Pending {stats.pending}
+            {t("pages.adminMembers.pendingBadge", { count: stats.pending })}
           </span>
         }
       />
@@ -418,29 +428,29 @@ export default function AdminMembersPage() {
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">
-                Approval Queue
-              </h2>
-              <p className="mt-1 text-sm text-club-muted">
-                Pending profiles are shown first. Use search and filters to narrow the list.
-              </p>
-            </div>
-            <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-club-muted">
-              Showing {sortedMembers.length} members
-            </span>
+            <h2 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">
+                {t("pages.adminMembers.queueTitle")}
+            </h2>
+            <p className="mt-1 text-sm text-club-muted">
+                {t("pages.adminMembers.queueSubtitle")}
+            </p>
+          </div>
+          <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-club-muted">
+            {t("pages.adminMembers.showing", { count: sortedMembers.length })}
+          </span>
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
             <label className="relative block">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-club-muted" />
+              <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-club-muted" />
               <input
                 value={searchInput}
                 onChange={(event) => {
                   setLoadingMembers(true);
                   setSearchInput(event.target.value);
                 }}
-                className="cn-input !pl-10"
-                placeholder="Search by name, email, or phone"
+                className="cn-input !ps-10"
+                placeholder={t("pages.adminMembers.searchPlaceholder")}
               />
             </label>
 
@@ -459,7 +469,7 @@ export default function AdminMembersPage() {
                       : "cn-btn cn-btn-ghost !px-3 !py-2 text-xs"
                   }
                 >
-                  {filter === "ALL" ? "All" : filter.toLowerCase()}
+                  {filter === "ALL" ? t("pages.adminMembers.filterAll") : translateAccountStatus(t, filter)}
                 </button>
               ))}
             </div>
@@ -472,7 +482,7 @@ export default function AdminMembersPage() {
           ) : sortedMembers.length === 0 ? (
             <div className="cn-empty-state mt-5">
               <Users className="h-8 w-8 opacity-30" />
-              <p>No members found for this filter/search.</p>
+              <p>{t("pages.adminMembers.empty")}</p>
             </div>
           ) : (
             <>
@@ -480,14 +490,14 @@ export default function AdminMembersPage() {
                 <table className="w-full min-w-[1120px] table-auto border-collapse text-left text-sm">
                   <thead>
                     <tr className="border-b border-white/10 text-xs uppercase tracking-[0.18em] text-club-muted">
-                      <th className="px-3 py-2">Member</th>
-                      <th className="px-3 py-2">Phone</th>
-                      <th className="px-3 py-2">Registered</th>
-                      <th className="px-3 py-2">Level</th>
-                      <th className="px-3 py-2">Membership</th>
-                      <th className="px-3 py-2">Age</th>
-                      <th className="px-3 py-2">Status</th>
-                      <th className="px-3 py-2 text-right">Actions</th>
+                      <th className="px-3 py-2">{t("pages.adminMembers.table.member")}</th>
+                      <th className="px-3 py-2">{t("pages.adminMembers.table.phone")}</th>
+                      <th className="px-3 py-2">{t("pages.adminMembers.table.registered")}</th>
+                      <th className="px-3 py-2">{t("pages.adminMembers.table.level")}</th>
+                      <th className="px-3 py-2">{t("pages.adminMembers.table.membership")}</th>
+                      <th className="px-3 py-2">{t("pages.adminMembers.table.age")}</th>
+                      <th className="px-3 py-2">{t("pages.adminMembers.table.status")}</th>
+                      <th className="px-3 py-2 text-right">{t("pages.adminMembers.table.actions")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -514,12 +524,12 @@ export default function AdminMembersPage() {
                             </div>
                           </td>
                           <td className="px-3 py-3 text-club-text-soft">{member.phone ?? "-"}</td>
-                          <td className="px-3 py-3 text-xs text-club-muted">{formatRegistrationDate(member.createdAt)}</td>
-                          <td className="px-3 py-3 text-club-text-soft">{member.sportLevel ?? "-"}</td>
-                          <td className="px-3 py-3 text-club-text-soft">{member.membershipType ?? "-"}</td>
+                          <td className="px-3 py-3 text-xs text-club-muted">{formatRegistrationDate(member.createdAt, intlLocale)}</td>
+                          <td className="px-3 py-3 text-club-text-soft">{member.sportLevel ? translateTrainingLevel(t, member.sportLevel) : "-"}</td>
+                          <td className="px-3 py-3 text-club-text-soft">{member.membershipType ? translateMembershipType(t, member.membershipType) : "-"}</td>
                           <td className="px-3 py-3 text-club-text-soft">{age !== null ? `${age}` : "-"}</td>
                           <td className="px-3 py-3">
-                            <Tag label={member.status} tone={tagToneByStatus(member.status)} />
+                            <Tag label={translateAccountStatus(t, member.status)} tone={tagToneByStatus(member.status)} />
                           </td>
                           <td className="px-3 py-3 text-right">
                             <div className="flex justify-end gap-2">
@@ -536,7 +546,7 @@ export default function AdminMembersPage() {
                                     ) : (
                                       <ShieldCheck className="h-3.5 w-3.5" />
                                     )}
-                                    Approve
+                                    {t("pages.adminMembers.actions.approve")}
                                   </button>
                                   <button
                                     type="button"
@@ -545,7 +555,7 @@ export default function AdminMembersPage() {
                                     className="cn-btn cn-btn-danger !px-2.5 !py-1.5 text-xs"
                                   >
                                     <ShieldBan className="h-3.5 w-3.5" />
-                                    Block
+                                    {t("pages.adminMembers.actions.block")}
                                   </button>
                                   <button
                                     type="button"
@@ -554,7 +564,7 @@ export default function AdminMembersPage() {
                                     className="cn-btn cn-btn-ghost !px-2.5 !py-1.5 text-xs"
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
-                                    Reject
+                                    {t("pages.adminMembers.actions.reject")}
                                   </button>
                                 </>
                               ) : member.status === "ACTIVE" ? (
@@ -565,7 +575,7 @@ export default function AdminMembersPage() {
                                   className="cn-btn cn-btn-danger !px-2.5 !py-1.5 text-xs"
                                 >
                                   <ShieldBan className="h-3.5 w-3.5" />
-                                  Block
+                                  {t("pages.adminMembers.actions.block")}
                                 </button>
                               ) : (
                                 <button
@@ -574,7 +584,7 @@ export default function AdminMembersPage() {
                                   disabled={actionLoading?.id === member.id}
                                   className="cn-btn cn-btn-outline !px-2.5 !py-1.5 text-xs"
                                 >
-                                  Activate
+                                  {t("pages.adminMembers.actions.activate")}
                                 </button>
                               )}
 
@@ -584,7 +594,7 @@ export default function AdminMembersPage() {
                                 className="cn-btn cn-btn-ghost !px-2.5 !py-1.5 text-xs"
                               >
                                 <Eye className="h-3.5 w-3.5" />
-                                View
+                                {t("pages.adminMembers.actions.view")}
                               </button>
                             </div>
                           </td>
@@ -612,15 +622,15 @@ export default function AdminMembersPage() {
                             <p className="truncate text-xs text-club-muted">{member.email}</p>
                           </div>
                         </div>
-                        <Tag label={member.status} tone={tagToneByStatus(member.status)} />
+                        <Tag label={translateAccountStatus(t, member.status)} tone={tagToneByStatus(member.status)} />
                       </div>
 
                       <div className="mt-2 grid gap-1 text-xs text-club-muted">
-                        <p>Phone: {member.phone ?? "-"}</p>
-                        <p>Registered: {formatRegistrationDate(member.createdAt)}</p>
-                        <p>Sport level: {member.sportLevel ?? "-"}</p>
-                        <p>Membership: {member.membershipType ?? "-"}</p>
-                        <p>Age: {age !== null ? `${age}` : "-"}</p>
+                        <p>{t("pages.adminMembers.mobile.phone")}: {member.phone ?? "-"}</p>
+                        <p>{t("pages.adminMembers.mobile.registered")}: {formatRegistrationDate(member.createdAt, intlLocale)}</p>
+                        <p>{t("pages.adminMembers.mobile.level")}: {member.sportLevel ? translateTrainingLevel(t, member.sportLevel) : "-"}</p>
+                        <p>{t("pages.adminMembers.mobile.membership")}: {member.membershipType ? translateMembershipType(t, member.membershipType) : "-"}</p>
+                        <p>{t("pages.adminMembers.mobile.age")}: {age !== null ? `${age}` : "-"}</p>
                       </div>
 
                       <div className="mt-3 flex flex-wrap gap-2">
@@ -632,7 +642,7 @@ export default function AdminMembersPage() {
                               disabled={actionLoading?.id === member.id}
                               className="cn-btn cn-btn-primary !px-2.5 !py-1.5 text-xs"
                             >
-                              Approve
+                              {t("pages.adminMembers.actions.approve")}
                             </button>
                             <button
                               type="button"
@@ -640,7 +650,7 @@ export default function AdminMembersPage() {
                               disabled={actionLoading?.id === member.id}
                               className="cn-btn cn-btn-danger !px-2.5 !py-1.5 text-xs"
                             >
-                              Block
+                              {t("pages.adminMembers.actions.block")}
                             </button>
                             <button
                               type="button"
@@ -648,7 +658,7 @@ export default function AdminMembersPage() {
                               disabled={actionLoading?.id === member.id}
                               className="cn-btn cn-btn-ghost !px-2.5 !py-1.5 text-xs"
                             >
-                              Reject
+                              {t("pages.adminMembers.actions.reject")}
                             </button>
                           </>
                         ) : member.status === "ACTIVE" ? (
@@ -658,7 +668,7 @@ export default function AdminMembersPage() {
                             disabled={actionLoading?.id === member.id}
                             className="cn-btn cn-btn-danger !px-2.5 !py-1.5 text-xs"
                           >
-                            Block
+                            {t("pages.adminMembers.actions.block")}
                           </button>
                         ) : (
                           <button
@@ -667,7 +677,7 @@ export default function AdminMembersPage() {
                             disabled={actionLoading?.id === member.id}
                             className="cn-btn cn-btn-outline !px-2.5 !py-1.5 text-xs"
                           >
-                            Activate
+                            {t("pages.adminMembers.actions.activate")}
                           </button>
                         )}
 
@@ -677,7 +687,7 @@ export default function AdminMembersPage() {
                           className="cn-btn cn-btn-ghost !px-2.5 !py-1.5 text-xs"
                         >
                           <Eye className="h-3.5 w-3.5" />
-                          View Profile
+                          {t("pages.adminMembers.actions.viewProfile")}
                         </button>
                       </div>
                     </article>
@@ -690,16 +700,16 @@ export default function AdminMembersPage() {
 
         <Card>
           <h2 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">
-            Manual Member Creation
+            {t("pages.adminMembers.manual.title")}
           </h2>
           <p className="mt-1 text-sm text-club-muted">
-            Create a member account directly from admin when needed.
+            {t("pages.adminMembers.manual.subtitle")}
           </p>
 
           <form onSubmit={handleManualCreate} className="mt-4 space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Full Name</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("profile.editor.fields.fullName")}</span>
                 <input
                   required
                   value={manualForm.fullName}
@@ -710,7 +720,7 @@ export default function AdminMembersPage() {
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Email</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("auth.email")}</span>
                 <input
                   required
                   type="email"
@@ -722,7 +732,7 @@ export default function AdminMembersPage() {
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Phone</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("profile.editor.fields.phone")}</span>
                 <input
                   required
                   value={manualForm.phone}
@@ -733,7 +743,7 @@ export default function AdminMembersPage() {
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Date of Birth</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("profile.editor.fields.dateOfBirth")}</span>
                 <input
                   required
                   type="date"
@@ -745,7 +755,7 @@ export default function AdminMembersPage() {
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Password</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("auth.password")}</span>
                 <input
                   required
                   type="password"
@@ -757,7 +767,7 @@ export default function AdminMembersPage() {
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Confirm Password</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("auth.confirmPassword")}</span>
                 <input
                   required
                   type="password"
@@ -769,7 +779,7 @@ export default function AdminMembersPage() {
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Gender</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("profile.editor.fields.gender")}</span>
                 <select
                   value={manualForm.gender}
                   onChange={(event) =>
@@ -780,14 +790,14 @@ export default function AdminMembersPage() {
                   }
                   className={inputClass(fieldErrors.gender)}
                 >
-                  <option value={Gender.MALE}>Male</option>
-                  <option value={Gender.FEMALE}>Female</option>
-                  <option value={Gender.OTHER}>Other</option>
-                  <option value={Gender.PREFER_NOT_TO_SAY}>Prefer not to say</option>
+                  <option value={Gender.MALE}>{translateGender(t, Gender.MALE)}</option>
+                  <option value={Gender.FEMALE}>{translateGender(t, Gender.FEMALE)}</option>
+                  <option value={Gender.OTHER}>{translateGender(t, Gender.OTHER)}</option>
+                  <option value={Gender.PREFER_NOT_TO_SAY}>{translateGender(t, Gender.PREFER_NOT_TO_SAY)}</option>
                 </select>
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Sport Level</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("profile.editor.fields.trainingLevel")}</span>
                 <select
                   value={manualForm.sportLevel}
                   onChange={(event) =>
@@ -798,13 +808,13 @@ export default function AdminMembersPage() {
                   }
                   className={inputClass(fieldErrors.sportLevel)}
                 >
-                  <option value={TrainingLevel.BEGINNER}>Beginner</option>
-                  <option value={TrainingLevel.INTERMEDIATE}>Intermediate</option>
-                  <option value={TrainingLevel.ADVANCED}>Advanced</option>
+                  <option value={TrainingLevel.BEGINNER}>{translateTrainingLevel(t, TrainingLevel.BEGINNER)}</option>
+                  <option value={TrainingLevel.INTERMEDIATE}>{translateTrainingLevel(t, TrainingLevel.INTERMEDIATE)}</option>
+                  <option value={TrainingLevel.ADVANCED}>{translateTrainingLevel(t, TrainingLevel.ADVANCED)}</option>
                 </select>
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Membership Type</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("pages.adminMembers.table.membership")}</span>
                 <select
                   value={manualForm.membershipType}
                   onChange={(event) =>
@@ -815,13 +825,13 @@ export default function AdminMembersPage() {
                   }
                   className={inputClass(fieldErrors.membershipType)}
                 >
-                  <option value={MembershipType.MONTHLY}>Monthly</option>
-                  <option value={MembershipType.QUARTERLY}>Quarterly</option>
-                  <option value={MembershipType.ANNUAL}>Annual</option>
+                  <option value={MembershipType.MONTHLY}>{translateMembershipType(t, MembershipType.MONTHLY)}</option>
+                  <option value={MembershipType.QUARTERLY}>{translateMembershipType(t, MembershipType.QUARTERLY)}</option>
+                  <option value={MembershipType.ANNUAL}>{translateMembershipType(t, MembershipType.ANNUAL)}</option>
                 </select>
               </label>
               <label className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Initial Status</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("pages.adminMembers.table.status")}</span>
                 <select
                   value={manualForm.status}
                   onChange={(event) =>
@@ -832,15 +842,15 @@ export default function AdminMembersPage() {
                   }
                   className={inputClass(fieldErrors.status)}
                 >
-                  <option value={AccountStatus.ACTIVE}>Active</option>
-                  <option value={AccountStatus.PENDING}>Pending</option>
-                  <option value={AccountStatus.BLOCKED}>Blocked</option>
+                  <option value={AccountStatus.ACTIVE}>{translateAccountStatus(t, AccountStatus.ACTIVE)}</option>
+                  <option value={AccountStatus.PENDING}>{translateAccountStatus(t, AccountStatus.PENDING)}</option>
+                  <option value={AccountStatus.BLOCKED}>{translateAccountStatus(t, AccountStatus.BLOCKED)}</option>
                 </select>
               </label>
             </div>
 
             <label className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Address</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("profile.editor.fields.address")}</span>
               <textarea
                 required
                 rows={2}
@@ -853,7 +863,7 @@ export default function AdminMembersPage() {
             </label>
 
             <label className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Emergency Contact</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("profile.editor.fields.emergencyContact")}</span>
               <input
                 required
                 value={manualForm.emergencyContact}
@@ -868,7 +878,7 @@ export default function AdminMembersPage() {
             </label>
 
             <label className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">Profile Image URL (Optional)</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-club-text-soft">{t("pages.adminMembers.manual.profileImageUrl")}</span>
               <input
                 value={manualForm.profileImage}
                 onChange={(event) =>
@@ -878,13 +888,13 @@ export default function AdminMembersPage() {
                   }))
                 }
                 className={inputClass(fieldErrors.profileImage)}
-                placeholder="https://..."
+                placeholder={t("pages.adminMembers.manual.profileImagePlaceholder")}
               />
             </label>
 
             <button type="submit" disabled={createLoading} className="cn-btn cn-btn-primary w-full !py-3">
               {createLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
-              {createLoading ? "Creating member…" : "Create Member"}
+              {createLoading ? t("pages.adminMembers.manual.creating") : t("pages.adminMembers.manual.create")}
             </button>
           </form>
         </Card>
@@ -893,9 +903,9 @@ export default function AdminMembersPage() {
       {confirmRejectMember ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-white/15 bg-club-surface p-5 shadow-[0_35px_80px_rgba(0,0,0,0.55)]">
-            <h3 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">Confirm Rejection</h3>
+            <h3 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">{t("pages.adminMembers.confirmRejectTitle")}</h3>
             <p className="mt-2 text-sm text-club-text-soft">
-              Rejecting this pending registration will permanently remove the request.
+              {t("pages.adminMembers.confirmRejectText")}
             </p>
             <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
               <p className="font-semibold text-white">{confirmRejectMember.displayName}</p>
@@ -907,7 +917,7 @@ export default function AdminMembersPage() {
                 onClick={() => setConfirmRejectMember(null)}
                 className="cn-btn cn-btn-ghost !py-2"
               >
-                Cancel
+                {t("pages.adminMembers.actions.cancel")}
               </button>
               <button
                 type="button"
@@ -920,7 +930,7 @@ export default function AdminMembersPage() {
                 ) : (
                   <Trash2 className="h-4 w-4" />
                 )}
-                Confirm Reject
+                {t("pages.adminMembers.actions.confirmReject")}
               </button>
             </div>
           </div>
@@ -931,7 +941,7 @@ export default function AdminMembersPage() {
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
           <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-white/15 bg-club-surface shadow-[0_35px_80px_rgba(0,0,0,0.55)]">
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-              <h3 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">Member Profile Details</h3>
+              <h3 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">{t("pages.adminMembers.detailsTitle")}</h3>
               <button
                 type="button"
                 onClick={() => setSelectedMember(null)}
@@ -948,44 +958,44 @@ export default function AdminMembersPage() {
                   <p className="truncate font-semibold text-white">{selectedMember.displayName}</p>
                   <p className="truncate text-sm text-club-muted">{selectedMember.email}</p>
                 </div>
-                <Tag label={selectedMember.status} tone={tagToneByStatus(selectedMember.status)} className="ml-auto" />
+                <Tag label={translateAccountStatus(t, selectedMember.status)} tone={tagToneByStatus(selectedMember.status)} className="ms-auto" />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Phone</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("pages.adminMembers.table.phone")}</p>
                   <p className="mt-1 text-sm text-white">{selectedMember.phone ?? "-"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Date Of Birth</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("profile.editor.fields.dateOfBirth")}</p>
                   <p className="mt-1 text-sm text-white">
-                    {selectedMember.dateOfBirth ? formatRegistrationDate(selectedMember.dateOfBirth) : "-"}
+                    {selectedMember.dateOfBirth ? formatRegistrationDate(selectedMember.dateOfBirth, intlLocale) : "-"}
                   </p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Age</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("pages.adminMembers.table.age")}</p>
                   <p className="mt-1 text-sm text-white">
                     {calculateAge(selectedMember.dateOfBirth) ?? "-"}
                   </p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Gender</p>
-                  <p className="mt-1 text-sm text-white">{selectedMember.gender ?? "-"}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("profile.editor.fields.gender")}</p>
+                  <p className="mt-1 text-sm text-white">{selectedMember.gender ? translateGender(t, selectedMember.gender) : "-"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Sport Level</p>
-                  <p className="mt-1 text-sm text-white">{selectedMember.sportLevel ?? "-"}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("pages.adminMembers.table.level")}</p>
+                  <p className="mt-1 text-sm text-white">{selectedMember.sportLevel ? translateTrainingLevel(t, selectedMember.sportLevel) : "-"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Membership Type</p>
-                  <p className="mt-1 text-sm text-white">{selectedMember.membershipType ?? "-"}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("pages.adminMembers.table.membership")}</p>
+                  <p className="mt-1 text-sm text-white">{selectedMember.membershipType ? translateMembershipType(t, selectedMember.membershipType) : "-"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3 sm:col-span-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Address</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("profile.editor.fields.address")}</p>
                   <p className="mt-1 text-sm text-white">{selectedMember.address ?? "-"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3 sm:col-span-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">Emergency Contact</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-club-muted">{t("profile.editor.fields.emergencyContact")}</p>
                   <p className="mt-1 text-sm text-white">{selectedMember.emergencyContact ?? "-"}</p>
                 </div>
               </div>
@@ -994,7 +1004,7 @@ export default function AdminMembersPage() {
         </div>
       ) : null}
 
-      <div className="pointer-events-none fixed bottom-5 right-5 z-[60] flex w-full max-w-sm flex-col gap-2">
+      <div className="pointer-events-none fixed bottom-5 end-5 z-[60] flex w-full max-w-sm flex-col gap-2">
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -1014,7 +1024,7 @@ export default function AdminMembersPage() {
         ))}
       </div>
 
-      <div className="sr-only">Pending approvals visible: {pendingVisibleCount}</div>
+      <div className="sr-only">{t("pages.adminMembers.pendingVisible", { count: pendingVisibleCount })}</div>
     </div>
   );
 }

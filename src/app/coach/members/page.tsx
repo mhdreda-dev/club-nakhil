@@ -7,11 +7,13 @@ import { SectionHeader } from "@/components/sports/section-header";
 import { Card } from "@/components/ui/card";
 import { requirePageAuth } from "@/lib/page-auth";
 import { prisma } from "@/lib/prisma";
+import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
 
 export default async function CoachMembersPage() {
   const session = await requirePageAuth(Role.COACH);
+  const { t } = await getServerTranslations();
 
   const members = await prisma.user.findMany({
     where: {
@@ -109,52 +111,52 @@ export default async function CoachMembersPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Coach Intelligence"
-        title="Member Performance"
-        subtitle="Review athlete progression, rank movement, and targeted coaching opportunities."
+        eyebrow={t("pages.coachMembers.eyebrow")}
+        title={t("pages.coachMembers.title")}
+        subtitle={t("pages.coachMembers.subtitle")}
       />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card className="border-red-300/20 bg-gradient-to-br from-red-500/15 via-club-surface to-transparent">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">Total Members</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">{t("pages.coachMembers.totalMembers")}</p>
           <p className="mt-2 text-3xl font-black text-white">{athletes.length}</p>
-          <p className="mt-2 text-xs text-red-100/80">Active roster under your supervision.</p>
+          <p className="mt-2 text-xs text-red-100/80">{t("pages.coachMembers.totalMembersHint")}</p>
         </Card>
         <Card className="border-cyan-300/20 bg-gradient-to-br from-cyan-500/15 via-club-surface to-transparent">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">Average Rating</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">{t("pages.coachMembers.averageRating")}</p>
           <p className="mt-2 text-3xl font-black text-white">{averageRating}</p>
-          <p className="mt-2 text-xs text-cyan-100/80">Current squad performance baseline.</p>
+          <p className="mt-2 text-xs text-cyan-100/80">{t("pages.coachMembers.averageRatingHint")}</p>
         </Card>
         <Card className="border-amber-300/25 bg-gradient-to-br from-amber-500/16 via-club-surface to-transparent">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">Top Performers</p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">{t("pages.coachMembers.topPerformers")}</p>
             <Sparkles className="h-4 w-4 text-amber-200" />
           </div>
           <p className="mt-2 text-3xl font-black text-white">{topPerformers.length}</p>
-          <p className="mt-2 text-xs text-amber-100/80">Athletes currently leading the board.</p>
+          <p className="mt-2 text-xs text-amber-100/80">{t("pages.coachMembers.topPerformersHint")}</p>
         </Card>
         <Card className="border-rose-300/25 bg-gradient-to-br from-rose-500/16 via-club-surface to-transparent">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">Need Attention</p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-club-muted">{t("pages.coachMembers.needsAttention")}</p>
             <ShieldAlert className="h-4 w-4 text-rose-200" />
           </div>
           <p className="mt-2 text-3xl font-black text-white">{needsAttention.length}</p>
-          <p className="mt-2 text-xs text-rose-100/80">Members needing close coaching follow-up.</p>
+          <p className="mt-2 text-xs text-rose-100/80">{t("pages.coachMembers.needsAttentionHint")}</p>
         </Card>
       </section>
 
       <section className="grid gap-5 xl:grid-cols-2">
         <Card className="border-amber-300/25 bg-black/20">
-          <h3 className="font-heading text-xl uppercase tracking-[0.08em] text-white">Top Performers</h3>
+          <h3 className="font-heading text-xl uppercase tracking-[0.08em] text-white">{t("pages.coachMembers.topPerformers")}</h3>
           <div className="mt-3 space-y-2">
             {topPerformers.length === 0 ? (
-              <p className="text-sm text-club-muted">No member performance data yet.</p>
+              <p className="text-sm text-club-muted">{t("pages.coachMembers.topPerformersEmpty")}</p>
             ) : (
               topPerformers.map((athlete) => (
                 <div key={athlete.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-3 py-2">
                   <div>
                     <p className="font-semibold text-white">{athlete.name}</p>
-                    <p className="text-xs text-club-muted">Rank {athlete.rank ? `#${athlete.rank}` : "-"}</p>
+                    <p className="text-xs text-club-muted">{t("pages.coachMembers.rank")} {athlete.rank ? `#${athlete.rank}` : "-"}</p>
                   </div>
                   <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/35 bg-amber-500/15 px-2 py-1 text-xs font-semibold text-amber-100">
                     <Award className="h-3.5 w-3.5" />
@@ -167,22 +169,22 @@ export default async function CoachMembersPage() {
         </Card>
 
         <Card className="border-rose-300/25 bg-black/20">
-          <h3 className="font-heading text-xl uppercase tracking-[0.08em] text-white">Needs Attention</h3>
+          <h3 className="font-heading text-xl uppercase tracking-[0.08em] text-white">{t("pages.coachMembers.needsAttention")}</h3>
           <div className="mt-3 space-y-2">
             {needsAttention.length === 0 ? (
-              <p className="text-sm text-club-muted">All tracked athletes are currently stable.</p>
+              <p className="text-sm text-club-muted">{t("pages.coachMembers.needsAttentionEmpty")}</p>
             ) : (
               needsAttention.map((athlete) => (
                 <div key={athlete.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-3 py-2">
                   <div>
                     <p className="font-semibold text-white">{athlete.name}</p>
                     <p className="text-xs text-club-muted">
-                      Rating {athlete.overallRating} • Attendance {athlete.attendanceCount}
+                      {t("pages.coachMembers.rating")} {athlete.overallRating} • {t("pages.coachMembers.attendance")} {athlete.attendanceCount}
                     </p>
                   </div>
                   <span className="inline-flex items-center gap-1 rounded-full border border-rose-300/35 bg-rose-500/15 px-2 py-1 text-xs font-semibold text-rose-100">
                     <AlertTriangle className="h-3.5 w-3.5" />
-                    Monitor
+                    {t("pages.coachMembers.monitor")}
                   </span>
                 </div>
               ))

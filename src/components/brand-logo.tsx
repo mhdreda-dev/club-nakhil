@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 
 import { ClubLogo } from "@/components/club-logo";
+import { useTranslations } from "@/components/providers/translations-provider";
 import { cn } from "@/lib/utils";
 
 type BrandLogoProps = {
@@ -22,16 +25,18 @@ export function BrandLogo({
   compact = false,
   href = "/",
   className,
-  tagline = "Kickboxing · Coach Rabah · Morocco",
+  tagline,
   size = "md",
   framed = true,
 }: BrandLogoProps) {
+  const { t } = useTranslations();
   const px = LOGO_SIZES[size];
+  const resolvedTagline = tagline ?? t("brand.tagline");
 
   return (
     <Link
       href={href}
-      aria-label="Club Nakhil home"
+      aria-label={t("brand.homeAriaLabel")}
       className={cn(
         "group inline-flex items-center gap-3 transition",
         className,
@@ -63,7 +68,7 @@ export function BrandLogo({
               size === "lg" ? "text-[11px]" : "text-[10px]",
             )}
           >
-            {tagline}
+            {resolvedTagline}
           </span>
         </span>
       ) : null}

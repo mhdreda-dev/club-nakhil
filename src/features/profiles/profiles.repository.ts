@@ -1,6 +1,7 @@
-import { AccountStatus, Prisma, Role } from "@prisma/client";
+import { AccountStatus, Prisma, Role, TrainingLevel } from "@prisma/client";
 import { subDays } from "date-fns";
 
+import { createMemberProfileCreateData } from "@/features/profiles/member-profile";
 import { prisma } from "@/lib/prisma";
 import type { NormalizedProfileUpdate } from "@/features/profiles/profiles.schemas";
 
@@ -29,6 +30,7 @@ export async function createDefaultProfileForUser(user: {
   role: Role;
   name: string;
   createdAt: Date;
+  sportLevel?: TrainingLevel | null;
 }) {
   const profile = await prisma.userProfile.create({
     data: {
@@ -51,11 +53,36 @@ export async function createDefaultProfileForUser(user: {
     await prisma.memberProfile.create({
       data: {
         userId: profile.userId,
+        ...createMemberProfileCreateData(user.sportLevel ?? TrainingLevel.BEGINNER),
       },
     });
   }
 
   return profile;
+}
+
+export async function ensureCoachProfileRecord(userId: string) {
+  return prisma.coachProfile.upsert({
+    where: { userId },
+    update: {},
+    create: {
+      userId,
+    },
+  });
+}
+
+export async function ensureMemberProfileRecord(
+  userId: string,
+  trainingLevel?: TrainingLevel,
+) {
+  return prisma.memberProfile.upsert({
+    where: { userId },
+    update: {},
+    create: {
+      userId,
+      ...createMemberProfileCreateData(trainingLevel ?? TrainingLevel.BEGINNER),
+    },
+  });
 }
 
 export async function updateUserProfileBase(userId: string, input: NormalizedProfileUpdate) {
@@ -403,6 +430,7 @@ export async function updateMemberProfileStats(userId: string, data: {
     where: { userId },
     create: {
       userId,
+      ...createMemberProfileCreateData(),
       attendanceCount: data.attendanceCount ?? 0,
       totalPoints: data.totalPoints ?? 0,
       currentStreak: data.currentStreak ?? 0,

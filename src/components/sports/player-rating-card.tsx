@@ -1,8 +1,11 @@
+"use client";
+
 import { Flame, ShieldCheck, Star } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { AttributeGrid, type Attribute } from "@/components/sports/attribute-grid";
 import { XpProgressBar } from "@/components/sports/xp-progress-bar";
+import { useTranslations } from "@/components/providers/translations-provider";
 import { Avatar } from "@/components/ui/avatar";
 import { getTierInfo } from "@/lib/tier";
 import { cn } from "@/lib/utils";
@@ -30,6 +33,7 @@ export function PlayerRatingCard({
   attributes,
   className,
 }: PlayerRatingCardProps) {
+  const { t } = useTranslations();
   const tier = getTierInfo(overallRating);
   const firstName = name.split(" ")[0] ?? name;
 
@@ -74,7 +78,7 @@ export function PlayerRatingCard({
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/30 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/75">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Athlete Profile
+              {t("sports.playerRating.athleteProfile")}
             </span>
             <span
               className={cn(
@@ -85,7 +89,7 @@ export function PlayerRatingCard({
               )}
             >
               <Star className="h-3 w-3" />
-              {tier.name} Tier
+              {t("sports.playerRating.tierLabel", { tier: tier.name })}
             </span>
           </div>
 
@@ -107,7 +111,7 @@ export function PlayerRatingCard({
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/45">
-                Welcome Back
+                {t("sports.playerRating.welcomeBack")}
               </p>
               <h1 className="mt-0.5 font-heading text-4xl uppercase leading-[1.05] tracking-[0.04em] text-white md:text-5xl">
                 {name}
@@ -130,7 +134,7 @@ export function PlayerRatingCard({
           {attributes && attributes.length > 0 && (
             <div className="rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur-sm">
               <p className="mb-3 text-[9px] font-black uppercase tracking-[0.28em] text-white/35">
-                Athlete Attributes
+                {t("sports.playerRating.athleteAttributes")}
               </p>
               <AttributeGrid attributes={attributes} />
             </div>

@@ -6,15 +6,19 @@ import { PlayerRatingCard } from "@/components/sports/player-rating-card";
 import { RankTrendBadge } from "@/components/sports/rank-trend-badge";
 import { SectionHeader } from "@/components/sports/section-header";
 import { Card } from "@/components/ui/card";
+import { normalizeMemberProfile } from "@/features/profiles/member-profile";
 import { syncMemberMetrics } from "@/features/profiles/profiles.service";
 import { formatSessionDate } from "@/lib/format";
+import { translateTrainingType } from "@/lib/i18n";
 import { requirePageAuth } from "@/lib/page-auth";
 import { prisma } from "@/lib/prisma";
+import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
 
 export default async function MemberDashboardPage() {
   const session = await requirePageAuth(Role.MEMBER);
+  const { intlLocale, t } = await getServerTranslations();
   await syncMemberMetrics(session.user.id);
 
   const [attendanceCount, points, badges, upcomingSessions, notes, memberProfile] = await Promise.all([
@@ -86,40 +90,54 @@ export default async function MemberDashboardPage() {
     }),
   ]);
 
+  const safeMemberProfile = normalizeMemberProfile(memberProfile);
   const totalPoints = points._sum.points ?? 0;
-  const roundedRating = Math.round(memberProfile?.overallRating ?? 0);
-  const rankLabel = memberProfile?.currentRank ? `Current Rank #${memberProfile.currentRank}` : "Not ranked yet";
-  const rankChange = memberProfile?.rankChange ?? 0;
-  const streak = memberProfile?.currentStreak ?? 0;
+  const badgeCount = Math.max(safeMemberProfile.badgeCount, badges.length);
+  const roundedRating = Math.round(safeMemberProfile.overallRating);
+  const hasTrackedPerformance =
+    roundedRating > 0 ||
+    attendanceCount > 0 ||
+    totalPoints > 0 ||
+    safeMemberProfile.currentStreak > 0 ||
+    badgeCount > 0;
+  const rankLabel =
+    hasTrackedPerformance && safeMemberProfile.currentRank
+      ? t("pages.memberDashboard.rankLabel", { rank: safeMemberProfile.currentRank })
+      : t("pages.memberDashboard.notRanked");
+  const rankChange = hasTrackedPerformance ? safeMemberProfile.rankChange : 0;
+  const streak = safeMemberProfile.currentStreak;
 
   // Derive FIFA-style attribute scores (40–99) from real member data
   const norm = (v: number, cap: number) => Math.min(1, Math.max(0, v / cap));
-  const toScore = (ratio: number) => Math.round(40 + ratio * 59);
+  const toScore = (ratio: number) => (ratio <= 0 ? 0 : Math.round(40 + ratio * 59));
   const attScore = toScore(norm(attendanceCount, 40));
   const pwrScore = toScore(norm(totalPoints, 120));
   const disScore = toScore(norm(streak, 30));
-  const spdScore = memberProfile?.currentRank
-    ? Math.max(40, Math.min(99, 99 - (memberProfile.currentRank - 1) * 3))
-    : 40;
-  const tecScore = Math.min(99, roundedRating + 1);
-  const carScore = Math.round(attScore * 0.55 + disScore * 0.45);
+  const spdScore =
+    hasTrackedPerformance && safeMemberProfile.currentRank
+      ? Math.max(40, Math.min(99, 99 - (safeMemberProfile.currentRank - 1) * 3))
+      : 0;
+  const tecScore = roundedRating > 0 ? Math.min(99, roundedRating + 1) : 0;
+  const carScore = hasTrackedPerformance ? Math.round(attScore * 0.55 + disScore * 0.45) : 0;
   const memberAttributes = [
-    { code: "ATT", label: "Attendance", value: attScore },
-    { code: "PWR", label: "Power", value: pwrScore },
-    { code: "DIS", label: "Discipline", value: disScore },
-    { code: "SPD", label: "Speed", value: spdScore },
-    { code: "TEC", label: "Technique", value: tecScore },
-    { code: "CAR", label: "Cardio", value: carScore },
+    { code: "ATT", label: t("pages.memberDashboard.attributes.attendance"), value: attScore },
+    { code: "PWR", label: t("pages.memberDashboard.attributes.power"), value: pwrScore },
+    { code: "DIS", label: t("pages.memberDashboard.attributes.discipline"), value: disScore },
+    { code: "SPD", label: t("pages.memberDashboard.attributes.speed"), value: spdScore },
+    { code: "TEC", label: t("pages.memberDashboard.attributes.technique"), value: tecScore },
+    { code: "CAR", label: t("pages.memberDashboard.attributes.cardio"), value: carScore },
   ];
   const trendSummary =
-    rankChange > 0
-      ? `Momentum rising with +${rankChange} rank movement.`
+    !hasTrackedPerformance
+      ? t("pages.memberDashboard.trend.locked")
+      : rankChange > 0
+      ? t("pages.memberDashboard.trend.up", { count: rankChange })
       : rankChange < 0
-        ? `Ranking slipped by ${Math.abs(rankChange)}. A strong session can recover quickly.`
-        : "Performance is stable. One high-quality session can push you up.";
+        ? t("pages.memberDashboard.trend.down", { count: Math.abs(rankChange) })
+        : t("pages.memberDashboard.trend.stable");
 
-  const updatedAtLabel = memberProfile?.leaderboardUpdatedAt
-    ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(
+  const updatedAtLabel = hasTrackedPerformance && memberProfile?.leaderboardUpdatedAt
+    ? new Intl.DateTimeFormat(intlLocale, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(
         memberProfile.leaderboardUpdatedAt,
       )
     : null;
@@ -127,67 +145,71 @@ export default async function MemberDashboardPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Athlete Dashboard"
-        title="Performance Center"
-        subtitle="Track your competitive form across rank, consistency, and coach feedback."
+        eyebrow={t("pages.memberDashboard.eyebrow")}
+        title={t("pages.memberDashboard.title")}
+        subtitle={t("pages.memberDashboard.subtitle")}
         action={
           updatedAtLabel ? (
             <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-club-muted">
-              Leaderboard updated {updatedAtLabel}
+              {t("pages.memberDashboard.leaderboardUpdated", { date: updatedAtLabel })}
             </span>
           ) : null
         }
       />
 
       <PlayerRatingCard
-        name={session.user.name ?? "Athlete"}
+        name={session.user.name ?? t("pages.memberDashboard.athleteFallback")}
         overallRating={roundedRating}
         rankLabel={rankLabel}
         statusText={trendSummary}
         trendBadge={<RankTrendBadge rankChange={rankChange} />}
         attributes={memberAttributes}
         highlights={[
-          { label: "Points", value: totalPoints },
-          { label: "Attendance", value: attendanceCount },
-          { label: "Streak", value: `${streak}d` },
-          { label: "Badges", value: badges.length },
+          { label: t("pages.memberDashboard.highlights.points"), value: totalPoints },
+          { label: t("pages.memberDashboard.highlights.attendance"), value: attendanceCount },
+          { label: t("pages.memberDashboard.highlights.streak"), value: `${streak}d` },
+          { label: t("pages.memberDashboard.highlights.badges"), value: badgeCount },
         ]}
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <MetricCard
-          label="Current Rank"
-          value={memberProfile?.currentRank ? `#${memberProfile.currentRank}` : "-"}
-          hint={memberProfile?.previousRank ? `Previous #${memberProfile.previousRank}` : "First snapshot pending"}
+          label={t("pages.memberDashboard.metric.currentRank")}
+          value={hasTrackedPerformance && safeMemberProfile.currentRank ? `#${safeMemberProfile.currentRank}` : "-"}
+          hint={
+            hasTrackedPerformance && safeMemberProfile.previousRank
+              ? t("pages.memberDashboard.metric.previousRank", { rank: safeMemberProfile.previousRank })
+              : t("pages.memberDashboard.metric.currentRankHint")
+          }
           icon={<Trophy className="h-5 w-5" />}
           badge={<RankTrendBadge rankChange={rankChange} compact />}
           tone="amber"
         />
         <MetricCard
-          label="Overall Rating"
+          label={t("pages.memberDashboard.metric.overallRating")}
           value={roundedRating}
-          hint="Weighted from attendance, points, streak, badges, and feedback"
+          hint={t("pages.memberDashboard.metric.overallRatingHint")}
           icon={<Star className="h-5 w-5" />}
           tone="sky"
         />
         <MetricCard
-          label="Total Points"
+          label={t("pages.memberDashboard.metric.totalPoints")}
           value={totalPoints}
-          hint="Earned through attendance and activity"
+          hint={t("pages.memberDashboard.metric.totalPointsHint")}
           icon={<Sparkles className="h-5 w-5" />}
           tone="emerald"
         />
         <MetricCard
-          label="Sessions Attended"
+          label={t("pages.memberDashboard.metric.sessionsAttended")}
           value={attendanceCount}
-          hint="Total attendance history"
+          hint={t("pages.memberDashboard.metric.sessionsAttendedHint")}
           icon={<CalendarDays className="h-5 w-5" />}
           tone="slate"
         />
         <MetricCard
-          label="Current Streak"
+          label={t("pages.memberDashboard.metric.currentStreak")}
           value={`${streak}d`}
-          hint="Consecutive active training days"
+          hint={t("pages.memberDashboard.metric.currentStreakHint")}
           icon={<Flame className="h-5 w-5" />}
           tone="rose"
         />
@@ -197,14 +219,14 @@ export default async function MemberDashboardPage() {
         <Card className="relative overflow-hidden">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-transparent" />
           <div className="relative">
-            <h2 className="font-heading text-2xl uppercase tracking-wide text-white">Upcoming Sessions</h2>
-            <p className="mt-1 text-sm text-club-muted">Your next training opportunities and coach assignments.</p>
+            <h2 className="font-heading text-2xl uppercase tracking-wide text-white">{t("pages.memberDashboard.upcomingSessionsTitle")}</h2>
+            <p className="mt-1 text-sm text-club-muted">{t("pages.memberDashboard.upcomingSessionsSubtitle")}</p>
           </div>
           <div className="mt-4 space-y-3">
             {upcomingSessions.length === 0 ? (
               <div className="cn-empty-state">
                 <CalendarDays className="h-7 w-7 opacity-25" />
-                <p>No upcoming sessions scheduled right now.</p>
+                <p>{t("pages.memberDashboard.upcomingSessionsEmpty")}</p>
               </div>
             ) : (
               upcomingSessions.map((trainingSession) => (
@@ -215,13 +237,15 @@ export default async function MemberDashboardPage() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="font-semibold text-white">{trainingSession.title}</h3>
                     <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-xs font-semibold text-zinc-100">
-                      {trainingSession.trainingType}
+                      {translateTrainingType(t, trainingSession.trainingType)}
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-club-muted">
-                    {formatSessionDate(trainingSession.sessionDate)} • {trainingSession.startTime} - {trainingSession.endTime}
+                    {formatSessionDate(trainingSession.sessionDate, intlLocale)} • {trainingSession.startTime} - {trainingSession.endTime}
                   </p>
-                  <p className="mt-2 text-xs uppercase tracking-[0.12em] text-red-200/80">Coach {trainingSession.coach.name}</p>
+                  <p className="mt-2 text-xs uppercase tracking-[0.12em] text-red-200/80">
+                    {t("pages.memberDashboard.coachPrefix", { name: trainingSession.coach.name })}
+                  </p>
                 </article>
               ))
             )}
@@ -231,14 +255,14 @@ export default async function MemberDashboardPage() {
         <Card className="relative overflow-hidden">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent" />
           <div className="relative">
-            <h2 className="font-heading text-2xl uppercase tracking-wide text-white">Recent Progress Notes</h2>
-            <p className="mt-1 text-sm text-club-muted">Coach feedback that impacts your next performance jump.</p>
+            <h2 className="font-heading text-2xl uppercase tracking-wide text-white">{t("pages.memberDashboard.recentNotesTitle")}</h2>
+            <p className="mt-1 text-sm text-club-muted">{t("pages.memberDashboard.recentNotesSubtitle")}</p>
           </div>
           <div className="mt-4 space-y-3">
             {notes.length === 0 ? (
               <div className="cn-empty-state">
                 <Sparkles className="h-7 w-7 opacity-25" />
-                <p>Your coach has not added notes yet.</p>
+                <p>{t("pages.memberDashboard.recentNotesEmpty")}</p>
               </div>
             ) : (
               notes.map((note) => (
@@ -255,25 +279,25 @@ export default async function MemberDashboardPage() {
       <Card className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-transparent" />
         <div className="relative">
-          <h2 className="font-heading text-2xl uppercase tracking-wide text-white">Performance Summary</h2>
+          <h2 className="font-heading text-2xl uppercase tracking-wide text-white">{t("pages.memberDashboard.summaryTitle")}</h2>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             <div className="rounded-xl border border-white/12 bg-black/20 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-club-muted">Trend Signal</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-club-muted">{t("pages.memberDashboard.summaryLabels.trendSignal")}</p>
               <p className="mt-1 text-sm font-semibold text-white">{trendSummary}</p>
             </div>
             <div className="rounded-xl border border-white/12 bg-black/20 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-club-muted">Session Outlook</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-club-muted">{t("pages.memberDashboard.summaryLabels.sessionOutlook")}</p>
               <p className="mt-1 text-sm font-semibold text-white">
                 {upcomingSessions.length > 0
-                  ? `${upcomingSessions.length} session(s) ahead. Keep attendance streak alive.`
-                  : "No sessions booked yet. Check with your coach for the next slot."}
+                  ? t("pages.memberDashboard.sessionOutlookBooked", { count: upcomingSessions.length })
+                  : t("pages.memberDashboard.sessionOutlookEmpty")}
               </p>
             </div>
             <div className="rounded-xl border border-white/12 bg-black/20 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-club-muted">Badge Progress</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-club-muted">{t("pages.memberDashboard.summaryLabels.badgeProgress")}</p>
               <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-white">
                 <Medal className="h-4 w-4 text-amber-200" />
-                {badges.length} achievement badge(s) unlocked.
+                {t("pages.memberProfile.badgesEarned", { count: badges.length })}
               </p>
             </div>
           </div>

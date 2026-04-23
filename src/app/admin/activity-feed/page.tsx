@@ -11,7 +11,7 @@ export default async function AdminActivityFeedPage() {
   return (
     <ActivityFeedBoard
       viewerRole={session.user.role}
-      userName={profileHeader?.displayName ?? session.user.name ?? "Admin"}
+      userName={profileHeader?.displayName ?? session.user.name ?? undefined}
       userAvatar={profileHeader?.avatarUrl ?? null}
     />
   );

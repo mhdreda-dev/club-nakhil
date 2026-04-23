@@ -9,11 +9,13 @@ import { Card } from "@/components/ui/card";
 import { formatSessionDate } from "@/lib/format";
 import { requirePageAuth } from "@/lib/page-auth";
 import { prisma } from "@/lib/prisma";
+import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
 
 export default async function CoachDashboardPage() {
   const session = await requirePageAuth(Role.COACH);
+  const { intlLocale, t } = await getServerTranslations();
 
   const [upcomingSessions, memberCount, weeklyAttendance, ratingStats, recentFeedback] =
     await Promise.all([
@@ -82,43 +84,43 @@ export default async function CoachDashboardPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Coach Command Center"
-        title="Performance Overview"
-        subtitle="Monitor session cadence, team attendance, and feedback at a glance."
+        eyebrow={t("pages.coachDashboard.eyebrow")}
+        title={t("pages.coachDashboard.title")}
+        subtitle={t("pages.coachDashboard.subtitle")}
         action={
           <span className="inline-flex items-center gap-2 rounded-full border border-red-300/25 bg-red-500/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-red-100">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-300 shadow-[0_0_8px_rgba(220,38,38,0.9)]" />
-            Live
+            {t("pages.coachDashboard.live")}
           </span>
         }
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="Upcoming Sessions"
+          label={t("pages.coachDashboard.upcomingSessions")}
           value={upcomingSessions}
-          hint="Scheduled and visible to members"
+          hint={t("pages.coachDashboard.upcomingSessionsHint")}
           icon={<CalendarClock className="h-5 w-5" />}
           tone="emerald"
         />
         <MetricCard
-          label="Active Members"
+          label={t("pages.coachDashboard.activeMembers")}
           value={memberCount}
-          hint="Private roster"
+          hint={t("pages.coachDashboard.activeMembersHint")}
           icon={<Users className="h-5 w-5" />}
           tone="sky"
         />
         <MetricCard
-          label="Attendance (7 days)"
+          label={t("pages.coachDashboard.attendance")}
           value={weeklyAttendance}
-          hint="Recent check-ins"
+          hint={t("pages.coachDashboard.attendanceHint")}
           icon={<Users className="h-5 w-5" />}
           tone="slate"
         />
         <MetricCard
-          label="Coach Rating"
+          label={t("pages.coachDashboard.coachRating")}
           value={averageRating.toFixed(2)}
-          hint={`${totalReviews} member reviews`}
+          hint={t("pages.coachDashboard.coachRatingHint", { count: totalReviews })}
           icon={<Star className="h-5 w-5" />}
           tone="amber"
         />
@@ -128,15 +130,15 @@ export default async function CoachDashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">
-              Recent Feedback
+              {t("pages.coachDashboard.recentFeedbackTitle")}
             </h2>
             <p className="mt-1 text-sm text-club-muted">
-              Latest coach ratings from members across your sessions.
+              {t("pages.coachDashboard.recentFeedbackSubtitle")}
             </p>
           </div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/35 bg-amber-400/12 px-3 py-1.5 text-xs font-semibold text-amber-100">
             <MessageSquareText className="h-3.5 w-3.5" />
-            {totalReviews} total reviews
+            {t("pages.coachDashboard.reviewsBadge", { count: totalReviews })}
           </span>
         </div>
 
@@ -144,7 +146,7 @@ export default async function CoachDashboardPage() {
           {recentFeedback.length === 0 ? (
             <div className="cn-empty-state">
               <MessageSquareText className="h-8 w-8 opacity-25" />
-              <p>No feedback yet. Members can rate your sessions after attending.</p>
+              <p>{t("pages.coachDashboard.empty")}</p>
             </div>
           ) : (
             recentFeedback.map((feedback) => (
@@ -160,7 +162,7 @@ export default async function CoachDashboardPage() {
                         {feedback.member.name}
                       </p>
                       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-club-muted">
-                        {feedback.session.title} · {formatSessionDate(feedback.session.sessionDate)}
+                        {feedback.session.title} · {formatSessionDate(feedback.session.sessionDate, intlLocale)}
                       </p>
                     </div>
                   </div>
@@ -171,7 +173,7 @@ export default async function CoachDashboardPage() {
                 </div>
                 <p className="mt-3 text-sm text-zinc-200">
                   {feedback.comment ?? (
-                    <span className="text-club-muted">No written comment.</span>
+                    <span className="text-club-muted">{t("pages.coachDashboard.noComment")}</span>
                   )}
                 </p>
               </article>

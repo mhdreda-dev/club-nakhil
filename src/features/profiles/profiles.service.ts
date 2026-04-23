@@ -1,7 +1,10 @@
-import { Role } from "@prisma/client";
+import { Role, type TrainingLevel, type TrainingType } from "@prisma/client";
 
+import { normalizeMemberProfile } from "@/features/profiles/member-profile";
 import {
   createDefaultProfileForUser,
+  ensureCoachProfileRecord,
+  ensureMemberProfileRecord,
   getCoachStats,
   findUserWithProfile,
   getMemberProfileExtras,
@@ -15,6 +18,7 @@ import {
 } from "@/features/profiles/profiles.repository";
 import { recomputeMemberLeaderboardRanks } from "@/features/leaderboard/leaderboard.service";
 import { calculateMemberOverallRating } from "@/features/profiles/member-rating";
+import { getTierInfo } from "@/lib/tier";
 import type { NormalizedProfileUpdate } from "@/features/profiles/profiles.schemas";
 
 export type ProfileDTO = {
@@ -41,8 +45,8 @@ export type ProfileDTO = {
     achievements: string | null;
   } | null;
   memberProfile: {
-    trainingLevel: string;
-    preferredTrainingType: string | null;
+    trainingLevel: TrainingLevel;
+    preferredTrainingType: TrainingType | null;
     attendanceCount: number;
     totalPoints: number;
     currentStreak: number;
@@ -50,6 +54,10 @@ export type ProfileDTO = {
     currentRank: number | null;
     previousRank: number | null;
     rankChange: number;
+    badgeCount: number;
+    progress: number;
+    wins: number;
+    losses: number;
   } | null;
 };
 
@@ -99,6 +107,11 @@ function toProfileDTO(user: Awaited<ReturnType<typeof findUserWithProfile>>): Pr
     throw new Error("Profile unavailable");
   }
 
+  const memberProfile =
+    user.role === Role.MEMBER
+      ? normalizeMemberProfile(user.profile.memberProfile, user.sportLevel ?? undefined)
+      : null;
+
   return {
     userId: user.id,
     role: user.role,
@@ -124,17 +137,21 @@ function toProfileDTO(user: Awaited<ReturnType<typeof findUserWithProfile>>): Pr
           achievements: user.profile.coachProfile.achievements,
         }
       : null,
-    memberProfile: user.profile.memberProfile
+    memberProfile: memberProfile
       ? {
-          trainingLevel: user.profile.memberProfile.trainingLevel,
-          preferredTrainingType: user.profile.memberProfile.preferredTrainingType,
-          attendanceCount: user.profile.memberProfile.attendanceCount,
-          totalPoints: user.profile.memberProfile.totalPoints,
-          currentStreak: user.profile.memberProfile.currentStreak,
-          overallRating: user.profile.memberProfile.overallRating,
-          currentRank: user.profile.memberProfile.currentRank,
-          previousRank: user.profile.memberProfile.previousRank,
-          rankChange: user.profile.memberProfile.rankChange,
+          trainingLevel: memberProfile.trainingLevel,
+          preferredTrainingType: memberProfile.preferredTrainingType,
+          attendanceCount: memberProfile.attendanceCount,
+          totalPoints: memberProfile.totalPoints,
+          currentStreak: memberProfile.currentStreak,
+          overallRating: memberProfile.overallRating,
+          currentRank: memberProfile.currentRank,
+          previousRank: memberProfile.previousRank,
+          rankChange: memberProfile.rankChange,
+          badgeCount: memberProfile.badgeCount,
+          progress: getTierInfo(memberProfile.overallRating).progress,
+          wins: memberProfile.wins,
+          losses: memberProfile.losses,
         }
       : null,
   };
@@ -188,9 +205,20 @@ export async function ensureProfile(userId: string) {
 
   if (!user.profile) {
     await createDefaultProfileForUser(user);
+    return findUserWithProfile(userId);
   }
 
-  return findUserWithProfile(userId);
+  if (user.role === Role.COACH && !user.profile.coachProfile) {
+    await ensureCoachProfileRecord(userId);
+    return findUserWithProfile(userId);
+  }
+
+  if (user.role === Role.MEMBER && !user.profile.memberProfile) {
+    await ensureMemberProfileRecord(userId, user.sportLevel ?? undefined);
+    return findUserWithProfile(userId);
+  }
+
+  return user;
 }
 
 export async function syncMemberMetrics(userId: string) {
@@ -276,7 +304,10 @@ export async function getProfileSidebarSummary(userId: string): Promise<ProfileS
     };
   }
 
-  const memberProfile = user.profile.memberProfile;
+  const memberProfile = normalizeMemberProfile(
+    user.profile.memberProfile,
+    user.sportLevel ?? undefined,
+  );
 
   return {
     userId,
@@ -286,9 +317,12 @@ export async function getProfileSidebarSummary(userId: string): Promise<ProfileS
     bio: user.profile.bio,
     avatarUrl: user.profile.avatarUrl,
     metrics: [
-      { label: "Points", value: String(memberProfile?.totalPoints ?? 0) },
-      { label: "Rating", value: String(Math.round(memberProfile?.overallRating ?? 0)) },
-      { label: "Rank", value: memberProfile?.currentRank ? `#${memberProfile.currentRank}` : "-" },
+      { label: "Points", value: String(memberProfile.totalPoints) },
+      { label: "Rating", value: String(Math.round(memberProfile.overallRating)) },
+      {
+        label: "Rank",
+        value: memberProfile.overallRating > 0 && memberProfile.currentRank ? `#${memberProfile.currentRank}` : "-",
+      },
     ],
   };
 }

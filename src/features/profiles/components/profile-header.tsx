@@ -1,8 +1,12 @@
+"use client";
+
 import { Role } from "@prisma/client";
 import { Calendar, MapPin } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/translations-provider";
 import { Avatar } from "@/components/ui/avatar";
 import { formatSessionDate } from "@/lib/format";
+import { getIntlLocale } from "@/lib/i18n";
 import { RoleBadge } from "@/features/profiles/components/role-badge";
 
 type ProfileHeaderProps = {
@@ -24,6 +28,8 @@ export function ProfileHeader({
   bio,
   joinedAt,
 }: ProfileHeaderProps) {
+  const { locale, t } = useTranslations();
+
   return (
     <section className="cn-glow-border relative overflow-hidden rounded-3xl border border-red-300/25 bg-[linear-gradient(135deg,rgba(35,8,8,0.95)_0%,rgba(6,9,15,0.95)_55%,rgba(25,20,5,0.8)_100%)] p-6 shadow-[0_28px_80px_rgba(0,0,0,0.5)] sm:p-7">
       <div
@@ -62,7 +68,9 @@ export function ProfileHeader({
           <div className="mt-1 flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/30 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-red-100/90">
               <Calendar className="h-3.5 w-3.5" />
-              Joined {formatSessionDate(new Date(joinedAt))}
+              {t("profile.header.joined", {
+                date: formatSessionDate(new Date(joinedAt), getIntlLocale(locale)),
+              })}
             </span>
             {city ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/30 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-red-100/90">

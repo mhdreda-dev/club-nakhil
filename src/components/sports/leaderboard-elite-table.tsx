@@ -13,7 +13,9 @@ import {
 import { useState, type CSSProperties } from "react";
 
 import type { LeaderboardEntry } from "@/features/leaderboard/leaderboard.service";
+import { useTranslations } from "@/components/providers/translations-provider";
 import { Avatar } from "@/components/ui/avatar";
+import type { MessageKey } from "@/lib/i18n";
 import { getTierInfo } from "@/lib/tier";
 import { cn } from "@/lib/utils";
 
@@ -24,10 +26,10 @@ type LeaderboardEliteTableProps = {
   currentMemberId?: string;
 };
 
-const FILTERS: { key: FilterPeriod; label: string; icon: typeof Clock }[] = [
-  { key: "week", label: "This Week", icon: Clock },
-  { key: "month", label: "This Month", icon: CalendarDays },
-  { key: "all", label: "All Time", icon: Infinity },
+const FILTERS: { key: FilterPeriod; labelKey: MessageKey; icon: typeof Clock }[] = [
+  { key: "week", labelKey: "sports.leaderboard.filters.week", icon: Clock },
+  { key: "month", labelKey: "sports.leaderboard.filters.month", icon: CalendarDays },
+  { key: "all", labelKey: "sports.leaderboard.filters.all", icon: Infinity },
 ];
 
 function RankBadge({ rank }: { rank: number | null }) {
@@ -104,6 +106,7 @@ export function LeaderboardEliteTable({
   leaderboard,
   currentMemberId,
 }: LeaderboardEliteTableProps) {
+  const { t } = useTranslations();
   const [filter, setFilter] = useState<FilterPeriod>("all");
 
   if (leaderboard.length === 0) {
@@ -111,10 +114,10 @@ export function LeaderboardEliteTable({
       <div className="cn-empty-state py-16">
         <Trophy className="h-10 w-10 opacity-20" />
         <p className="font-heading text-sm uppercase tracking-[0.15em]">
-          No ranked athletes yet
+          {t("sports.leaderboard.empty.title")}
         </p>
         <p className="text-xs text-club-muted-soft">
-          Train consistently to earn your place on the board.
+          {t("sports.leaderboard.empty.subtitle")}
         </p>
       </div>
     );
@@ -141,14 +144,14 @@ export function LeaderboardEliteTable({
               )}
             >
               <Icon className="h-3 w-3" />
-              {f.label}
+              {t(f.labelKey)}
             </button>
           );
         })}
 
         {filter !== "all" && (
-          <span className="ml-auto text-[10px] italic text-club-muted-soft">
-            Showing all-time data
+          <span className="ms-auto text-[10px] italic text-club-muted-soft">
+            {t("sports.leaderboard.filters.allTimeNote")}
           </span>
         )}
       </div>
@@ -158,14 +161,14 @@ export function LeaderboardEliteTable({
         {/* Column header */}
         <div className="border-b border-white/8 px-4 py-3">
           <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.22em] text-club-muted">
-            <span className="w-10 shrink-0 text-center">Rank</span>
-            <span className="w-14 shrink-0 text-center">Move</span>
-            <span className="flex-1">Athlete</span>
+            <span className="w-10 shrink-0 text-center">{t("sports.leaderboard.columns.rank")}</span>
+            <span className="w-14 shrink-0 text-center">{t("sports.leaderboard.columns.move")}</span>
+            <span className="flex-1">{t("sports.leaderboard.columns.athlete")}</span>
             <span className="hidden shrink-0 w-16 text-right md:block">
-              Tier
+              {t("sports.leaderboard.columns.tier")}
             </span>
-            <span className="shrink-0 w-10 text-right">OVR</span>
-            <span className="shrink-0 w-12 text-right">PTS</span>
+            <span className="shrink-0 w-10 text-right">{t("sports.leaderboard.columns.ovr")}</span>
+            <span className="shrink-0 w-12 text-right">{t("sports.leaderboard.columns.pts")}</span>
           </div>
         </div>
 
@@ -232,12 +235,12 @@ export function LeaderboardEliteTable({
                       </span>
                       {isCurrentMember && (
                         <span className="inline-flex shrink-0 rounded-full border border-red-300/45 bg-red-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] text-red-200">
-                          You
+                          {t("sports.leaderboard.you")}
                         </span>
                       )}
                     </div>
                     <p className="truncate text-[11px] text-club-muted">
-                      {entry.city ?? "Club Nakhil Member"}
+                      {entry.city ?? t("sports.leaderboard.memberFallback")}
                     </p>
                   </div>
                 </div>

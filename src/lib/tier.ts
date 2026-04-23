@@ -1,4 +1,4 @@
-export type TierName = "Bronze" | "Silver" | "Gold" | "Elite" | "Champion";
+export type TierName = "Unranked" | "Bronze" | "Silver" | "Gold" | "Elite" | "Champion";
 
 export type TierInfo = {
   name: TierName;
@@ -18,6 +18,7 @@ export type TierInfo = {
 };
 
 const TIERS = [
+  { name: "Unranked" as TierName, min: 0, max: 39 },
   { name: "Bronze" as TierName, min: 40, max: 54 },
   { name: "Silver" as TierName, min: 55, max: 64 },
   { name: "Gold" as TierName, min: 65, max: 74 },
@@ -29,6 +30,16 @@ const STYLES: Record<
   TierName,
   Omit<TierInfo, "name" | "min" | "max" | "nextTier" | "nextThreshold" | "progress">
 > = {
+  Unranked: {
+    cardGradient: "from-zinc-950/98 via-zinc-900/92 to-black/98",
+    cardBorder: "border-white/12",
+    cardShadow: "shadow-[0_24px_70px_rgba(0,0,0,0.5)]",
+    badgeBg: "bg-white/8",
+    badgeBorder: "border-white/12",
+    badgeText: "text-zinc-200",
+    ovrText: "text-white",
+    barGradient: "from-zinc-700 via-zinc-500 to-zinc-300",
+  },
   Bronze: {
     cardGradient: "from-orange-950/98 via-orange-900/85 to-amber-950/98",
     cardBorder: "border-orange-500/55",
@@ -82,14 +93,18 @@ const STYLES: Record<
 };
 
 export function getTierInfo(rating: number): TierInfo {
-  const r = Math.min(99, Math.max(40, rating));
+  const r = Math.min(99, Math.max(0, rating));
   const idx = TIERS.findIndex((t) => r >= t.min && r <= t.max);
   const i = idx >= 0 ? idx : TIERS.length - 1;
   const tier = TIERS[i];
   const next = TIERS[i + 1] ?? null;
   const range = tier.max - tier.min + 1;
   const progress =
-    tier.name === "Champion" ? 100 : Math.round(((r - tier.min) / range) * 100);
+    tier.name === "Champion"
+      ? 100
+      : tier.name === "Unranked"
+        ? Math.round((r / 40) * 100)
+        : Math.round(((r - tier.min) / range) * 100);
 
   return {
     name: tier.name,

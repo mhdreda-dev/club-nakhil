@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+import { createMemberProfileCreateData } from "@/features/profiles/member-profile";
 import { requireApiAuth } from "@/lib/route-auth";
 import {
   manualMemberCreateSchema,
@@ -225,7 +226,7 @@ export async function POST(request: NextRequest) {
       await tx.memberProfile.create({
         data: {
           userId: user.id,
-          trainingLevel: parsed.data.sportLevel,
+          ...createMemberProfileCreateData(parsed.data.sportLevel),
         },
       });
 

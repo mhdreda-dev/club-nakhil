@@ -8,11 +8,14 @@ import { SectionHeader } from "@/components/sports/section-header";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Tag } from "@/components/ui/tag";
+import { translateMembershipType, translateTrainingLevel } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
+import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  const { intlLocale, t } = await getServerTranslations();
   const oneWeekAgo = subDays(new Date(), 7);
 
   const [pendingMembers, activeMembers, blockedMembers, newRegistrationsThisWeek, recentPending] =
@@ -77,12 +80,12 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Admin Overview"
-        title="Member Approval Pipeline"
-        subtitle="Track pending requests, active members, and blocked accounts in real time."
+        eyebrow={t("pages.adminDashboard.eyebrow")}
+        title={t("pages.adminDashboard.title")}
+        subtitle={t("pages.adminDashboard.subtitle")}
         action={
           <Link href="/admin/members" className="cn-btn cn-btn-primary !py-2.5">
-            Open Member Manager
+            {t("pages.adminDashboard.openManager")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         }
@@ -90,30 +93,30 @@ export default async function AdminDashboardPage() {
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="Pending Approval"
+          label={t("pages.adminDashboard.pendingApproval")}
           value={pendingMembers}
-          hint="Waiting for admin decision"
+          hint={t("pages.adminDashboard.pendingHint")}
           icon={<Clock3 className="h-5 w-5" />}
           tone="amber"
         />
         <MetricCard
-          label="Active Members"
+          label={t("pages.adminDashboard.activeMembers")}
           value={activeMembers}
-          hint="Can access the platform"
+          hint={t("pages.adminDashboard.activeHint")}
           icon={<UserCheck className="h-5 w-5" />}
           tone="sky"
         />
         <MetricCard
-          label="Blocked Members"
+          label={t("pages.adminDashboard.blockedMembers")}
           value={blockedMembers}
-          hint="Access revoked"
+          hint={t("pages.adminDashboard.blockedHint")}
           icon={<ShieldAlert className="h-5 w-5" />}
           tone="rose"
         />
         <MetricCard
-          label="New This Week"
+          label={t("pages.adminDashboard.newThisWeek")}
           value={newRegistrationsThisWeek}
-          hint="Registrations in the last 7 days"
+          hint={t("pages.adminDashboard.newThisWeekHint")}
           icon={<CalendarDays className="h-5 w-5" />}
           tone="emerald"
         />
@@ -123,21 +126,21 @@ export default async function AdminDashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-heading text-2xl uppercase tracking-[0.06em] text-white">
-              New User Approvals
+              {t("pages.adminDashboard.newApprovalsTitle")}
             </h2>
             <p className="mt-1 text-sm text-club-muted">
-              Review newly self-registered members and process pending approvals quickly.
+              {t("pages.adminDashboard.newApprovalsSubtitle")}
             </p>
           </div>
           <Link href="/admin/members?status=PENDING" className="cn-btn cn-btn-outline !py-2">
-            Review Pending
+            {t("pages.adminDashboard.reviewPending")}
           </Link>
         </div>
 
         <div className="mt-5 space-y-3">
           {recentPending.length === 0 ? (
             <div className="rounded-xl border border-dashed border-white/15 bg-black/20 px-4 py-8 text-center">
-              <p className="text-sm text-club-muted">No pending registrations right now.</p>
+              <p className="text-sm text-club-muted">{t("pages.adminDashboard.empty")}</p>
             </div>
           ) : (
             recentPending.map((member) => (
@@ -162,13 +165,16 @@ export default async function AdminDashboardPage() {
 
                   <div className="flex flex-wrap items-center gap-2">
                     {member.profile?.memberProfile?.trainingLevel ? (
-                      <Tag label={member.profile.memberProfile.trainingLevel} tone="cyan" />
+                      <Tag
+                        label={translateTrainingLevel(t, member.profile.memberProfile.trainingLevel)}
+                        tone="cyan"
+                      />
                     ) : null}
                     {member.membershipType ? (
-                      <Tag label={member.membershipType} tone="gold" />
+                      <Tag label={translateMembershipType(t, member.membershipType)} tone="gold" />
                     ) : null}
                     <span className="text-xs text-club-muted">
-                      {new Intl.DateTimeFormat("en-US", {
+                      {new Intl.DateTimeFormat(intlLocale, {
                         month: "short",
                         day: "numeric",
                         hour: "2-digit",

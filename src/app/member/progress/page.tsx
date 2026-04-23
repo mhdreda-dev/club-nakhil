@@ -5,11 +5,13 @@ import { Card } from "@/components/ui/card";
 import { formatReadableDateTime } from "@/lib/format";
 import { requirePageAuth } from "@/lib/page-auth";
 import { prisma } from "@/lib/prisma";
+import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
 
 export default async function MemberProgressPage() {
   const session = await requirePageAuth(Role.MEMBER);
+  const { intlLocale, t } = await getServerTranslations();
 
   const [notes, pointsLogs, badges] = await Promise.all([
     prisma.progressNote.findMany({
@@ -56,25 +58,25 @@ export default async function MemberProgressPage() {
           <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-300/30 bg-gradient-to-br from-cyan-500/20 to-cyan-700/5 text-cyan-100">
             <BookOpen className="h-4.5 w-4.5" />
           </div>
-          <div>
-            <h2 className="font-heading text-xl uppercase tracking-[0.05em] text-white">Coach Progress Notes</h2>
-            <p className="text-xs text-club-muted">{notes.length} note{notes.length !== 1 ? "s" : ""} from your coach</p>
-          </div>
+            <div>
+              <h2 className="font-heading text-xl uppercase tracking-[0.05em] text-white">{t("pages.memberProgress.notesTitle")}</h2>
+              <p className="text-xs text-club-muted">{t("pages.memberProgress.notesCount", { count: notes.length })}</p>
+            </div>
         </div>
 
         <div className="mt-5 space-y-2.5">
           {notes.length === 0 ? (
-            <div className="cn-empty-state">
-              <BookOpen className="h-7 w-7 opacity-25" />
-              <p>No progress notes yet. Your coach will add observations here.</p>
-            </div>
+              <div className="cn-empty-state">
+                <BookOpen className="h-7 w-7 opacity-25" />
+                <p>{t("pages.memberProgress.notesEmpty")}</p>
+              </div>
           ) : (
             notes.map((note) => (
               <article key={note.id} className="rounded-xl border border-white/8 bg-black/20 p-4 transition hover:border-cyan-300/20">
                 <p className="text-sm leading-relaxed text-zinc-200">{note.note}</p>
                 <div className="mt-2.5 flex items-center justify-between gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-300/80">{note.coach.name}</span>
-                  <span className="text-[10px] text-club-muted">{formatReadableDateTime(note.createdAt)}</span>
+                  <span className="text-[10px] text-club-muted">{formatReadableDateTime(note.createdAt, intlLocale)}</span>
                 </div>
               </article>
             ))
@@ -89,8 +91,8 @@ export default async function MemberProgressPage() {
               <Zap className="h-4.5 w-4.5" />
             </div>
             <div>
-              <h2 className="font-heading text-xl uppercase tracking-[0.05em] text-white">Points Log</h2>
-              <p className="text-xs text-club-muted">Recent {pointsLogs.length} earning{pointsLogs.length !== 1 ? "s" : ""}</p>
+              <h2 className="font-heading text-xl uppercase tracking-[0.05em] text-white">{t("pages.memberProgress.pointsTitle")}</h2>
+              <p className="text-xs text-club-muted">{t("pages.memberProgress.pointsCount", { count: pointsLogs.length })}</p>
             </div>
           </div>
 
@@ -98,7 +100,7 @@ export default async function MemberProgressPage() {
             {pointsLogs.length === 0 ? (
               <div className="cn-empty-state">
                 <Zap className="h-7 w-7 opacity-25" />
-                <p>No points earned yet. Attend sessions to start accumulating.</p>
+                <p>{t("pages.memberProgress.pointsEmpty")}</p>
               </div>
             ) : (
               pointsLogs.map((log) => (
@@ -109,7 +111,7 @@ export default async function MemberProgressPage() {
                   <p className="text-sm text-zinc-200">{log.reason}</p>
                   <div className="flex shrink-0 flex-col items-end gap-0.5">
                     <span className="font-heading text-sm font-bold text-amber-300">+{log.points}</span>
-                    <span className="text-[10px] text-club-muted">{formatReadableDateTime(log.createdAt)}</span>
+                    <span className="text-[10px] text-club-muted">{formatReadableDateTime(log.createdAt, intlLocale)}</span>
                   </div>
                 </div>
               ))
@@ -123,8 +125,8 @@ export default async function MemberProgressPage() {
               <Trophy className="h-4.5 w-4.5" />
             </div>
             <div>
-              <h2 className="font-heading text-xl uppercase tracking-[0.05em] text-white">Badges Earned</h2>
-              <p className="text-xs text-club-muted">{badges.length} achievement{badges.length !== 1 ? "s" : ""} unlocked</p>
+              <h2 className="font-heading text-xl uppercase tracking-[0.05em] text-white">{t("pages.memberProgress.badgesTitle")}</h2>
+              <p className="text-xs text-club-muted">{t("pages.memberProgress.badgesCount", { count: badges.length })}</p>
             </div>
           </div>
 
@@ -132,7 +134,7 @@ export default async function MemberProgressPage() {
             {badges.length === 0 ? (
               <div className="cn-empty-state">
                 <Trophy className="h-7 w-7 opacity-25" />
-                <p>No badges yet. Keep training to unlock achievements.</p>
+                <p>{t("pages.memberProgress.badgesEmpty")}</p>
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 export type Attribute = {
   code: string;
   label: string;
-  value: number; // 40–99
+  value: number; // 0–99
 };
 
 type AttributeGridProps = {
@@ -12,6 +12,7 @@ type AttributeGridProps = {
 };
 
 function scoreColor(v: number) {
+  if (v <= 0) return "text-white/25";
   if (v >= 85) return "text-yellow-300";
   if (v >= 75) return "text-amber-300";
   if (v >= 65) return "text-red-300";
@@ -20,6 +21,7 @@ function scoreColor(v: number) {
 }
 
 function barFill(v: number) {
+  if (v <= 0) return "bg-gradient-to-r from-white/10 to-white/5";
   if (v >= 85) return "bg-gradient-to-r from-yellow-500 to-yellow-300";
   if (v >= 75) return "bg-gradient-to-r from-amber-500 to-amber-300";
   if (v >= 65) return "bg-gradient-to-r from-red-500 to-red-300";
@@ -36,7 +38,10 @@ export function AttributeGrid({ attributes, className }: AttributeGridProps) {
       {cols.map((col, ci) => (
         <div key={ci} className="space-y-2.5">
           {col.map((attr) => {
-            const pct = Math.round(((attr.value - 40) / 59) * 100);
+            const pct =
+              attr.value <= 0
+                ? 0
+                : Math.round(((Math.max(attr.value, 40) - 40) / 59) * 100);
             return (
               <div key={attr.code} className="group">
                 <div className="flex items-center gap-2">
@@ -45,7 +50,7 @@ export function AttributeGrid({ attributes, className }: AttributeGridProps) {
                   </span>
                   <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-black/50">
                     <div
-                      className={cn("absolute inset-y-0 left-0 rounded-full transition-all duration-500", barFill(attr.value))}
+                      className={cn("absolute inset-y-0 start-0 rounded-full transition-all duration-500", barFill(attr.value))}
                       style={{ width: `${pct}%` }}
                     />
                   </div>

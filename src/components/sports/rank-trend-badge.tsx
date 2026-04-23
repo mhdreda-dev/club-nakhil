@@ -1,5 +1,8 @@
+"use client";
+
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 
+import { useTranslations } from "@/components/providers/translations-provider";
 import { cn } from "@/lib/utils";
 
 export type RankTrend = "up" | "down" | "same";
@@ -24,6 +27,7 @@ function getRankTrend(rankChange: number): RankTrend {
 
 export function RankTrendBadge({ rankChange, className, compact = false }: RankTrendBadgeProps) {
   const trend = getRankTrend(rankChange);
+  const { t } = useTranslations();
 
   if (trend === "up") {
     return (
@@ -35,7 +39,9 @@ export function RankTrendBadge({ rankChange, className, compact = false }: RankT
         )}
       >
         <ArrowUpRight className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
-        {compact ? `+${rankChange}` : `Up +${rankChange}`}
+        {compact
+          ? t("sports.rankTrend.compactUp", { count: rankChange })
+          : t("sports.rankTrend.up", { count: rankChange })}
       </span>
     );
   }
@@ -50,7 +56,9 @@ export function RankTrendBadge({ rankChange, className, compact = false }: RankT
         )}
       >
         <ArrowDownRight className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
-        {compact ? `${Math.abs(rankChange)}` : `Down ${Math.abs(rankChange)}`}
+        {compact
+          ? t("sports.rankTrend.compactDown", { count: Math.abs(rankChange) })
+          : t("sports.rankTrend.down", { count: Math.abs(rankChange) })}
       </span>
     );
   }
@@ -64,7 +72,7 @@ export function RankTrendBadge({ rankChange, className, compact = false }: RankT
       )}
     >
       <Minus className={compact ? "h-3 w-3" : "h-3.5 w-3.5"} />
-      {compact ? "0" : "Stable"}
+      {compact ? t("sports.rankTrend.compactStable") : t("sports.rankTrend.stable")}
     </span>
   );
 }

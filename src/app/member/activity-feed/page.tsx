@@ -11,7 +11,7 @@ export default async function MemberActivityFeedPage() {
   return (
     <ActivityFeedBoard
       viewerRole={session.user.role}
-      userName={profileHeader?.displayName ?? session.user.name ?? "Club Member"}
+      userName={profileHeader?.displayName ?? session.user.name ?? undefined}
       userAvatar={profileHeader?.avatarUrl ?? null}
     />
   );

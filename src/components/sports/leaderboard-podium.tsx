@@ -1,8 +1,11 @@
+"use client";
+
 import { Crown, Medal, Star } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
 import type { LeaderboardEntry } from "@/features/leaderboard/leaderboard.service";
 import { Avatar } from "@/components/ui/avatar";
+import { useTranslations } from "@/components/providers/translations-provider";
 import { RankTrendBadge } from "@/components/sports/rank-trend-badge";
 import { getTierInfo } from "@/lib/tier";
 import { cn } from "@/lib/utils";
@@ -106,6 +109,8 @@ export function LeaderboardPodium({
   className,
   footer,
 }: LeaderboardPodiumProps) {
+  const { t } = useTranslations();
+
   if (entries.length === 0) return null;
 
   const orderedByPodium = [entries[1], entries[0], entries[2]].filter(
@@ -125,6 +130,12 @@ export function LeaderboardPodium({
           const isCurrentMember = entry.memberId === currentMemberId;
           const memberTier = getTierInfo(entry.overallRating);
           const Icon = isGold ? Crown : Medal;
+          const toneLabel =
+            tone === "gold"
+              ? t("sports.leaderboard.podium.champion")
+              : tone === "silver"
+                ? t("sports.leaderboard.podium.runnerUp")
+                : t("sports.leaderboard.podium.thirdPlace");
 
           return (
             <article
@@ -176,11 +187,11 @@ export function LeaderboardPodium({
                       cfg.rankText,
                       cfg.rankGlow,
                     )}
-                  >
-                    <Icon
-                      className={cn("h-3.5 w-3.5", cfg.iconColor, cfg.iconGlow)}
-                    />
-                    {cfg.label}
+                    >
+                      <Icon
+                        className={cn("h-3.5 w-3.5", cfg.iconColor, cfg.iconGlow)}
+                      />
+                    {toneLabel}
                   </span>
 
                   <span
@@ -214,7 +225,7 @@ export function LeaderboardPodium({
                       {entry.name}
                     </p>
                     <p className="mt-0.5 text-xs text-club-muted">
-                      {entry.city ?? "Club Nakhil Member"}
+                      {entry.city ?? t("sports.leaderboard.memberFallback")}
                     </p>
                   </div>
                 </div>
@@ -235,7 +246,7 @@ export function LeaderboardPodium({
                   </span>
                   {isCurrentMember && (
                     <span className="inline-flex rounded-full border border-red-300/45 bg-red-500/15 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] text-red-200">
-                      You
+                      {t("sports.leaderboard.you")}
                     </span>
                   )}
                 </div>
@@ -254,8 +265,8 @@ export function LeaderboardPodium({
                         "text-[8px] font-bold uppercase tracking-[0.22em]",
                         cfg.statLabel,
                       )}
-                    >
-                      Rating
+                      >
+                      {t("sports.leaderboard.stats.rating")}
                     </p>
                     <p
                       className={cn(
@@ -273,8 +284,8 @@ export function LeaderboardPodium({
                         "text-[8px] font-bold uppercase tracking-[0.22em]",
                         cfg.statLabel,
                       )}
-                    >
-                      Points
+                      >
+                      {t("sports.leaderboard.stats.points")}
                     </p>
                     <p
                       className={cn(

@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 import { uploadAvatarObject } from "@/features/profiles/avatar.repository";
+import { createMemberProfileCreateData } from "@/features/profiles/member-profile";
 import { buildAvatarStoragePath, validateAvatarFile } from "@/features/profiles/avatar.schemas";
 import { notifyAdminsOfPendingMember } from "@/lib/member-notifications";
 import { prisma } from "@/lib/prisma";
@@ -406,7 +407,7 @@ export async function POST(request: NextRequest) {
             emergencyContact: parsed.data.emergencyContact,
             memberProfile: {
               create: {
-                trainingLevel: parsed.data.sportLevel,
+                ...createMemberProfileCreateData(parsed.data.sportLevel),
               },
             },
           },

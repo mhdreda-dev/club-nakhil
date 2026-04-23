@@ -17,7 +17,9 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useTranslations } from "@/components/providers/translations-provider";
 import { trainingLevelOptions, trainingTypeOptions } from "@/lib/domain";
+import { translateTrainingLevel, translateTrainingType } from "@/lib/i18n";
 
 type SessionItem = {
   id: string;
@@ -59,6 +61,7 @@ type CoachSessionManagerProps = {
 
 export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const [form, setForm] = useState<SessionFormState>(initialFormState);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -89,12 +92,16 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
 
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
-      setMessage(payload.message ?? "Unable to save session.");
+      setMessage(payload.message ?? t("forms.coachSessionManager.errors.save"));
       setLoading(false);
       return;
     }
 
-    setMessage(editingId ? "Session updated." : "Session created.");
+    setMessage(
+      editingId
+        ? t("forms.coachSessionManager.success.updated")
+        : t("forms.coachSessionManager.success.created"),
+    );
     setForm(initialFormState);
     setEditingId(null);
     setLoading(false);
@@ -116,7 +123,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
   }
 
   async function removeSession(id: string) {
-    if (!confirm("Delete this session and related attendance/ratings?")) {
+    if (!confirm(t("forms.coachSessionManager.confirmDelete"))) {
       return;
     }
 
@@ -128,12 +135,12 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
     });
 
     if (!response.ok) {
-      setMessage("Unable to delete session.");
+      setMessage(t("forms.coachSessionManager.errors.delete"));
       setLoading(false);
       return;
     }
 
-    setMessage("Session deleted.");
+    setMessage(t("forms.coachSessionManager.success.deleted"));
     if (editingId === id) {
       setEditingId(null);
       setForm(initialFormState);
@@ -166,16 +173,18 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
             </div>
             <div>
               <h2 className="font-heading text-2xl uppercase leading-none tracking-[0.04em] text-white">
-                {isEditMode ? "Edit Session" : "Create New Session"}
+                {isEditMode
+                  ? t("forms.coachSessionManager.title.edit")
+                  : t("forms.coachSessionManager.title.create")}
               </h2>
               <p className="mt-1 text-sm text-club-muted">
-                Define date, training type, level, and notes. QR is generated automatically.
+                {t("forms.coachSessionManager.subtitle")}
               </p>
             </div>
           </div>
           {isEditMode ? (
             <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/45 bg-amber-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-100">
-              <Pencil className="h-3 w-3" /> Editing
+              <Pencil className="h-3 w-3" /> {t("forms.coachSessionManager.badges.editing")}
             </span>
           ) : null}
         </div>
@@ -183,20 +192,20 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
         <form onSubmit={onSubmit} className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 sm:col-span-2 block">
             <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-              Title
+              {t("forms.coachSessionManager.fields.title")}
             </span>
             <input
               required
               value={form.title}
               onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
               className="cn-input"
-              placeholder="Example: Technique Masterclass"
+              placeholder={t("forms.coachSessionManager.placeholders.title")}
             />
           </label>
 
           <label className="space-y-2 block">
             <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-              Date
+              {t("forms.coachSessionManager.fields.date")}
             </span>
             <input
               required
@@ -212,7 +221,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
           <div className="grid grid-cols-2 gap-3">
             <label className="space-y-2 block">
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-                Start
+                {t("forms.coachSessionManager.fields.start")}
               </span>
               <input
                 required
@@ -226,7 +235,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
             </label>
             <label className="space-y-2 block">
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-                End
+                {t("forms.coachSessionManager.fields.end")}
               </span>
               <input
                 required
@@ -242,7 +251,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
 
           <label className="space-y-2 block">
             <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-              Training Type
+              {t("forms.coachSessionManager.fields.trainingType")}
             </span>
             <select
               value={form.trainingType}
@@ -253,7 +262,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
             >
               {trainingTypeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {translateTrainingType(t, option.value)}
                 </option>
               ))}
             </select>
@@ -261,7 +270,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
 
           <label className="space-y-2 block">
             <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-              Level
+              {t("forms.coachSessionManager.fields.level")}
             </span>
             <select
               value={form.level}
@@ -272,7 +281,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
             >
               {trainingLevelOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {translateTrainingLevel(t, option.value)}
                 </option>
               ))}
             </select>
@@ -280,14 +289,14 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
 
           <label className="space-y-2 sm:col-span-2 block">
             <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-              Coach Notes
+              {t("forms.coachSessionManager.fields.notes")}
             </span>
             <textarea
               rows={3}
               value={form.notes}
               onChange={(event) => setForm((prev) => ({ ...prev, notes: event.target.value }))}
               className="cn-input resize-none"
-              placeholder="Optional focus, reminders, or prep notes"
+              placeholder={t("forms.coachSessionManager.placeholders.notes")}
             />
           </label>
 
@@ -302,7 +311,11 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {isEditMode ? "Save Changes" : "Create Session"}
+              {loading
+                ? t("forms.coachSessionManager.actions.saving")
+                : isEditMode
+                  ? t("forms.coachSessionManager.actions.saveChanges")
+                  : t("forms.coachSessionManager.actions.create")}
             </button>
 
             {isEditMode ? (
@@ -312,7 +325,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                 className="cn-btn cn-btn-ghost"
               >
                 <X className="h-4 w-4" />
-                Cancel Edit
+                {t("forms.coachSessionManager.actions.cancel")}
               </button>
             ) : null}
           </div>
@@ -336,11 +349,16 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
           </div>
           <div>
             <h2 className="font-heading text-2xl uppercase leading-none tracking-[0.04em] text-white">
-              Existing Sessions
+              {t("forms.coachSessionManager.list.title")}
             </h2>
             <p className="mt-1 text-sm text-club-muted">
-              {sortedSessions.length} total{" "}
-              {sortedSessions.length === 1 ? "session" : "sessions"}
+              {t("forms.coachSessionManager.list.count", {
+                count: sortedSessions.length,
+                noun:
+                  sortedSessions.length === 1
+                    ? t("common.units.session.one")
+                    : t("common.units.session.other"),
+              })}
             </p>
           </div>
         </div>
@@ -349,7 +367,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
           {sortedSessions.length === 0 ? (
             <div className="rounded-xl border border-dashed border-white/12 bg-black/20 p-8 text-center">
               <p className="text-sm text-club-muted">
-                No sessions created yet. Launch your first one above.
+                {t("forms.coachSessionManager.list.empty")}
               </p>
             </div>
           ) : (
@@ -368,10 +386,10 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                       {session.title}
                     </h3>
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-red-300/40 bg-red-500/12 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-red-100">
-                      {session.trainingType.toLowerCase()}
+                      {translateTrainingType(t, session.trainingType)}
                     </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-300/40 bg-sky-500/12 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-sky-100">
-                      {session.level.toLowerCase()}
+                      {translateTrainingLevel(t, session.level)}
                     </span>
                   </div>
 
@@ -382,7 +400,9 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                       <Users className="h-3.5 w-3.5 text-red-200/80" />
-                      Attendance: {session.attendanceCount}
+                      {t("forms.coachSessionManager.list.attendance", {
+                        count: session.attendanceCount,
+                      })}
                     </span>
                   </div>
 
@@ -399,7 +419,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                       className="cn-btn cn-btn-outline !py-1.5 !text-[11px]"
                     >
                       <Pencil className="h-3.5 w-3.5" />
-                      Edit
+                      {t("common.edit")}
                     </button>
                     <button
                       type="button"
@@ -407,7 +427,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                       className="cn-btn cn-btn-danger !py-1.5 !text-[11px]"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                      Delete
+                      {t("common.delete")}
                     </button>
                   </div>
                 </div>
@@ -415,11 +435,13 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                 <div className="relative rounded-xl border border-white/10 bg-zinc-950/40 p-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
                   <div className="absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full border border-red-300/45 bg-club-surface px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.24em] text-red-100">
                     <QrCode className="h-3 w-3" />
-                    QR
+                    {t("forms.coachSessionManager.list.qr")}
                   </div>
                   <Image
                     src={session.qrDataUrl}
-                    alt={`QR for ${session.title}`}
+                    alt={t("forms.coachSessionManager.list.qrAlt", {
+                      title: session.title,
+                    })}
                     width={220}
                     height={220}
                     unoptimized

@@ -4,8 +4,11 @@ import { Loader2, Megaphone } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useTranslations } from "@/components/providers/translations-provider";
+
 export function AnnouncementForm() {
   const router = useRouter();
+  const { t } = useTranslations();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,14 +29,14 @@ export function AnnouncementForm() {
 
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
-      setMessage(payload.message ?? "Unable to publish announcement.");
+      setMessage(payload.message ?? t("forms.announcement.errors.publish"));
       setLoading(false);
       return;
     }
 
     setTitle("");
     setContent("");
-    setMessage("Announcement published.");
+    setMessage(t("forms.announcement.success"));
     setLoading(false);
     router.refresh();
   }
@@ -53,10 +56,10 @@ export function AnnouncementForm() {
         </div>
         <div>
           <h2 className="font-heading text-2xl uppercase leading-none tracking-[0.04em] text-white">
-            Publish Announcement
+            {t("forms.announcement.title")}
           </h2>
           <p className="mt-1 text-sm text-club-muted">
-            Send reminders, schedule changes, and motivational notes.
+            {t("forms.announcement.subtitle")}
           </p>
         </div>
       </div>
@@ -64,20 +67,20 @@ export function AnnouncementForm() {
       <div className="mt-5 space-y-4">
         <label className="space-y-2 block">
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-            Title
+            {t("forms.announcement.fields.title")}
           </span>
           <input
             required
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             className="cn-input"
-            placeholder="Example: Monday warm-up starts 10 min earlier"
+            placeholder={t("forms.announcement.placeholders.title")}
           />
         </label>
 
         <label className="space-y-2 block">
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">
-            Message
+            {t("forms.announcement.fields.message")}
           </span>
           <textarea
             required
@@ -85,7 +88,7 @@ export function AnnouncementForm() {
             value={content}
             onChange={(event) => setContent(event.target.value)}
             className="cn-input resize-none"
-            placeholder="Write your note to all members..."
+            placeholder={t("forms.announcement.placeholders.message")}
           />
         </label>
 
@@ -100,7 +103,9 @@ export function AnnouncementForm() {
             ) : (
               <Megaphone className="h-4 w-4" />
             )}
-            Publish
+            {loading
+              ? t("forms.announcement.actions.publishing")
+              : t("forms.announcement.actions.publish")}
           </button>
 
           {message ? (

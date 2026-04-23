@@ -136,6 +136,7 @@ Required:
 
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/club_nakhil?schema=public"
+DIRECT_URL="postgresql://USER:PASSWORD@HOST:5432/club_nakhil?schema=public"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="replace-with-a-long-random-secret"
 NEXT_PUBLIC_SUPABASE_URL="https://YOUR_PROJECT_REF.supabase.co"
@@ -170,9 +171,12 @@ Notes:
 ## PostgreSQL + Prisma Setup
 
 1. Create a PostgreSQL database (Neon/Supabase/Railway/Postgres).
-2. Put the connection string in `DATABASE_URL`.
-3. Run migrations.
-4. Seed demo data.
+2. Put the pooled connection string in `DATABASE_URL`.
+3. Put the direct connection string in `DIRECT_URL`.
+   If your provider does not give you a separate direct URL, you can reuse `DATABASE_URL`.
+4. Replace the `USER`, `PASSWORD`, and `HOST` placeholders in `.env`.
+5. Run migrations.
+6. Seed demo data.
 
 Commands:
 

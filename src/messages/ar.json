@@ -1,0 +1,893 @@
+{
+  "locale": {
+    "switcher": "تغيير اللغة",
+    "english": "الإنجليزية",
+    "french": "الفرنسية",
+    "arabic": "العربية"
+  },
+  "common": {
+    "close": "إغلاق",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "notSet": "غير محدد",
+    "notProvided": "غير متوفر",
+    "none": "لا شيء",
+    "by": "من خلال",
+    "and": "و",
+    "termsOfService": "شروط الاستخدام",
+    "privacyPolicy": "سياسة الخصوصية",
+    "units": {
+      "session": {
+        "one": "جلسة",
+        "other": "جلسات"
+      }
+    }
+  },
+  "brand": {
+    "tagline": "كيك بوكسينغ · الكوتش رابح · المغرب",
+    "homeAriaLabel": "العودة إلى الصفحة الرئيسية لنادي النخيل"
+  },
+  "splash": {
+    "loading": "جارٍ التحميل"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "members": "الأعضاء",
+    "sessions": "الجلسات",
+    "attendance": "الحضور",
+    "leaderboard": "لوحة الصدارة",
+    "activityFeed": "سجل النشاط",
+    "announcements": "الإعلانات",
+    "progress": "التقدم",
+    "ratings": "التقييمات",
+    "profile": "الملف الشخصي"
+  },
+  "roles": {
+    "admin": "مسؤول",
+    "coach": "مدرب",
+    "member": "عضو"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "welcomeBack": "مرحبًا بعودتك",
+    "createAccount": "أنشئ حسابك",
+    "fullName": "الاسم الكامل",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "role": "الدور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "creatingAccount": "عند إنشاء حسابك",
+    "placeholders": {
+      "fullName": "أدخل اسمك الكامل",
+      "email": "name@example.com",
+      "password": "أدخل كلمة المرور",
+      "confirmPassword": "أعد كتابة كلمة المرور"
+    },
+    "notes": {
+      "accountReview": "تتم مراجعة الحسابات الجديدة قبل تفعيلها."
+    },
+    "errors": {
+      "pendingApproval": "حسابك بانتظار موافقة الإدارة.",
+      "accountBlocked": "تم حظر حسابك. يرجى التواصل مع الإدارة.",
+      "invalidCredentials": "بيانات الدخول غير صحيحة. تحقق من البريد الإلكتروني وكلمة المرور.",
+      "unauthorized": "سجّل الدخول للمتابعة.",
+      "forbidden": "ليس لديك صلاحية لهذا الإجراء."
+    }
+  },
+  "layout": {
+    "mobileNav": {
+      "open": "فتح القائمة",
+      "close": "إغلاق القائمة"
+    },
+    "logout": {
+      "ariaLabel": "تسجيل الخروج",
+      "label": "خروج"
+    },
+    "admin": {
+      "title": "مركز قيادة المسؤول",
+      "subtitle": "وافق على التسجيلات، وأدر حالات الحسابات، وحافظ على تنظيم القائمة."
+    },
+    "coach": {
+      "title": "بوابة المدرب",
+      "subtitle": "أدر الرياضيين، وتابع الجلسات، وراقب التقدم."
+    },
+    "member": {
+      "title": "مساحة العضو",
+      "subtitle": "تابع جلساتك وتقدمك وإنجازاتك.",
+      "nav": {
+        "profile": "ملفي الشخصي",
+        "sessions": "جلساتي",
+        "attendance": "حضوري",
+        "progress": "تقدمي",
+        "rateCoach": "تقييم المدرب"
+      }
+    }
+  },
+  "forms": {
+    "announcement": {
+      "title": "نشر إعلان",
+      "subtitle": "أرسل تذكيرات وتغييرات في المواعيد ورسائل تحفيزية.",
+      "fields": {
+        "title": "العنوان",
+        "message": "الرسالة"
+      },
+      "placeholders": {
+        "title": "مثال: يبدأ إحماء يوم الاثنين قبل 10 دقائق",
+        "message": "اكتب رسالتك لجميع الأعضاء..."
+      },
+      "actions": {
+        "publish": "نشر",
+        "publishing": "جارٍ النشر..."
+      },
+      "success": "تم نشر الإعلان.",
+      "errors": {
+        "publish": "تعذر نشر الإعلان."
+      }
+    },
+    "progressNote": {
+      "placeholder": "أضف ملاحظة تدريبية لهذا العضو",
+      "actions": {
+        "save": "حفظ الملاحظة",
+        "saving": "جارٍ الحفظ..."
+      },
+      "success": "تم حفظ ملاحظة التقدم.",
+      "errors": {
+        "save": "تعذر إضافة ملاحظة التقدم."
+      }
+    },
+    "rateCoach": {
+      "fields": {
+        "rating": "التقييم",
+        "comment": "تعليق اختياري"
+      },
+      "placeholder": "ما الذي ساعدك أكثر في هذه الجلسة؟",
+      "score": "{value} / 5",
+      "actions": {
+        "submit": "إرسال التقييم",
+        "submitting": "جارٍ الإرسال..."
+      },
+      "success": "تم إرسال ملاحظاتك للمدرب.",
+      "errors": {
+        "submit": "تعذر إرسال التقييم."
+      },
+      "aria": {
+        "rateStars": "قيّم بـ {count} نجوم"
+      }
+    },
+    "coachSessionManager": {
+      "title": {
+        "create": "إنشاء جلسة جديدة",
+        "edit": "تعديل الجلسة"
+      },
+      "subtitle": "حدد التاريخ ونوع التدريب والمستوى والملاحظات. يتم إنشاء رمز QR تلقائيًا.",
+      "badges": {
+        "editing": "تعديل"
+      },
+      "fields": {
+        "title": "العنوان",
+        "date": "التاريخ",
+        "start": "البداية",
+        "end": "النهاية",
+        "trainingType": "نوع التدريب",
+        "level": "المستوى",
+        "notes": "ملاحظات المدرب"
+      },
+      "placeholders": {
+        "title": "مثال: حصة تقنية متقدمة",
+        "notes": "تركيز أو تذكيرات أو ملاحظات تحضير اختيارية"
+      },
+      "actions": {
+        "create": "إنشاء الجلسة",
+        "saveChanges": "حفظ التغييرات",
+        "saving": "جارٍ الحفظ...",
+        "cancel": "إلغاء التعديل"
+      },
+      "success": {
+        "created": "تم إنشاء الجلسة.",
+        "updated": "تم تحديث الجلسة.",
+        "deleted": "تم حذف الجلسة."
+      },
+      "errors": {
+        "save": "تعذر حفظ الجلسة.",
+        "delete": "تعذر حذف الجلسة."
+      },
+      "confirmDelete": "هل تريد حذف هذه الجلسة وما يرتبط بها من حضور وتقييمات؟",
+      "list": {
+        "title": "الجلسات الحالية",
+        "count": "{count} {noun} إجمالاً",
+        "empty": "لا توجد جلسات بعد. ابدأ بإنشاء أول جلسة بالأعلى.",
+        "attendance": "الحضور: {count}",
+        "qr": "QR",
+        "qrAlt": "رمز QR لـ {title}"
+      }
+    }
+  },
+  "profile": {
+    "avatar": {
+      "actions": {
+        "choose": "اختر صورة",
+        "upload": "رفع الصورة الرمزية",
+        "uploading": "جارٍ الرفع..."
+      },
+      "selected": "المحدد:",
+      "current": "الحالي:",
+      "helpText": "JPG أو PNG أو WEBP. الحد الأقصى {size}.",
+      "success": "تم رفع الصورة الرمزية بنجاح.",
+      "errors": {
+        "unsupportedFormat": "صيغة الصورة غير مدعومة. استخدم JPG أو PNG أو WEBP.",
+        "maxSize": "الصورة كبيرة جدًا. الحد الأقصى {size}.",
+        "chooseImage": "اختر صورة قبل الرفع.",
+        "uploadFailed": "فشل رفع الصورة الرمزية.",
+        "metadataMissing": "اكتمل الرفع لكن بيانات الصورة الرمزية مفقودة.",
+        "unavailable": "تعذر رفع الصورة الرمزية الآن.",
+        "bucketMissing": "تخزين الصور الرمزية غير جاهز بعد. حاول مرة أخرى لاحقًا."
+      }
+    },
+    "header": {
+      "joined": "انضم في {date}"
+    },
+    "editor": {
+      "actions": {
+        "save": "حفظ الملف الشخصي",
+        "saving": "جارٍ الحفظ..."
+      },
+      "success": {
+        "updated": "تم تحديث الملف الشخصي بنجاح.",
+        "avatarUpdated": "تم تحديث الصورة الرمزية بنجاح."
+      },
+      "errors": {
+        "update": "تعذر تحديث الملف الشخصي."
+      },
+      "sections": {
+        "editProfile": {
+          "title": "تعديل الملف الشخصي",
+          "description": "حدّث هويتك وبيانات الاتصال والتفاصيل الخاصة بدورك."
+        },
+        "avatar": {
+          "title": "إعدادات الصورة الرمزية",
+          "description": "حدد هويتك البصرية عبر Club Nakhil."
+        },
+        "coach": {
+          "title": "ملف المدرب",
+          "description": "أبرز هويتك التدريبية وخلفيتك."
+        },
+        "member": {
+          "title": "تفضيلات العضو",
+          "description": "خصص ملفك التدريبي."
+        }
+      },
+      "fields": {
+        "fullName": "الاسم الكامل",
+        "displayName": "الاسم الظاهر",
+        "phone": "الهاتف",
+        "dateOfBirth": "تاريخ الميلاد",
+        "gender": "الجنس",
+        "city": "المدينة",
+        "address": "العنوان",
+        "bio": "نبذة",
+        "emergencyContact": "جهة الاتصال للطوارئ",
+        "specialization": "التخصص",
+        "yearsOfExperience": "سنوات الخبرة",
+        "certifications": "الشهادات",
+        "coachingStyle": "أسلوب التدريب",
+        "achievements": "الإنجازات",
+        "trainingLevel": "مستوى التدريب",
+        "preferredTrainingType": "نوع التدريب المفضل"
+      },
+      "placeholders": {
+        "fullName": "اسمك القانوني الكامل",
+        "displayName": "الاسم الذي يظهر في اللوحات",
+        "phone": "+212...",
+        "gender": "اختر الجنس",
+        "city": "الدار البيضاء",
+        "address": "الشارع، الحي، المدينة",
+        "bio": "شارك نبذة قصيرة عنك",
+        "emergencyContact": "الاسم + الهاتف",
+        "specialization": "تقنية، سبارينغ، لياقة...",
+        "yearsOfExperience": "10",
+        "certifications": "قائمة مفصولة بفواصل",
+        "coachingStyle": "كيف تنظم الجلسات وتحفز الرياضيين",
+        "achievements": "ألقاب، محطات مهمة، نتائج الرياضيين"
+      }
+    }
+  },
+  "sports": {
+    "athleteSummary": {
+      "unranked": "غير مصنف",
+      "latestCoachNote": "أحدث ملاحظة من المدرب",
+      "emptyNote": "لا توجد ملاحظات تقدم بعد.",
+      "stats": {
+        "rating": "التقييم",
+        "points": "النقاط",
+        "attendance": "الحضور",
+        "badges": "الشارات"
+      },
+      "badges": {
+        "topPerformer": "الأفضل أداءً",
+        "needsAttention": "يحتاج متابعة",
+        "inProgress": "قيد التقدم"
+      }
+    },
+    "rankTrend": {
+      "up": "صعود +{count}",
+      "down": "هبوط {count}",
+      "stable": "مستقر",
+      "compactUp": "+{count}",
+      "compactDown": "{count}",
+      "compactStable": "0"
+    },
+    "playerRating": {
+      "athleteProfile": "ملف اللاعب",
+      "tierLabel": "فئة {tier}",
+      "welcomeBack": "مرحبًا بعودتك",
+      "athleteAttributes": "خصائص اللاعب"
+    },
+    "xpProgress": {
+      "current": "{points}/{total} XP",
+      "nextTier": "{points} نقطة → {tier}",
+      "maxTier": "★ أعلى فئة"
+    },
+    "leaderboard": {
+      "you": "أنت",
+      "memberFallback": "عضو Club Nakhil",
+      "empty": {
+        "title": "لا يوجد رياضيون مصنفون بعد",
+        "subtitle": "تدرّب باستمرار لتحجز مكانك في لوحة الصدارة."
+      },
+      "filters": {
+        "week": "هذا الأسبوع",
+        "month": "هذا الشهر",
+        "all": "كل الوقت",
+        "allTimeNote": "يتم عرض بيانات جميع الفترات"
+      },
+      "columns": {
+        "rank": "الترتيب",
+        "move": "التغير",
+        "athlete": "اللاعب",
+        "tier": "الفئة",
+        "ovr": "OVR",
+        "pts": "PTS"
+      },
+      "stats": {
+        "rating": "التقييم",
+        "points": "النقاط"
+      },
+      "podium": {
+        "champion": "البطل",
+        "runnerUp": "الوصيف",
+        "thirdPlace": "المركز الثالث"
+      }
+    }
+  },
+  "activityFeed": {
+    "section": {
+      "eyebrow": "نبض النادي",
+      "title": "سجل نشاط النادي",
+      "subtitle": "آخر الأخبار والإنجازات والجلسات وتحديثات النادي."
+    },
+    "filters": {
+      "all": "الكل",
+      "achievements": "الإنجازات",
+      "training": "التدريب",
+      "matches": "المباريات",
+      "coachPosts": "منشورات المدرب",
+      "events": "الفعاليات"
+    },
+    "empty": "ستظهر أنشطة جديدة هنا قريبًا.",
+    "actions": {
+      "share": "مشاركة"
+    },
+    "reactions": {
+      "like": "إعجاب",
+      "fire": "حماس",
+      "clap": "تصفيق"
+    },
+    "comments": {
+      "count": "{count} تعليق",
+      "placeholder": "اكتب تعليقًا..."
+    },
+    "errors": {
+      "loadPosts": "تعذر تحميل منشورات المجتمع.",
+      "updateReaction": "تعذر تحديث التفاعل.",
+      "share": "تعذر مشاركة هذا المنشور.",
+      "comment": "تعذر نشر التعليق.",
+      "moderation": "تعذر تحديث إجراء الإشراف."
+    },
+    "official": {
+      "title": "تحديثات النادي الرسمية",
+      "tag": "إدارة / مدرب",
+      "badges": {
+        "gold": "شارة ذهبية"
+      },
+      "labels": {
+        "training": "تدريب",
+        "matchResult": "نتيجة المباراة",
+        "win": "فوز",
+        "pinned": "مثبت",
+        "coachPost": "منشور رسمي من المدرب",
+        "coachMessage": "رسالة المدرب",
+        "weekly": "أسبوعي",
+        "sessions": "الجلسات",
+        "completedThisWeek": "أُنجزت هذا الأسبوع",
+        "pointsEarned": "النقاط المكتسبة",
+        "performanceGain": "تحسن الأداء"
+      },
+      "membersAttended": "حضر {count} عضوًا",
+      "duration": "المدة {value}",
+      "mvp": "أفضل لاعب: {name}"
+    },
+    "community": {
+      "title": "منشورات المجتمع",
+      "tag": "الأعضاء",
+      "createTitle": "إنشاء منشور",
+      "createSubtitle": "شارك تقدمك مع النادي...",
+      "onlyMembers": "إنشاء المنشورات المجتمعية متاح للأعضاء فقط.",
+      "postTypes": {
+        "photo": "صورة تدريب",
+        "achievement": "إنجاز",
+        "support": "دعم",
+        "text": "منشور نصي"
+      },
+      "actions": {
+        "photo": "صورة",
+        "achievement": "إنجاز",
+        "text": "منشور نصي",
+        "addImage": "إضافة صورة",
+        "support": "وضعه كرسالة دعم / تحفيز",
+        "post": "انشر في المجتمع",
+        "posting": "جارٍ النشر..."
+      },
+      "errors": {
+        "caption": "أضف وصفًا قبل النشر.",
+        "imageRequired": "أضف صورة تدريب أو صورة من القاعة.",
+        "publish": "تعذر نشر المنشور المجتمعي."
+      }
+    },
+    "demo": {
+      "achievementRank1": {
+        "title": "وصل إلى المركز الأول",
+        "description": "هيمن هذا الأسبوع بتركيبات نظيفة وثبات على مستوى عالٍ.",
+        "comment1": "مستحق يا بطل.",
+        "comment2": "حافظ على هذا الانضباط."
+      },
+      "trainingElite": {
+        "title": "انتهت حصة السبارينغ النخبوية",
+        "description": "جولات عالية الضغط ركزت على التحكم والمسافة وذكاء الحلبة.",
+        "comment": "الوتيرة كانت قوية جدًا الليلة."
+      },
+      "matchResult": {
+        "title": "كلوب النخيل ضد تايتنز كلوب",
+        "description": "تنفيذ جماعي حاسم ودفاع قوي ضمنا الفوز.",
+        "comment": "فخور بالفريق."
+      },
+      "announcement": {
+        "title": "تدريب الغد يبدأ الساعة 18:00",
+        "description": "احضر قبل 15 دقيقة للإحماء الحركي والإيجاز التكتيكي.",
+        "comment": "جاهز كوتش."
+      },
+      "motivation": {
+        "title": "ذهنية اليوم",
+        "quote": "الانضباط يتفوق على الحماس.",
+        "description": "الثبات تحت الضغط هو ما يميز المنافسين عن الأبطال.",
+        "comment": "كنت أحتاج هذا اليوم."
+      },
+      "event": {
+        "title": "البطولة الجهوية",
+        "description": "سيتنافس مقاتلو نادي النخيل في فئتي الوزن الخفيف والمتوسط.",
+        "eventDate": "الأحد 18:00",
+        "countdown": "بعد 4 أيام و07 ساعات"
+      },
+      "progress": {
+        "title": "تقدم هذا الأسبوع",
+        "description": "زخم قوي للنادي وانتظام واضح في الحضور هذا الأسبوع."
+      }
+    }
+  },
+  "pendingApproval": {
+    "approvalRequired": "يلزم الاعتماد",
+    "accountPending": "الحساب قيد الانتظار",
+    "title": "بانتظار اعتماد الإدارة",
+    "description": "تم إنشاء حساب العضوية بنجاح وهو الآن قيد المراجعة. ستتمكن من تسجيل الدخول فور تفعيل الحساب من طرف الإدارة.",
+    "registeredEmail": "البريد المسجل",
+    "warningAvatar": "تم إنشاء الحساب، لكن تعذر رفع صورة الملف الشخصي. يمكنك إضافتها لاحقًا من ملفك بعد الموافقة.",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "returnHome": "العودة إلى الرئيسية",
+    "nextTitle": "ماذا سيحدث بعد ذلك",
+    "step1": "يقوم أحد المسؤولين بمراجعة طلب التسجيل.",
+    "step2": "يتحول وضع الحساب إلى نشط.",
+    "step3": "يمكنك تسجيل الدخول والوصول إلى لوحة العضو."
+  },
+  "attendanceScanner": {
+    "title": "تأكيد الحضور عبر QR",
+    "subtitle": "امسح رمز الجلسة أو الصق الرمز يدويًا.",
+    "fieldLabel": "رمز الجلسة",
+    "fieldPlaceholder": "الصق رمزًا أو امسح QR",
+    "scan": "فتح الكاميرا",
+    "scanning": "جارٍ المسح...",
+    "submit": "تأكيد الحضور",
+    "submitting": "جارٍ التحقق...",
+    "success": "تم تأكيد الحضور! حصلت على +2 نقاط.",
+    "errors": {
+      "invalidToken": "يرجى مسح رمز QR صالح أو إدخال رمز صحيح.",
+      "submit": "تعذر تسجيل الحضور.",
+      "autoCheckIn": "فشل التحقق التلقائي. حاول المسح مرة أخرى.",
+      "camera": "تعذر الوصول إلى الكاميرا. لا يزال بإمكانك إدخال الرمز يدويًا.",
+      "scannerInit": "فشل تشغيل أداة المسح."
+    }
+  },
+  "pages": {
+    "adminDashboard": {
+      "eyebrow": "نظرة الإدارة",
+      "title": "مسار اعتماد الأعضاء",
+      "subtitle": "تابع الطلبات المعلقة والأعضاء النشطين والحسابات المحظورة لحظة بلحظة.",
+      "openManager": "فتح إدارة الأعضاء",
+      "pendingApproval": "بانتظار الاعتماد",
+      "pendingHint": "بانتظار قرار الإدارة",
+      "activeMembers": "الأعضاء النشطون",
+      "activeHint": "يمكنهم دخول المنصة",
+      "blockedMembers": "الأعضاء المحظورون",
+      "blockedHint": "تم سحب الوصول",
+      "newThisWeek": "الجدد هذا الأسبوع",
+      "newThisWeekHint": "تسجيلات آخر 7 أيام",
+      "newApprovalsTitle": "طلبات الاعتماد الجديدة",
+      "newApprovalsSubtitle": "راجع طلبات التسجيل الذاتي الجديدة بسرعة.",
+      "reviewPending": "مراجعة المعلّق",
+      "empty": "لا توجد طلبات معلقة الآن."
+    },
+    "adminMembers": {
+      "eyebrow": "أعضاء الإدارة",
+      "title": "اعتماد المستخدمين الجدد",
+      "subtitle": "ابدأ بالمستخدمين المعلقين، ثم قم بالموافقة أو الرفض أو الحظر أو عرض الملف الكامل.",
+      "pendingBadge": "معلّق {count}",
+      "queueTitle": "قائمة الاعتماد",
+      "queueSubtitle": "تظهر الملفات المعلقة أولًا. استخدم البحث والفلاتر لتضييق النتائج.",
+      "showing": "عرض {count} عضو",
+      "searchPlaceholder": "ابحث بالاسم أو البريد أو الهاتف",
+      "filterAll": "الكل",
+      "empty": "لا يوجد أعضاء مطابقون لهذا الفلتر أو البحث.",
+      "table": {
+        "member": "العضو",
+        "phone": "الهاتف",
+        "registered": "تاريخ التسجيل",
+        "level": "المستوى",
+        "membership": "نوع العضوية",
+        "age": "العمر",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      },
+      "mobile": {
+        "phone": "الهاتف",
+        "registered": "تاريخ التسجيل",
+        "level": "المستوى الرياضي",
+        "membership": "نوع العضوية",
+        "age": "العمر"
+      },
+      "actions": {
+        "approve": "موافقة",
+        "block": "حظر",
+        "reject": "رفض",
+        "activate": "تفعيل",
+        "view": "عرض",
+        "viewProfile": "عرض الملف",
+        "cancel": "إلغاء",
+        "confirmReject": "تأكيد الرفض"
+      },
+      "manual": {
+        "title": "إنشاء عضو يدويًا",
+        "subtitle": "أنشئ حساب عضو مباشرة من الإدارة عند الحاجة.",
+        "profileImageUrl": "رابط صورة الملف الشخصي (اختياري)",
+        "profileImagePlaceholder": "https://...",
+        "create": "إنشاء العضو",
+        "creating": "جارٍ إنشاء العضو..."
+      },
+      "detailsTitle": "تفاصيل ملف العضو",
+      "confirmRejectTitle": "تأكيد الرفض",
+      "confirmRejectText": "رفض هذا الطلب سيحذف التسجيل المعلق نهائيًا.",
+      "pendingVisible": "طلبات الاعتماد الظاهرة: {count}",
+      "errors": {
+        "load": "تعذر تحميل الأعضاء.",
+        "updateStatus": "تعذر تحديث حالة العضو.",
+        "reject": "تعذر رفض العضو المعلق.",
+        "create": "تعذر إنشاء حساب العضو.",
+        "passwordMismatch": "كلمتا المرور غير متطابقتين."
+      },
+      "success": {
+        "approved": "تم اعتماد العضو بنجاح.",
+        "blocked": "تم حظر العضو بنجاح.",
+        "updated": "تم تحديث حالة العضو بنجاح.",
+        "rejected": "تم رفض العضو المعلق بنجاح.",
+        "created": "تم إنشاء حساب العضو بنجاح."
+      }
+    },
+    "coachDashboard": {
+      "eyebrow": "مركز المدرب",
+      "title": "نظرة على الأداء",
+      "subtitle": "تابع إيقاع الجلسات وحضور الفريق والتقييمات بسرعة.",
+      "live": "مباشر",
+      "upcomingSessions": "الجلسات القادمة",
+      "upcomingSessionsHint": "مجدولة ومرئية للأعضاء",
+      "activeMembers": "الأعضاء النشطون",
+      "activeMembersHint": "قائمتك الخاصة",
+      "attendance": "الحضور (7 أيام)",
+      "attendanceHint": "آخر عمليات التسجيل",
+      "coachRating": "تقييم المدرب",
+      "coachRatingHint": "{count} مراجعة من الأعضاء",
+      "recentFeedbackTitle": "أحدث الملاحظات",
+      "recentFeedbackSubtitle": "آخر تقييمات المدرب من أعضاء حصصك.",
+      "reviewsBadge": "{count} مراجعة إجمالًا",
+      "empty": "لا توجد ملاحظات بعد. سيتمكن الأعضاء من تقييم حصصك بعد الحضور.",
+      "noComment": "لا يوجد تعليق مكتوب."
+    },
+    "coachMembers": {
+      "eyebrow": "رؤية المدرب",
+      "title": "أداء الأعضاء",
+      "subtitle": "راجع تطور الرياضيين وحركتهم في الترتيب وفرص التدخل التدريبي.",
+      "totalMembers": "إجمالي الأعضاء",
+      "totalMembersHint": "القائمة النشطة تحت إشرافك.",
+      "averageRating": "متوسط التقييم",
+      "averageRatingHint": "الخط الأساسي الحالي للفريق.",
+      "topPerformers": "الأفضل أداءً",
+      "topPerformersHint": "الرياضيون المتصدرون حاليًا.",
+      "needsAttention": "بحاجة للمتابعة",
+      "needsAttentionHint": "أعضاء يحتاجون متابعة تدريبية أقرب.",
+      "topPerformersEmpty": "لا توجد بيانات أداء بعد.",
+      "needsAttentionEmpty": "كل الرياضيين المتابعين مستقرون حاليًا.",
+      "rank": "الرتبة",
+      "rating": "التقييم",
+      "attendance": "الحضور",
+      "monitor": "متابعة"
+    },
+    "coachAnnouncements": {
+      "title": "أحدث الإعلانات",
+      "empty": "لا توجد إعلانات بعد."
+    },
+    "coachAttendance": {
+      "title": "حضور الجلسات",
+      "subtitle": "تابع من قام بتسجيل حضوره في كل جلسة تدريب.",
+      "count": "{count} جلسة",
+      "empty": "لا توجد جلسات بعد. أنشئ جلسة لتبدأ متابعة الحضور.",
+      "checkedIn": "{count} تم تسجيلهم",
+      "noAttendance": "لا توجد بيانات حضور مسجلة بعد.",
+      "table": {
+        "member": "العضو",
+        "email": "البريد الإلكتروني",
+        "checkedIn": "وقت الحضور"
+      }
+    },
+    "coachRatings": {
+      "averageRating": "متوسط التقييم",
+      "averageRatingHint": "من 5",
+      "totalReviews": "إجمالي المراجعات",
+      "totalReviewsHint": "كلها مرسلة من الأعضاء",
+      "title": "أحدث التقييمات",
+      "subtitle": "الملاحظات التي أرسلها أعضاؤك.",
+      "count": "{count} مراجعة",
+      "empty": "لا توجد تقييمات بعد. ستظهر الملاحظات هنا بعد الجلسات.",
+      "noComment": "لم تتم إضافة تعليق."
+    },
+    "coachProfile": {
+      "unavailableTitle": "الملف غير متاح",
+      "unavailableDescription": "تعذر تحميل ملفك حاليًا.",
+      "refresh": "يرجى تحديث الصفحة ثم المحاولة مجددًا.",
+      "averageRating": "متوسط التقييم",
+      "averageRatingHint": "من مراجعات الأعضاء",
+      "totalReviews": "إجمالي المراجعات",
+      "totalReviewsHint": "الملاحظات المرسلة من الأعضاء",
+      "sessionsCoached": "الجلسات المؤطرة",
+      "sessionsCoachedHint": "إجمالي الجلسات المخططة",
+      "experience": "الخبرة",
+      "experienceHint": "سنوات",
+      "identityTitle": "هوية المدرب",
+      "identityDescription": "تخصصك التدريبي وأسلوبك في الإشراف.",
+      "contactTitle": "التواصل",
+      "contactDescription": "بيانات تواصل خاصة للاستخدام الداخلي للنادي.",
+      "specialization": "التخصص",
+      "coachingStyle": "أسلوب التدريب",
+      "achievements": "الإنجازات",
+      "certifications": "الشهادات",
+      "noCertifications": "لا توجد شهادات مضافة حتى الآن."
+    },
+    "memberDashboard": {
+      "eyebrow": "لوحة الرياضي",
+      "title": "مركز الأداء",
+      "subtitle": "تابع مستواك التنافسي عبر الترتيب والثبات وملاحظات المدرب.",
+      "leaderboardUpdated": "تم تحديث لوحة الصدارة {date}",
+      "athleteFallback": "الرياضي",
+      "rankLabel": "الرتبة الحالية #{rank}",
+      "notRanked": "غير مصنف بعد",
+      "attributes": {
+        "attendance": "الحضور",
+        "power": "القوة",
+        "discipline": "الانضباط",
+        "speed": "السرعة",
+        "technique": "التقنية",
+        "cardio": "اللياقة"
+      },
+      "trend": {
+        "locked": "ستظهر بيانات الأداء بعد إكمال حصصك الأولى.",
+        "up": "الزخم في صعود مع +{count} مراكز.",
+        "down": "تراجع الترتيب بمقدار {count}. يمكن لحصة قوية أن تعيدك سريعًا.",
+        "stable": "الأداء مستقر. حصة عالية الجودة قد تدفعك للأعلى."
+      },
+      "highlights": {
+        "points": "النقاط",
+        "attendance": "الحضور",
+        "streak": "السلسلة",
+        "badges": "الشارات"
+      },
+      "metric": {
+        "currentRank": "الرتبة الحالية",
+        "currentRankHint": "ابدأ التدريب لفتح الترتيب",
+        "previousRank": "الرتبة السابقة #{rank}",
+        "overallRating": "التقييم العام",
+        "overallRatingHint": "يعتمد على الحضور والنقاط والسلسلة والشارات والتغذية الراجعة",
+        "totalPoints": "إجمالي النقاط",
+        "totalPointsHint": "تُكتسب من الحضور والنشاط",
+        "sessionsAttended": "الجلسات المحضورة",
+        "sessionsAttendedHint": "إجمالي سجل الحضور",
+        "currentStreak": "السلسلة الحالية",
+        "currentStreakHint": "أيام التدريب المتتالية"
+      },
+      "upcomingSessionsTitle": "الجلسات القادمة",
+      "upcomingSessionsSubtitle": "فرصك التدريبية التالية وتكليفات المدرب.",
+      "upcomingSessionsEmpty": "لا توجد جلسات قادمة الآن.",
+      "coachPrefix": "الكوتش {name}",
+      "recentNotesTitle": "أحدث ملاحظات التقدم",
+      "recentNotesSubtitle": "ملاحظات المدرب التي تؤثر على قفزتك القادمة في الأداء.",
+      "recentNotesEmpty": "لم يضف المدرب أي ملاحظات بعد.",
+      "summaryTitle": "ملخص الأداء",
+      "summaryLabels": {
+        "trendSignal": "إشارة الاتجاه",
+        "sessionOutlook": "نظرة الجلسات",
+        "badgeProgress": "تقدم الشارات"
+      },
+      "sessionOutlookBooked": "{count} جلسة قادمة محجوزة.",
+      "sessionOutlookEmpty": "لا توجد جلسات محجوزة بعد. تواصل مع المدرب لتحديد الموعد القادم."
+    },
+    "memberLeaderboard": {
+      "eyebrow": "الترتيب التنافسي",
+      "title": "لوحة صدارة الأعضاء",
+      "subtitle": "يتم احتساب الترتيب من التقييم العام الحقيقي والنقاط والحضور وكسر التعادل.",
+      "updated": "تم التحديث {date}",
+      "position": "مركزك #{rank}",
+      "notRanked": "غير مصنف بعد",
+      "status": {
+        "locked": "أكمل حصصك الأولى لفتح موقعك في لوحة الصدارة.",
+        "up": "صعدت {count} مركزًا.",
+        "down": "تراجعت {count} مركزًا.",
+        "stable": "مركزك مستقر."
+      },
+      "highlights": {
+        "points": "النقاط",
+        "attendance": "الحضور",
+        "city": "المدينة",
+        "trend": "الاتجاه",
+        "cityFallback": "غير متوفر"
+      },
+      "podium": {
+        "label": "المنصة",
+        "subtitle": "أفضل 3 رياضيين وفق بيانات الأداء المسجلة فعليًا."
+      },
+      "fullRankingTitle": "الترتيب الكامل",
+      "fullRankingSubtitle": "جميع الرياضيين المصنفين مرتبين حسب التقييم العام ثم النقاط.",
+      "memberCount": "{count} عضو"
+    },
+    "memberRateCoach": {
+      "title": "تقييم المدرب",
+      "subtitle": "شارك ملاحظاتك بعد الحصص المكتملة للمساعدة في رفع جودة التدريب.",
+      "count": "{rated}/{total} تم تقييمها",
+      "empty": "احضر الجلسات أولًا لفتح التقييم.",
+      "rated": "تم التقييم",
+      "pending": "قيد الانتظار",
+      "coachPrefix": "الكوتش {name}"
+    },
+    "memberProgress": {
+      "notesTitle": "ملاحظات تقدم المدرب",
+      "notesCount": "{count} ملاحظات من مدربك",
+      "notesEmpty": "لا توجد ملاحظات تقدم بعد. سيضيف المدرب ملاحظاته هنا.",
+      "pointsTitle": "سجل النقاط",
+      "pointsCount": "{count} مكاسب حديثة",
+      "pointsEmpty": "لم تُكتسب أي نقاط بعد. احضر الجلسات لتبدأ بالتراكم.",
+      "badgesTitle": "الشارات المكتسبة",
+      "badgesCount": "{count} إنجازات مفتوحة",
+      "badgesEmpty": "لا توجد شارات بعد. استمر في التدريب لفتح الإنجازات."
+    },
+    "memberAttendance": {
+      "title": "سجل الحضور",
+      "subtitle": "كل الجلسات التي سجلت حضورك فيها.",
+      "count": "{count} جلسات",
+      "empty": "لا توجد سجلات حضور بعد. امسح رمز QR لتسجيل الحضور.",
+      "coachPrefix": "الكوتش {name}"
+    },
+    "memberSessions": {
+      "title": "جلساتي",
+      "subtitle": "كل الحصص التدريبية وحالة حضورك فيها.",
+      "count": "{count} جلسات",
+      "empty": "لا توجد جلسات متاحة بعد.",
+      "table": {
+        "session": "الجلسة",
+        "schedule": "الموعد",
+        "coach": "المدرب",
+        "status": "الحالة"
+      },
+      "status": {
+        "attended": "حضر",
+        "notCheckedIn": "لم يسجل الحضور",
+        "absent": "غائب",
+        "rated": "تم التقييم",
+        "pending": "قيد الانتظار"
+      },
+      "coachPrefix": "الكوتش {name}"
+    },
+    "memberAnnouncements": {
+      "title": "الإعلانات",
+      "subtitle": "ابقَ على اطلاع على تغييرات الجدول والتذكيرات.",
+      "count": "{count} إعلانات",
+      "empty": "لا توجد إعلانات بعد. عد لاحقًا.",
+      "coachPrefix": "الكوتش {name}"
+    },
+    "memberProfile": {
+      "unavailableTitle": "الملف غير متاح",
+      "unavailableDescription": "تعذر تحميل ملفك الشخصي الآن.",
+      "refresh": "يرجى تحديث الصفحة ثم المحاولة مجددًا.",
+      "attendance": "الحضور",
+      "points": "النقاط",
+      "currentStreak": "السلسلة الحالية",
+      "overallRating": "التقييم العام",
+      "overallRatingHint": "الحضور والنقاط والسلسلة والشارات وتقدم المدرب كلها تؤثر في هذا التقييم",
+      "currentRank": "الرتبة الحالية",
+      "currentRankHint": "ابدأ التدريب لفتح الترتيب",
+      "previousRank": "الرتبة السابقة #{rank}",
+      "trainingProfileTitle": "ملف التدريب",
+      "trainingProfileDescription": "إعداداتك وتفضيلاتك الحالية كعضو.",
+      "progressSummaryTitle": "ملخص التقدم",
+      "progressSummaryDescription": "لقطة سريعة عن مسار تطورك.",
+      "personalDetailsTitle": "البيانات الشخصية",
+      "personalDetailsDescription": "هوية العضو وبيانات التواصل الخاصة بك.",
+      "badgesTitle": "ملخص الشارات",
+      "badgesDescription": "محطات تم فتحها بفضل الاستمرارية.",
+      "progressNotes": "ملاحظات التقدم",
+      "lastAttendance": "آخر حضور",
+      "lastAttendanceEmpty": "لا يوجد حضور بعد",
+      "latestCoachNote": "آخر ملاحظة من المدرب",
+      "latestCoachNoteEmpty": "لا توجد ملاحظة من المدرب بعد.",
+      "badgesEarned": "{count} شارات مكتسبة",
+      "badgesEmpty": "لا توجد شارات مكتسبة بعد. واصل التدريب لفتح المزيد من المحطات.",
+      "awarded": "مُنحت في {date}"
+    }
+  },
+  "enums": {
+    "accountStatus": {
+      "pending": "قيد الانتظار",
+      "active": "نشط",
+      "blocked": "محظور"
+    },
+    "gender": {
+      "male": "ذكر",
+      "female": "أنثى",
+      "other": "آخر",
+      "preferNotToSay": "أفضل عدم التصريح"
+    },
+    "trainingLevel": {
+      "beginner": "مبتدئ",
+      "intermediate": "متوسط",
+      "advanced": "متقدم"
+    },
+    "trainingType": {
+      "cardio": "كارديو",
+      "technique": "تقنية",
+      "sparring": "سبارينغ",
+      "conditioning": "تهيئة بدنية"
+    },
+    "membershipType": {
+      "monthly": "شهري",
+      "quarterly": "ربع سنوي",
+      "annual": "سنوي"
+    }
+  }
+}

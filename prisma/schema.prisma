@@ -156,6 +156,10 @@ model MemberProfile {
   currentRank           Int?
   previousRank          Int?
   rankChange            Int           @default(0)
+  badgeCount            Int           @default(0)
+  progress              Int           @default(0)
+  wins                  Int           @default(0)
+  losses                Int           @default(0)
   leaderboardUpdatedAt  DateTime?
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt

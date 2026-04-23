@@ -1,7 +1,10 @@
+"use client";
+
 import { AlertTriangle, Sparkles, Target } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { RankTrendBadge } from "@/components/sports/rank-trend-badge";
+import { useTranslations } from "@/components/providers/translations-provider";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +41,8 @@ export function AthleteSummaryCard({
   className,
   children,
 }: AthleteSummaryCardProps) {
+  const { t } = useTranslations();
+
   return (
     <article
       className={cn(
@@ -73,7 +78,7 @@ export function AthleteSummaryCard({
           </div>
           <div className="flex flex-col items-end gap-1.5">
             <span className="rounded-full border border-white/15 bg-black/30 px-2.5 py-1 text-xs font-bold text-white">
-              {rank ? `#${rank}` : "Unranked"}
+              {rank ? `#${rank}` : t("sports.athleteSummary.unranked")}
             </span>
             <RankTrendBadge rankChange={rankChange} compact />
           </div>
@@ -82,7 +87,7 @@ export function AthleteSummaryCard({
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
             <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-club-muted">
-              Rating
+              {t("sports.athleteSummary.stats.rating")}
             </p>
             <p className="mt-1 font-heading text-xl font-bold text-white">
               {overallRating}
@@ -90,7 +95,7 @@ export function AthleteSummaryCard({
           </div>
           <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
             <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-club-muted">
-              Points
+              {t("sports.athleteSummary.stats.points")}
             </p>
             <p className="mt-1 font-heading text-xl font-bold text-white">
               {points}
@@ -98,7 +103,7 @@ export function AthleteSummaryCard({
           </div>
           <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
             <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-club-muted">
-              Attendance
+              {t("sports.athleteSummary.stats.attendance")}
             </p>
             <p className="mt-1 font-heading text-xl font-bold text-white">
               {attendanceCount}
@@ -106,7 +111,7 @@ export function AthleteSummaryCard({
           </div>
           <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
             <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-club-muted">
-              Badges
+              {t("sports.athleteSummary.stats.badges")}
             </p>
             <p className="mt-1 font-heading text-xl font-bold text-white">
               {badgesCount}
@@ -118,29 +123,29 @@ export function AthleteSummaryCard({
           {isTopPerformer ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/40 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-100">
               <Sparkles className="h-3.5 w-3.5" />
-              Top Performer
+              {t("sports.athleteSummary.badges.topPerformer")}
             </span>
           ) : null}
           {needsAttention ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-300/40 bg-rose-500/15 px-2.5 py-1 text-xs font-semibold text-rose-100">
               <AlertTriangle className="h-3.5 w-3.5" />
-              Needs Attention
+              {t("sports.athleteSummary.badges.needsAttention")}
             </span>
           ) : null}
           {!isTopPerformer && !needsAttention ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-red-300/30 bg-red-500/10 px-2.5 py-1 text-xs font-semibold text-red-100">
               <Target className="h-3.5 w-3.5" />
-              In Progress
+              {t("sports.athleteSummary.badges.inProgress")}
             </span>
           ) : null}
         </div>
 
         <div className="mt-4 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-club-muted">
-            Latest Coach Note
+            {t("sports.athleteSummary.latestCoachNote")}
           </p>
           <p className="mt-1 text-sm text-zinc-200">
-            {latestNote ?? "No progress note yet."}
+            {latestNote ?? t("sports.athleteSummary.emptyNote")}
           </p>
         </div>
 

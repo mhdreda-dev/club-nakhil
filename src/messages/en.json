@@ -1,0 +1,893 @@
+{
+  "locale": {
+    "switcher": "Change language",
+    "english": "English",
+    "french": "Français",
+    "arabic": "العربية"
+  },
+  "common": {
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "notSet": "Not set",
+    "notProvided": "Not provided",
+    "none": "None",
+    "by": "by",
+    "and": "and",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "units": {
+      "session": {
+        "one": "session",
+        "other": "sessions"
+      }
+    }
+  },
+  "brand": {
+    "tagline": "Kickboxing · Coach Rabah · Morocco",
+    "homeAriaLabel": "Club Nakhil home"
+  },
+  "splash": {
+    "loading": "Loading"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "sessions": "Sessions",
+    "attendance": "Attendance",
+    "leaderboard": "Leaderboard",
+    "activityFeed": "Activity Feed",
+    "announcements": "Announcements",
+    "progress": "Progress",
+    "ratings": "Ratings",
+    "profile": "Profile"
+  },
+  "roles": {
+    "admin": "Admin",
+    "coach": "Coach",
+    "member": "Member"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email Address",
+    "password": "Password",
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create your account",
+    "fullName": "Full Name",
+    "confirmPassword": "Confirm password",
+    "role": "Role",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don’t have an account?",
+    "hasAccount": "Already have an account?",
+    "creatingAccount": "creating your account",
+    "placeholders": {
+      "fullName": "Enter your full name",
+      "email": "name@example.com",
+      "password": "Enter your password",
+      "confirmPassword": "Repeat your password"
+    },
+    "notes": {
+      "accountReview": "New accounts are reviewed before activation."
+    },
+    "errors": {
+      "pendingApproval": "Your account is waiting for admin approval.",
+      "accountBlocked": "Your account is blocked. Please contact an administrator.",
+      "invalidCredentials": "Invalid credentials. Check your email and password.",
+      "unauthorized": "You need to sign in to continue.",
+      "forbidden": "You do not have access to this action."
+    }
+  },
+  "layout": {
+    "mobileNav": {
+      "open": "Open navigation",
+      "close": "Close navigation"
+    },
+    "logout": {
+      "ariaLabel": "Sign out",
+      "label": "Logout"
+    },
+    "admin": {
+      "title": "Admin Command Center",
+      "subtitle": "Approve member registrations, manage account status, and keep the roster clean."
+    },
+    "coach": {
+      "title": "Coach Portal",
+      "subtitle": "Manage your athletes, track sessions, and monitor progress."
+    },
+    "member": {
+      "title": "Member Workspace",
+      "subtitle": "Track your sessions, progress, and performance milestones.",
+      "nav": {
+        "profile": "My Profile",
+        "sessions": "My Sessions",
+        "attendance": "My Attendance",
+        "progress": "My Progress",
+        "rateCoach": "Rate Coach"
+      }
+    }
+  },
+  "forms": {
+    "announcement": {
+      "title": "Publish Announcement",
+      "subtitle": "Send reminders, schedule changes, and motivational notes.",
+      "fields": {
+        "title": "Title",
+        "message": "Message"
+      },
+      "placeholders": {
+        "title": "Example: Monday warm-up starts 10 min earlier",
+        "message": "Write your note to all members..."
+      },
+      "actions": {
+        "publish": "Publish",
+        "publishing": "Publishing..."
+      },
+      "success": "Announcement published.",
+      "errors": {
+        "publish": "Unable to publish announcement."
+      }
+    },
+    "progressNote": {
+      "placeholder": "Add a coaching observation for this member",
+      "actions": {
+        "save": "Save Note",
+        "saving": "Saving..."
+      },
+      "success": "Progress note saved.",
+      "errors": {
+        "save": "Unable to add progress note."
+      }
+    },
+    "rateCoach": {
+      "fields": {
+        "rating": "Rating",
+        "comment": "Optional comment"
+      },
+      "placeholder": "What helped you most in this session?",
+      "score": "{value} / 5",
+      "actions": {
+        "submit": "Submit Rating",
+        "submitting": "Submitting..."
+      },
+      "success": "Coach feedback submitted.",
+      "errors": {
+        "submit": "Unable to submit rating."
+      },
+      "aria": {
+        "rateStars": "Rate {count} stars"
+      }
+    },
+    "coachSessionManager": {
+      "title": {
+        "create": "Create New Session",
+        "edit": "Edit Session"
+      },
+      "subtitle": "Define date, training type, level, and notes. QR is generated automatically.",
+      "badges": {
+        "editing": "Editing"
+      },
+      "fields": {
+        "title": "Title",
+        "date": "Date",
+        "start": "Start",
+        "end": "End",
+        "trainingType": "Training Type",
+        "level": "Level",
+        "notes": "Coach Notes"
+      },
+      "placeholders": {
+        "title": "Example: Technique Masterclass",
+        "notes": "Optional focus, reminders, or prep notes"
+      },
+      "actions": {
+        "create": "Create Session",
+        "saveChanges": "Save Changes",
+        "saving": "Saving...",
+        "cancel": "Cancel Edit"
+      },
+      "success": {
+        "created": "Session created.",
+        "updated": "Session updated.",
+        "deleted": "Session deleted."
+      },
+      "errors": {
+        "save": "Unable to save session.",
+        "delete": "Unable to delete session."
+      },
+      "confirmDelete": "Delete this session and related attendance/ratings?",
+      "list": {
+        "title": "Existing Sessions",
+        "count": "{count} total {noun}",
+        "empty": "No sessions created yet. Launch your first one above.",
+        "attendance": "Attendance: {count}",
+        "qr": "QR",
+        "qrAlt": "QR for {title}"
+      }
+    }
+  },
+  "profile": {
+    "avatar": {
+      "actions": {
+        "choose": "Choose Image",
+        "upload": "Upload Avatar",
+        "uploading": "Uploading..."
+      },
+      "selected": "Selected:",
+      "current": "Current:",
+      "helpText": "JPG, PNG, or WEBP. Max {size}.",
+      "success": "Avatar uploaded successfully.",
+      "errors": {
+        "unsupportedFormat": "Unsupported image format. Please use JPG, PNG, or WEBP.",
+        "maxSize": "Image is too large. Max size is {size}.",
+        "chooseImage": "Choose an image before uploading.",
+        "uploadFailed": "Avatar upload failed.",
+        "metadataMissing": "Upload completed, but avatar metadata was missing.",
+        "unavailable": "Unable to upload avatar right now.",
+        "bucketMissing": "Avatar storage is not ready yet. Please try again later."
+      }
+    },
+    "header": {
+      "joined": "Joined {date}"
+    },
+    "editor": {
+      "actions": {
+        "save": "Save Profile",
+        "saving": "Saving..."
+      },
+      "success": {
+        "updated": "Profile updated successfully.",
+        "avatarUpdated": "Avatar updated successfully."
+      },
+      "errors": {
+        "update": "Unable to update profile."
+      },
+      "sections": {
+        "editProfile": {
+          "title": "Edit Profile",
+          "description": "Update your identity, contact, and role-specific profile details."
+        },
+        "avatar": {
+          "title": "Avatar Settings",
+          "description": "Define your visual identity across Club Nakhil."
+        },
+        "coach": {
+          "title": "Coach Profile",
+          "description": "Highlight your coaching identity and background."
+        },
+        "member": {
+          "title": "Member Preferences",
+          "description": "Customize your training profile."
+        }
+      },
+      "fields": {
+        "fullName": "Full Name",
+        "displayName": "Display Name",
+        "phone": "Phone",
+        "dateOfBirth": "Date of Birth",
+        "gender": "Gender",
+        "city": "City",
+        "address": "Address",
+        "bio": "Bio",
+        "emergencyContact": "Emergency Contact",
+        "specialization": "Specialization",
+        "yearsOfExperience": "Years of Experience",
+        "certifications": "Certifications",
+        "coachingStyle": "Coaching Style",
+        "achievements": "Achievements",
+        "trainingLevel": "Training Level",
+        "preferredTrainingType": "Preferred Training Type"
+      },
+      "placeholders": {
+        "fullName": "Your legal full name",
+        "displayName": "Name shown in dashboards",
+        "phone": "+212...",
+        "gender": "Select gender",
+        "city": "Casablanca",
+        "address": "Street, district, city",
+        "bio": "Share a short profile summary",
+        "emergencyContact": "Name + phone",
+        "specialization": "Technique, sparring, conditioning...",
+        "yearsOfExperience": "10",
+        "certifications": "Comma separated list",
+        "coachingStyle": "How you structure sessions and motivate athletes",
+        "achievements": "Titles, milestones, athlete outcomes"
+      }
+    }
+  },
+  "sports": {
+    "athleteSummary": {
+      "unranked": "Unranked",
+      "latestCoachNote": "Latest Coach Note",
+      "emptyNote": "No progress note yet.",
+      "stats": {
+        "rating": "Rating",
+        "points": "Points",
+        "attendance": "Attendance",
+        "badges": "Badges"
+      },
+      "badges": {
+        "topPerformer": "Top Performer",
+        "needsAttention": "Needs Attention",
+        "inProgress": "In Progress"
+      }
+    },
+    "rankTrend": {
+      "up": "Up +{count}",
+      "down": "Down {count}",
+      "stable": "Stable",
+      "compactUp": "+{count}",
+      "compactDown": "{count}",
+      "compactStable": "0"
+    },
+    "playerRating": {
+      "athleteProfile": "Athlete Profile",
+      "tierLabel": "{tier} Tier",
+      "welcomeBack": "Welcome Back",
+      "athleteAttributes": "Athlete Attributes"
+    },
+    "xpProgress": {
+      "current": "{points}/{total} XP",
+      "nextTier": "{points} pts → {tier}",
+      "maxTier": "★ Max Tier"
+    },
+    "leaderboard": {
+      "you": "You",
+      "memberFallback": "Club Nakhil Member",
+      "empty": {
+        "title": "No ranked athletes yet",
+        "subtitle": "Train consistently to earn your place on the board."
+      },
+      "filters": {
+        "week": "This Week",
+        "month": "This Month",
+        "all": "All Time",
+        "allTimeNote": "Showing all-time data"
+      },
+      "columns": {
+        "rank": "Rank",
+        "move": "Move",
+        "athlete": "Athlete",
+        "tier": "Tier",
+        "ovr": "OVR",
+        "pts": "PTS"
+      },
+      "stats": {
+        "rating": "Rating",
+        "points": "Points"
+      },
+      "podium": {
+        "champion": "Champion",
+        "runnerUp": "Runner-up",
+        "thirdPlace": "Third Place"
+      }
+    }
+  },
+  "activityFeed": {
+    "section": {
+      "eyebrow": "Club Pulse",
+      "title": "Club Activity Feed",
+      "subtitle": "Latest news, achievements, sessions and club updates."
+    },
+    "filters": {
+      "all": "All",
+      "achievements": "Achievements",
+      "training": "Training",
+      "matches": "Matches",
+      "coachPosts": "Coach Posts",
+      "events": "Events"
+    },
+    "empty": "New activities will appear here soon.",
+    "actions": {
+      "share": "Share"
+    },
+    "reactions": {
+      "like": "Like",
+      "fire": "Fire",
+      "clap": "Clap"
+    },
+    "comments": {
+      "count": "{count} comments",
+      "placeholder": "Write a comment..."
+    },
+    "errors": {
+      "loadPosts": "Unable to load community posts.",
+      "updateReaction": "Unable to update reaction.",
+      "share": "Unable to share this post.",
+      "comment": "Unable to post comment.",
+      "moderation": "Unable to update moderation action."
+    },
+    "official": {
+      "title": "Official Club Updates",
+      "tag": "Admin / Coach",
+      "badges": {
+        "gold": "Gold Badge"
+      },
+      "labels": {
+        "training": "Training",
+        "matchResult": "Match Result",
+        "win": "Win",
+        "pinned": "Pinned",
+        "coachPost": "Official coach post",
+        "coachMessage": "Coach Message",
+        "weekly": "Weekly",
+        "sessions": "Sessions",
+        "completedThisWeek": "completed this week",
+        "pointsEarned": "Points Earned",
+        "performanceGain": "performance gain"
+      },
+      "membersAttended": "{count} members attended",
+      "duration": "Duration {value}",
+      "mvp": "MVP Player: {name}"
+    },
+    "community": {
+      "title": "Community Posts",
+      "tag": "Members",
+      "createTitle": "Create Post",
+      "createSubtitle": "Share your progress with the club...",
+      "onlyMembers": "Community post creation is available for members.",
+      "postTypes": {
+        "photo": "Training Selfie",
+        "achievement": "Achievement",
+        "support": "Support",
+        "text": "Text Post"
+      },
+      "actions": {
+        "photo": "Photo",
+        "achievement": "Achievement",
+        "text": "Text Post",
+        "addImage": "Add Image",
+        "support": "Mark as support / motivation message",
+        "post": "Post to Community",
+        "posting": "Posting..."
+      },
+      "errors": {
+        "caption": "Please add a caption before posting.",
+        "imageRequired": "Please add a training selfie or gym photo.",
+        "publish": "Unable to publish community post."
+      }
+    },
+    "demo": {
+      "achievementRank1": {
+        "title": "Reached Rank #1",
+        "description": "Dominated this week with clean combinations and elite consistency.",
+        "comment1": "Well deserved, champ.",
+        "comment2": "Keep that discipline."
+      },
+      "trainingElite": {
+        "title": "Elite Sparring Session Completed",
+        "description": "High-pressure rounds focused on control, distance, and ring IQ.",
+        "comment": "Insane pace tonight."
+      },
+      "matchResult": {
+        "title": "Club Nakhil vs Titans Club",
+        "description": "Clinical team execution and sharp defense secured the victory.",
+        "comment": "Proud of the team."
+      },
+      "announcement": {
+        "title": "Tomorrow training starts at 18:00",
+        "description": "Arrive 15 minutes early for mobility warm-up and tactical briefing.",
+        "comment": "Ready, coach."
+      },
+      "motivation": {
+        "title": "Daily Mindset",
+        "quote": "Discipline beats motivation.",
+        "description": "Consistency under pressure is what separates contenders from champions.",
+        "comment": "Needed this today."
+      },
+      "event": {
+        "title": "Regional Tournament",
+        "description": "Club Nakhil fighters will compete across lightweight and middleweight divisions.",
+        "eventDate": "Sunday 18:00",
+        "countdown": "In 4d 07h"
+      },
+      "progress": {
+        "title": "This Week Progress",
+        "description": "Strong club momentum and attendance consistency this week."
+      }
+    }
+  },
+  "pendingApproval": {
+    "approvalRequired": "Approval Required",
+    "accountPending": "Account Pending",
+    "title": "Waiting for Admin Approval",
+    "description": "Your member account has been created successfully and is now under review. You will be able to sign in as soon as an admin activates your account.",
+    "registeredEmail": "Registered email",
+    "warningAvatar": "Your account was created, but the profile image could not be uploaded. You can add it later from your profile after approval.",
+    "backToLogin": "Back to Login",
+    "returnHome": "Return Home",
+    "nextTitle": "What happens next",
+    "step1": "An admin reviews your registration request.",
+    "step2": "Your account status changes to Active.",
+    "step3": "You can sign in and access your member dashboard."
+  },
+  "attendanceScanner": {
+    "title": "QR Attendance Check-In",
+    "subtitle": "Scan the session QR code or paste the token manually.",
+    "fieldLabel": "Session Token",
+    "fieldPlaceholder": "Paste a token or scan a QR code",
+    "scan": "Open Camera Scanner",
+    "scanning": "Scanning...",
+    "submit": "Confirm Attendance",
+    "submitting": "Checking in...",
+    "success": "Attendance confirmed! +2 points earned.",
+    "errors": {
+      "invalidToken": "Please scan a valid QR code or enter a token.",
+      "submit": "Unable to mark attendance.",
+      "autoCheckIn": "Auto check-in failed. Please try scanning again.",
+      "camera": "Could not access the camera. You can still enter the token manually.",
+      "scannerInit": "Scanner initialization failed."
+    }
+  },
+  "pages": {
+    "adminDashboard": {
+      "eyebrow": "Admin Overview",
+      "title": "Member Approval Pipeline",
+      "subtitle": "Track pending requests, active members, and blocked accounts in real time.",
+      "openManager": "Open Member Manager",
+      "pendingApproval": "Pending Approval",
+      "pendingHint": "Waiting for admin decision",
+      "activeMembers": "Active Members",
+      "activeHint": "Can access the platform",
+      "blockedMembers": "Blocked Members",
+      "blockedHint": "Access revoked",
+      "newThisWeek": "New This Week",
+      "newThisWeekHint": "Registrations in the last 7 days",
+      "newApprovalsTitle": "New User Approvals",
+      "newApprovalsSubtitle": "Review newly self-registered members and process pending approvals quickly.",
+      "reviewPending": "Review Pending",
+      "empty": "No pending registrations right now."
+    },
+    "adminMembers": {
+      "eyebrow": "Admin Members",
+      "title": "New User Approvals",
+      "subtitle": "Review pending members first, then approve, reject, block, or inspect full profile details.",
+      "pendingBadge": "Pending {count}",
+      "queueTitle": "Approval Queue",
+      "queueSubtitle": "Pending profiles are shown first. Use search and filters to narrow the list.",
+      "showing": "Showing {count} members",
+      "searchPlaceholder": "Search by name, email, or phone",
+      "filterAll": "All",
+      "empty": "No members found for this filter or search.",
+      "table": {
+        "member": "Member",
+        "phone": "Phone",
+        "registered": "Registered",
+        "level": "Level",
+        "membership": "Membership",
+        "age": "Age",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "mobile": {
+        "phone": "Phone",
+        "registered": "Registered",
+        "level": "Sport level",
+        "membership": "Membership",
+        "age": "Age"
+      },
+      "actions": {
+        "approve": "Approve",
+        "block": "Block",
+        "reject": "Reject",
+        "activate": "Activate",
+        "view": "View",
+        "viewProfile": "View Profile",
+        "cancel": "Cancel",
+        "confirmReject": "Confirm Reject"
+      },
+      "manual": {
+        "title": "Manual Member Creation",
+        "subtitle": "Create a member account directly from admin when needed.",
+        "profileImageUrl": "Profile Image URL (Optional)",
+        "profileImagePlaceholder": "https://...",
+        "create": "Create Member",
+        "creating": "Creating member..."
+      },
+      "detailsTitle": "Member Profile Details",
+      "confirmRejectTitle": "Confirm Rejection",
+      "confirmRejectText": "Rejecting this pending registration will permanently remove the request.",
+      "pendingVisible": "Pending approvals visible: {count}",
+      "errors": {
+        "load": "Unable to load members.",
+        "updateStatus": "Unable to update member status.",
+        "reject": "Unable to reject pending member.",
+        "create": "Unable to create member account.",
+        "passwordMismatch": "Passwords do not match."
+      },
+      "success": {
+        "approved": "Member approved successfully.",
+        "blocked": "Member blocked successfully.",
+        "updated": "Member status updated successfully.",
+        "rejected": "Pending member rejected successfully.",
+        "created": "Member account created successfully."
+      }
+    },
+    "coachDashboard": {
+      "eyebrow": "Coach Command Center",
+      "title": "Performance Overview",
+      "subtitle": "Monitor session cadence, team attendance, and feedback at a glance.",
+      "live": "Live",
+      "upcomingSessions": "Upcoming Sessions",
+      "upcomingSessionsHint": "Scheduled and visible to members",
+      "activeMembers": "Active Members",
+      "activeMembersHint": "Private roster",
+      "attendance": "Attendance (7 days)",
+      "attendanceHint": "Recent check-ins",
+      "coachRating": "Coach Rating",
+      "coachRatingHint": "{count} member reviews",
+      "recentFeedbackTitle": "Recent Feedback",
+      "recentFeedbackSubtitle": "Latest coach ratings from members across your sessions.",
+      "reviewsBadge": "{count} total reviews",
+      "empty": "No feedback yet. Members can rate your sessions after attending.",
+      "noComment": "No written comment."
+    },
+    "coachMembers": {
+      "eyebrow": "Coach Intelligence",
+      "title": "Member Performance",
+      "subtitle": "Review athlete progression, rank movement, and targeted coaching opportunities.",
+      "totalMembers": "Total Members",
+      "totalMembersHint": "Active roster under your supervision.",
+      "averageRating": "Average Rating",
+      "averageRatingHint": "Current squad performance baseline.",
+      "topPerformers": "Top Performers",
+      "topPerformersHint": "Athletes currently leading the board.",
+      "needsAttention": "Need Attention",
+      "needsAttentionHint": "Members needing close coaching follow-up.",
+      "topPerformersEmpty": "No member performance data yet.",
+      "needsAttentionEmpty": "All tracked athletes are currently stable.",
+      "rank": "Rank",
+      "rating": "Rating",
+      "attendance": "Attendance",
+      "monitor": "Monitor"
+    },
+    "coachAnnouncements": {
+      "title": "Recent Announcements",
+      "empty": "No announcements yet."
+    },
+    "coachAttendance": {
+      "title": "Session Attendance",
+      "subtitle": "Track who checked in for each training session.",
+      "count": "{count} sessions",
+      "empty": "No sessions yet. Create one to start tracking attendance.",
+      "checkedIn": "{count} checked in",
+      "noAttendance": "No attendance recorded yet.",
+      "table": {
+        "member": "Member",
+        "email": "Email",
+        "checkedIn": "Checked In"
+      }
+    },
+    "coachRatings": {
+      "averageRating": "Average Rating",
+      "averageRatingHint": "Out of 5",
+      "totalReviews": "Total Reviews",
+      "totalReviewsHint": "All submitted by members",
+      "title": "Recent Ratings",
+      "subtitle": "Feedback submitted by your members.",
+      "count": "{count} reviews",
+      "empty": "No ratings yet. Feedback will appear here after sessions.",
+      "noComment": "No comment provided."
+    },
+    "coachProfile": {
+      "unavailableTitle": "Profile Unavailable",
+      "unavailableDescription": "We could not load your profile right now.",
+      "refresh": "Please refresh the page and try again.",
+      "averageRating": "Average Rating",
+      "averageRatingHint": "From member reviews",
+      "totalReviews": "Total Reviews",
+      "totalReviewsHint": "Member feedback submitted",
+      "sessionsCoached": "Sessions Coached",
+      "sessionsCoachedHint": "Total planned sessions",
+      "experience": "Experience",
+      "experienceHint": "Years",
+      "identityTitle": "Coach Identity",
+      "identityDescription": "Your coaching specialization and style.",
+      "contactTitle": "Contact",
+      "contactDescription": "Private contact details for internal club use.",
+      "specialization": "Specialization",
+      "coachingStyle": "Coaching Style",
+      "achievements": "Achievements",
+      "certifications": "Certifications",
+      "noCertifications": "No certifications added yet."
+    },
+    "memberDashboard": {
+      "eyebrow": "Athlete Dashboard",
+      "title": "Performance Center",
+      "subtitle": "Track your competitive form across rank, consistency, and coach feedback.",
+      "leaderboardUpdated": "Leaderboard updated {date}",
+      "athleteFallback": "Athlete",
+      "rankLabel": "Current Rank #{rank}",
+      "notRanked": "Not ranked yet",
+      "attributes": {
+        "attendance": "Attendance",
+        "power": "Power",
+        "discipline": "Discipline",
+        "speed": "Speed",
+        "technique": "Technique",
+        "cardio": "Cardio"
+      },
+      "trend": {
+        "locked": "Your performance data will unlock after your first completed sessions.",
+        "up": "Momentum is rising with +{count} rank movement.",
+        "down": "Ranking slipped by {count}. One strong session can recover quickly.",
+        "stable": "Performance is stable. One high-quality session can push you up."
+      },
+      "highlights": {
+        "points": "Points",
+        "attendance": "Attendance",
+        "streak": "Streak",
+        "badges": "Badges"
+      },
+      "metric": {
+        "currentRank": "Current Rank",
+        "currentRankHint": "Start training to unlock ranking",
+        "previousRank": "Previous #{rank}",
+        "overallRating": "Overall Rating",
+        "overallRatingHint": "Weighted from attendance, points, streak, badges, and feedback",
+        "totalPoints": "Total Points",
+        "totalPointsHint": "Earned through attendance and activity",
+        "sessionsAttended": "Sessions Attended",
+        "sessionsAttendedHint": "Total attendance history",
+        "currentStreak": "Current Streak",
+        "currentStreakHint": "Consecutive active training days"
+      },
+      "upcomingSessionsTitle": "Upcoming Sessions",
+      "upcomingSessionsSubtitle": "Your next training opportunities and coach assignments.",
+      "upcomingSessionsEmpty": "No upcoming sessions are scheduled right now.",
+      "coachPrefix": "Coach {name}",
+      "recentNotesTitle": "Recent Progress Notes",
+      "recentNotesSubtitle": "Coach feedback that impacts your next performance jump.",
+      "recentNotesEmpty": "Your coach has not added notes yet.",
+      "summaryTitle": "Performance Summary",
+      "summaryLabels": {
+        "trendSignal": "Trend Signal",
+        "sessionOutlook": "Session Outlook",
+        "badgeProgress": "Badge Progress"
+      },
+      "sessionOutlookBooked": "{count} upcoming sessions booked.",
+      "sessionOutlookEmpty": "No sessions booked yet. Check with your coach for the next slot."
+    },
+    "memberLeaderboard": {
+      "eyebrow": "Competitive Rankings",
+      "title": "Member Leaderboard",
+      "subtitle": "Placement is computed from real overall rating, points, attendance, and tie-breakers.",
+      "updated": "Updated {date}",
+      "position": "Your Position #{rank}",
+      "notRanked": "Not ranked yet",
+      "status": {
+        "locked": "Complete your first sessions to unlock your leaderboard position.",
+        "up": "You climbed {count} spot(s).",
+        "down": "You dropped {count} spot(s).",
+        "stable": "Your position is stable."
+      },
+      "highlights": {
+        "points": "Points",
+        "attendance": "Attendance",
+        "city": "City",
+        "trend": "Trend",
+        "cityFallback": "N/A"
+      },
+      "podium": {
+        "label": "Podium",
+        "subtitle": "Top 3 athletes ranked by real persisted performance data."
+      },
+      "fullRankingTitle": "Full Ranking",
+      "fullRankingSubtitle": "All ranked athletes sorted by overall rating and points.",
+      "memberCount": "{count} members"
+    },
+    "memberRateCoach": {
+      "title": "Rate Coach",
+      "subtitle": "Share feedback after completed sessions to help improve training quality.",
+      "count": "{rated}/{total} rated",
+      "empty": "Attend sessions first to unlock rating.",
+      "rated": "Rated",
+      "pending": "Pending",
+      "coachPrefix": "Coach {name}"
+    },
+    "memberProgress": {
+      "notesTitle": "Coach Progress Notes",
+      "notesCount": "{count} notes from your coach",
+      "notesEmpty": "No progress notes yet. Your coach will add observations here.",
+      "pointsTitle": "Points Log",
+      "pointsCount": "Recent {count} earnings",
+      "pointsEmpty": "No points earned yet. Attend sessions to start accumulating.",
+      "badgesTitle": "Badges Earned",
+      "badgesCount": "{count} achievements unlocked",
+      "badgesEmpty": "No badges yet. Keep training to unlock achievements."
+    },
+    "memberAttendance": {
+      "title": "Attendance History",
+      "subtitle": "All sessions you have checked into.",
+      "count": "{count} sessions",
+      "empty": "No attendance entries yet. Scan a QR code to check in.",
+      "coachPrefix": "Coach {name}"
+    },
+    "memberSessions": {
+      "title": "My Sessions",
+      "subtitle": "All training sessions and your attendance status.",
+      "count": "{count} sessions",
+      "empty": "No sessions available yet.",
+      "table": {
+        "session": "Session",
+        "schedule": "Schedule",
+        "coach": "Coach",
+        "status": "Status"
+      },
+      "status": {
+        "attended": "Attended",
+        "notCheckedIn": "Not checked in",
+        "absent": "Absent",
+        "rated": "Rated",
+        "pending": "Pending"
+      },
+      "coachPrefix": "Coach {name}"
+    },
+    "memberAnnouncements": {
+      "title": "Announcements",
+      "subtitle": "Stay updated on schedule changes and reminders.",
+      "count": "{count} announcements",
+      "empty": "No announcements yet. Check back soon.",
+      "coachPrefix": "Coach {name}"
+    },
+    "memberProfile": {
+      "unavailableTitle": "Profile Unavailable",
+      "unavailableDescription": "We could not load your profile right now.",
+      "refresh": "Please refresh the page and try again.",
+      "attendance": "Attendance",
+      "points": "Points",
+      "currentStreak": "Current Streak",
+      "overallRating": "Overall Rating",
+      "overallRatingHint": "Attendance, points, streak, badges, and coach progress impact this score",
+      "currentRank": "Current Rank",
+      "currentRankHint": "Start training to unlock ranking",
+      "previousRank": "Previous #{rank}",
+      "trainingProfileTitle": "Training Profile",
+      "trainingProfileDescription": "Your current member settings and preferences.",
+      "progressSummaryTitle": "Progress Summary",
+      "progressSummaryDescription": "A quick snapshot of your development journey.",
+      "personalDetailsTitle": "Personal Details",
+      "personalDetailsDescription": "Your member identity and contact profile.",
+      "badgesTitle": "Badges Summary",
+      "badgesDescription": "Milestones unlocked through consistency.",
+      "progressNotes": "Progress Notes",
+      "lastAttendance": "Last Attendance",
+      "lastAttendanceEmpty": "No attendance yet",
+      "latestCoachNote": "Latest Coach Note",
+      "latestCoachNoteEmpty": "No coach note yet.",
+      "badgesEarned": "{count} badges earned",
+      "badgesEmpty": "No badges earned yet. Keep training to unlock milestones.",
+      "awarded": "Awarded {date}"
+    }
+  },
+  "enums": {
+    "accountStatus": {
+      "pending": "Pending",
+      "active": "Active",
+      "blocked": "Blocked"
+    },
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "preferNotToSay": "Prefer not to say"
+    },
+    "trainingLevel": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "trainingType": {
+      "cardio": "Cardio",
+      "technique": "Technique",
+      "sparring": "Sparring",
+      "conditioning": "Conditioning"
+    },
+    "membershipType": {
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "annual": "Annual"
+    }
+  }
+}

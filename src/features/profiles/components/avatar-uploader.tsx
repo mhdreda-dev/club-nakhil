@@ -10,6 +10,7 @@ import {
   AVATAR_MAX_FILE_SIZE_BYTES,
   AVATAR_UPLOAD_FIELD,
 } from "@/features/profiles/avatar.constants";
+import { useTranslations } from "@/components/providers/translations-provider";
 import { Avatar } from "@/components/ui/avatar";
 
 type AvatarUploaderProps = {
@@ -34,6 +35,7 @@ export function AvatarUploader({
   onUploaded,
 }: AvatarUploaderProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -51,6 +53,23 @@ export function AvatarUploader({
 
     return `${selectedFile.name} (${formatBytes(selectedFile.size)})`;
   }, [selectedFile]);
+
+  const normalizeUploadError = (message: string | null) => {
+    if (!message) {
+      return null;
+    }
+
+    const normalized = message.toLowerCase();
+
+    if (
+      normalized.includes("bucket not found") ||
+      normalized.includes("missing or inaccessible")
+    ) {
+      return t("profile.avatar.errors.bucketMissing");
+    }
+
+    return message;
+  };
 
   useEffect(() => {
     return () => {
@@ -87,14 +106,16 @@ export function AvatarUploader({
     }
 
     if (!allowedMimeTypeSet.has(file.type)) {
-      setError("Unsupported image format. Please use JPG, PNG, or WEBP.");
+      setError(t("profile.avatar.errors.unsupportedFormat"));
       resetSelection();
       return;
     }
 
     if (file.size > AVATAR_MAX_FILE_SIZE_BYTES) {
       setError(
-        `Image is too large. Max size is ${formatBytes(AVATAR_MAX_FILE_SIZE_BYTES)}.`,
+        t("profile.avatar.errors.maxSize", {
+          size: formatBytes(AVATAR_MAX_FILE_SIZE_BYTES),
+        }),
       );
       resetSelection();
       return;
@@ -106,7 +127,7 @@ export function AvatarUploader({
 
   async function uploadAvatar() {
     if (!selectedFile) {
-      setError("Choose an image before uploading.");
+      setError(t("profile.avatar.errors.chooseImage"));
       return;
     }
 
@@ -134,7 +155,10 @@ export function AvatarUploader({
           .filter((part): part is string => Boolean(part && part.trim().length))
           .join(" ");
 
-        setError(combinedError || "Avatar upload failed.");
+        setError(
+          normalizeUploadError(combinedError) ??
+            t("profile.avatar.errors.uploadFailed"),
+        );
         setUploading(false);
         return;
       }
@@ -143,7 +167,7 @@ export function AvatarUploader({
       const uploadedAvatarPath = payload.avatarPath as string | undefined;
 
       if (!uploadedAvatarUrl || !uploadedAvatarPath) {
-        setError("Upload completed, but avatar metadata was missing.");
+        setError(t("profile.avatar.errors.metadataMissing"));
         setUploading(false);
         return;
       }
@@ -153,14 +177,14 @@ export function AvatarUploader({
         avatarPath: uploadedAvatarPath,
       });
 
-      setMessage("Avatar uploaded successfully.");
+      setMessage(t("profile.avatar.success"));
       resetSelection();
       router.refresh();
     } catch (error) {
       const message =
         error instanceof Error && error.message.length
-          ? error.message
-          : "Unable to upload avatar right now.";
+          ? normalizeUploadError(error.message) ?? error.message
+          : t("profile.avatar.errors.unavailable");
       setError(message);
     } finally {
       setUploading(false);
@@ -200,7 +224,7 @@ export function AvatarUploader({
             className="cn-btn cn-btn-ghost"
           >
             <Upload className="h-4 w-4" />
-            Choose Image
+            {t("profile.avatar.actions.choose")}
           </button>
 
           <button
@@ -214,24 +238,30 @@ export function AvatarUploader({
             ) : (
               <Upload className="h-4 w-4" />
             )}
-            {uploading ? "Uploading..." : "Upload Avatar"}
+            {uploading
+              ? t("profile.avatar.actions.uploading")
+              : t("profile.avatar.actions.upload")}
           </button>
         </div>
 
         {selectedFileSummary ? (
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-red-200/85">
-            Selected: <span className="text-white normal-case tracking-normal">{selectedFileSummary}</span>
+            {t("profile.avatar.selected")}{" "}
+            <span className="text-white normal-case tracking-normal">{selectedFileSummary}</span>
           </p>
         ) : null}
 
         {avatarPath ? (
           <p className="truncate text-[11px] text-club-muted">
-            Current: <span className="text-club-text-soft">{avatarPath}</span>
+            {t("profile.avatar.current")}{" "}
+            <span className="text-club-text-soft">{avatarPath}</span>
           </p>
         ) : null}
 
         <p className="text-[11px] text-club-muted">
-          JPG, PNG, or WEBP. Max {formatBytes(AVATAR_MAX_FILE_SIZE_BYTES)}.
+          {t("profile.avatar.helpText", {
+            size: formatBytes(AVATAR_MAX_FILE_SIZE_BYTES),
+          })}
         </p>
 
         {error ? (

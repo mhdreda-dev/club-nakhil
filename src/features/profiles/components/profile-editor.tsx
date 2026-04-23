@@ -7,7 +7,9 @@ import { useRouter } from "next/navigation";
 
 import { AvatarUploader } from "@/features/profiles/components/avatar-uploader";
 import { ProfileSection } from "@/features/profiles/components/profile-section";
+import { useTranslations } from "@/components/providers/translations-provider";
 import type { ProfileDTO } from "@/features/profiles/profiles.service";
+import { translateGender, translateTrainingLevel, translateTrainingType } from "@/lib/i18n";
 
 type ProfileEditorProps = {
   profile: ProfileDTO;
@@ -41,6 +43,7 @@ function inputClass(error?: string) {
 
 export function ProfileEditor({ profile }: ProfileEditorProps) {
   const router = useRouter();
+  const { t } = useTranslations();
 
   const [fullName, setFullName] = useState(profile.fullName);
   const [displayName, setDisplayName] = useState(profile.displayName);
@@ -108,7 +111,7 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
     setAvatarUrl(value.avatarUrl);
     setAvatarPath(value.avatarPath);
     setError(null);
-    setMessage("Avatar updated successfully.");
+    setMessage(t("profile.editor.success.avatarUpdated"));
   }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -173,12 +176,12 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
         setFieldErrors(mappedErrors);
       }
 
-      setError(responsePayload.message ?? "Unable to update profile.");
+      setError(responsePayload.message ?? t("profile.editor.errors.update"));
       setLoading(false);
       return;
     }
 
-    setMessage("Profile updated successfully.");
+    setMessage(t("profile.editor.success.updated"));
     setLoading(false);
     router.refresh();
   }
@@ -186,18 +189,18 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       <ProfileSection
-        title="Edit Profile"
-        description="Update your identity, contact, and role-specific profile details."
+        title={t("profile.editor.sections.editProfile.title")}
+        description={t("profile.editor.sections.editProfile.description")}
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Full Name</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.fullName")}</span>
             <input
               required
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
               className={inputClass(getFieldError("fullName"))}
-              placeholder="Your legal full name"
+              placeholder={t("profile.editor.placeholders.fullName")}
             />
             {getFieldError("fullName") ? (
               <p className="text-xs text-red-300">{getFieldError("fullName")}</p>
@@ -205,13 +208,13 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
           </label>
 
           <label className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Display Name</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.displayName")}</span>
             <input
               required
               value={displayName}
               onChange={(event) => setDisplayName(event.target.value)}
               className={inputClass(getFieldError("displayName"))}
-              placeholder="Name shown in dashboards"
+              placeholder={t("profile.editor.placeholders.displayName")}
             />
             {getFieldError("displayName") ? (
               <p className="text-xs text-red-300">{getFieldError("displayName")}</p>
@@ -219,18 +222,18 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
           </label>
 
           <label className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Phone</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.phone")}</span>
             <input
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
               className={inputClass(getFieldError("phone"))}
-              placeholder="+212..."
+              placeholder={t("profile.editor.placeholders.phone")}
             />
             {getFieldError("phone") ? <p className="text-xs text-red-300">{getFieldError("phone")}</p> : null}
           </label>
 
           <label className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Date of Birth</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.dateOfBirth")}</span>
             <input
               type="date"
               value={dateOfBirth}
@@ -243,65 +246,68 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
           </label>
 
           <label className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Gender</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.gender")}</span>
             <select
               value={gender}
               onChange={(event) => setGender((event.target.value as Gender) || "")}
               className={inputClass(getFieldError("gender"))}
             >
-              <option value="">Select gender</option>
+              <option value="">{t("profile.editor.placeholders.gender")}</option>
               {genderOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {translateGender(t, option.value)}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">City</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.city")}</span>
             <input
               value={city}
               onChange={(event) => setCity(event.target.value)}
               className={inputClass(getFieldError("city"))}
-              placeholder="Casablanca"
+              placeholder={t("profile.editor.placeholders.city")}
             />
           </label>
 
           <label className="space-y-2 sm:col-span-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Address</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.address")}</span>
             <input
               value={address}
               onChange={(event) => setAddress(event.target.value)}
               className={inputClass(getFieldError("address"))}
-              placeholder="Street, district, city"
+              placeholder={t("profile.editor.placeholders.address")}
             />
           </label>
 
           <label className="space-y-2 sm:col-span-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Bio</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.bio")}</span>
             <textarea
               rows={3}
               value={bio}
               onChange={(event) => setBio(event.target.value)}
               className={inputClass(getFieldError("bio"))}
-              placeholder="Share a short profile summary"
+              placeholder={t("profile.editor.placeholders.bio")}
             />
           </label>
 
           <label className="space-y-2 sm:col-span-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Emergency Contact</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.emergencyContact")}</span>
             <input
               value={emergencyContact}
               onChange={(event) => setEmergencyContact(event.target.value)}
               className={inputClass(getFieldError("emergencyContact"))}
-              placeholder="Name + phone"
+              placeholder={t("profile.editor.placeholders.emergencyContact")}
             />
           </label>
         </div>
       </ProfileSection>
 
-      <ProfileSection title="Avatar Settings" description="Define your visual identity across Club Nakhil.">
+      <ProfileSection
+        title={t("profile.editor.sections.avatar.title")}
+        description={t("profile.editor.sections.avatar.description")}
+      >
         <AvatarUploader
           name={displayName || fullName}
           avatarUrl={avatarUrl || null}
@@ -315,20 +321,23 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
       </ProfileSection>
 
       {hasCoachFields ? (
-        <ProfileSection title="Coach Profile" description="Highlight your coaching identity and background.">
+        <ProfileSection
+          title={t("profile.editor.sections.coach.title")}
+          description={t("profile.editor.sections.coach.description")}
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Specialization</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.specialization")}</span>
               <input
                 value={specialization}
                 onChange={(event) => setSpecialization(event.target.value)}
                 className={inputClass(getFieldError("coachProfile.specialization"))}
-                placeholder="Technique, sparring, conditioning..."
+                placeholder={t("profile.editor.placeholders.specialization")}
               />
             </label>
 
             <label className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Years of Experience</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.yearsOfExperience")}</span>
               <input
                 type="number"
                 min={0}
@@ -336,39 +345,39 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
                 value={yearsOfExperience}
                 onChange={(event) => setYearsOfExperience(event.target.value)}
                 className={inputClass(getFieldError("coachProfile.yearsOfExperience"))}
-                placeholder="10"
+                placeholder={t("profile.editor.placeholders.yearsOfExperience")}
               />
             </label>
 
             <label className="space-y-2 sm:col-span-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Certifications</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.certifications")}</span>
               <input
                 value={certifications}
                 onChange={(event) => setCertifications(event.target.value)}
                 className={inputClass(getFieldError("coachProfile.certifications"))}
-                placeholder="Comma separated list"
+                placeholder={t("profile.editor.placeholders.certifications")}
               />
             </label>
 
             <label className="space-y-2 sm:col-span-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Coaching Style</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.coachingStyle")}</span>
               <textarea
                 rows={3}
                 value={coachingStyle}
                 onChange={(event) => setCoachingStyle(event.target.value)}
                 className={inputClass(getFieldError("coachProfile.coachingStyle"))}
-                placeholder="How you structure sessions and motivate athletes"
+                placeholder={t("profile.editor.placeholders.coachingStyle")}
               />
             </label>
 
             <label className="space-y-2 sm:col-span-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Achievements</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.achievements")}</span>
               <textarea
                 rows={3}
                 value={achievements}
                 onChange={(event) => setAchievements(event.target.value)}
                 className={inputClass(getFieldError("coachProfile.achievements"))}
-                placeholder="Titles, milestones, athlete outcomes"
+                placeholder={t("profile.editor.placeholders.achievements")}
               />
             </label>
           </div>
@@ -376,10 +385,13 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
       ) : null}
 
       {hasMemberFields ? (
-        <ProfileSection title="Member Preferences" description="Customize your training profile.">
+        <ProfileSection
+          title={t("profile.editor.sections.member.title")}
+          description={t("profile.editor.sections.member.description")}
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Training Level</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.trainingLevel")}</span>
               <select
                 value={memberTrainingLevel}
                 onChange={(event) => setMemberTrainingLevel(event.target.value as TrainingLevel)}
@@ -387,14 +399,14 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
               >
                 {trainingLevelOptions.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {translateTrainingLevel(t, option.value)}
                   </option>
                 ))}
               </select>
             </label>
 
             <label className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">Preferred Training Type</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-club-text-soft">{t("profile.editor.fields.preferredTrainingType")}</span>
               <select
                 value={preferredTrainingType}
                 onChange={(event) =>
@@ -402,10 +414,10 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
                 }
                 className={inputClass(getFieldError("memberProfile.preferredTrainingType"))}
               >
-                <option value="">Not set</option>
+                <option value="">{t("common.notSet")}</option>
                 {trainingTypeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {translateTrainingType(t, option.value)}
                   </option>
                 ))}
               </select>
@@ -421,7 +433,7 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
           ) : (
             <Save className="h-4 w-4" />
           )}
-          {loading ? "Saving..." : "Save Profile"}
+          {loading ? t("profile.editor.actions.saving") : t("profile.editor.actions.save")}
         </button>
 
         {statusBanner}
