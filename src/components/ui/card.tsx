@@ -14,7 +14,7 @@ export function Card({ children, className, tone = "default", style }: CardProps
     <section
       style={style}
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-5 transition-all duration-300",
+        "relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 sm:p-5",
         tone === "default" &&
           "border-white/8 bg-club-surface/80 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur-md hover:border-white/[0.13] hover:shadow-[0_22px_55px_rgba(0,0,0,0.42)]",
         tone === "raised" &&

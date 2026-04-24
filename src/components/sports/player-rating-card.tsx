@@ -40,7 +40,7 @@ export function PlayerRatingCard({
   return (
     <section
       className={cn(
-        "cn-glow-border relative overflow-hidden rounded-3xl border-2 p-6 shadow-[0_32px_90px_rgba(0,0,0,0.6)]",
+        "cn-glow-border relative overflow-hidden rounded-3xl border-2 p-4 shadow-[0_32px_90px_rgba(0,0,0,0.6)] sm:p-6",
         tier.cardBorder,
         tier.cardShadow,
         className,
@@ -145,7 +145,9 @@ export function PlayerRatingCard({
             <div
               className={cn(
                 "grid gap-2",
-                attributes ? "grid-cols-4" : "grid-cols-2 md:max-w-xl md:grid-cols-4",
+                attributes
+                  ? "grid-cols-2 sm:grid-cols-4"
+                  : "grid-cols-2 md:max-w-xl md:grid-cols-4",
               )}
             >
               {highlights.map((h) => (
@@ -167,7 +169,7 @@ export function PlayerRatingCard({
         </div>
 
         {/* ═══ RIGHT: FIFA-style identity card ═══ */}
-        <div className="mx-auto lg:mx-0">
+        <div className="mx-auto w-full max-w-[152px] lg:mx-0">
           <FifaStyleCard
             name={firstName}
             avatarUrl={avatarUrl}

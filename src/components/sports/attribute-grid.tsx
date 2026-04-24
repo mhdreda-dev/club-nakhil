@@ -34,7 +34,7 @@ export function AttributeGrid({ attributes, className }: AttributeGridProps) {
   const cols = [attributes.slice(0, half), attributes.slice(half)];
 
   return (
-    <div className={cn("grid grid-cols-2 gap-x-6 gap-y-2.5", className)}>
+    <div className={cn("grid grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2", className)}>
       {cols.map((col, ci) => (
         <div key={ci} className="space-y-2.5">
           {col.map((attr) => {

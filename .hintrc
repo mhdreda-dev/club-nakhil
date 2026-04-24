@@ -8,6 +8,16 @@
       {
         "aria-valid-attr-value": "off"
       }
-    ]
+    ],
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "user-select",
+          "-webkit-mask"
+        ]
+      }
+    ],
+    "no-inline-styles": "off"
   }
 }

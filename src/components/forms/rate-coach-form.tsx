@@ -106,7 +106,7 @@ export function RateCoachForm({
         <button
           disabled={loading}
           type="submit"
-          className="cn-btn cn-btn-outline !border-amber-300/40 !text-amber-100 hover:!bg-amber-500/10"
+          className="cn-btn cn-btn-outline w-full justify-center !border-amber-300/40 !text-amber-100 hover:!bg-amber-500/10 sm:w-auto"
         >
           {loading ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />

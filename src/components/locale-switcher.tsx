@@ -46,7 +46,7 @@ export function LocaleSwitcher() {
         aria-haspopup="menu"
         aria-controls="locale-menu"
         aria-label={t("locale.switcher")}
-        className="group inline-flex min-w-[132px] max-w-[44vw] items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] px-3 py-2.5 text-sm text-white shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl transition hover:border-red-300/30 hover:bg-[linear-gradient(135deg,rgba(220,38,38,0.14),rgba(255,255,255,0.05))] sm:min-w-[148px] sm:max-w-none sm:px-3.5"
+        className="group inline-flex min-w-[120px] max-w-[46vw] items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))] px-2.5 py-2 text-sm text-white shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl transition hover:border-red-300/30 hover:bg-[linear-gradient(135deg,rgba(220,38,38,0.14),rgba(255,255,255,0.05))] sm:min-w-[148px] sm:max-w-none sm:gap-3 sm:px-3.5 sm:py-2.5"
       >
         <span
           className={cn(
@@ -54,11 +54,11 @@ export function LocaleSwitcher() {
             dir === "rtl" ? "flex-row-reverse" : "",
           )}
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-red-300/20 bg-red-500/12 text-red-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-            <Languages className="h-4 w-4" />
-          </span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl border border-red-300/20 bg-red-500/12 text-red-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:h-8 sm:w-8">
+              <Languages className="h-4 w-4" />
+            </span>
           <span className="flex min-w-0 flex-col items-start leading-none" data-rtl-align="start">
-            <span className="text-[9px] font-bold uppercase tracking-[0.24em] text-zinc-400">
+            <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-400 sm:text-[9px] sm:tracking-[0.24em]">
               {t("locale.switcher")}
             </span>
             <span className="mt-1 font-semibold text-white">
@@ -79,7 +79,7 @@ export function LocaleSwitcher() {
         <div
           id="locale-menu"
           role="menu"
-          className="absolute end-0 z-[999] mt-2 w-56 overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(17,17,17,0.97),rgba(10,10,10,0.95))] p-2 shadow-[0_22px_55px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:w-60"
+          className="absolute end-0 z-[999] mt-2 w-[min(15rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(17,17,17,0.97),rgba(10,10,10,0.95))] p-2 shadow-[0_22px_55px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:w-60"
         >
           {localeOptions.map((option) => {
             const active = option.code === locale;

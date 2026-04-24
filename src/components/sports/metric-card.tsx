@@ -56,7 +56,7 @@ export function MetricCard({
   return (
     <article
       className={cn(
-        "group relative overflow-hidden rounded-2xl border bg-club-surface/85 p-5 backdrop-blur-md transition duration-300 hover:-translate-y-1",
+        "group relative overflow-hidden rounded-2xl border bg-club-surface/85 p-4 backdrop-blur-md transition duration-300 hover:-translate-y-1 sm:p-5",
         toneBg[tone],
         toneGlow[tone],
         className,
@@ -75,18 +75,18 @@ export function MetricCard({
       />
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-club-muted">
               {label}
             </p>
-            <p className="mt-2.5 font-heading text-4xl font-black leading-none text-white">
+            <p className="mt-2.5 break-words font-heading text-3xl font-black leading-none text-white sm:text-4xl">
               {value}
             </p>
           </div>
           {icon ? (
             <div
               className={cn(
-                "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border backdrop-blur",
+                "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border backdrop-blur sm:h-11 sm:w-11",
                 iconTone[tone],
               )}
             >
@@ -96,7 +96,7 @@ export function MetricCard({
         </div>
         <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2">
           {hint ? (
-            <p className="text-[11px] text-club-muted">{hint}</p>
+            <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-club-muted">{hint}</p>
           ) : (
             <span />
           )}

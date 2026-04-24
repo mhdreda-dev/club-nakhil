@@ -217,8 +217,8 @@ textarea::placeholder {
   );
   border: 1px solid var(--club-border);
   border-radius: var(--r-xl);
-  backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .cn-surface-raised {

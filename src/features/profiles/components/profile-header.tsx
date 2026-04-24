@@ -53,7 +53,7 @@ export function ProfileHeader({
           className="h-24 w-24 border-red-200/40 shadow-[0_0_0_3px_rgba(220,38,38,0.2)]"
         />
 
-        <div className="min-w-[220px] flex-1 space-y-2">
+        <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-3">
             <h2 className="font-heading text-3xl uppercase leading-none tracking-[0.04em] text-white md:text-4xl">
               {displayName}

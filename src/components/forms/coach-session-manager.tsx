@@ -300,11 +300,11 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
             />
           </label>
 
-          <div className="flex flex-wrap gap-3 sm:col-span-2">
+          <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
             <button
               disabled={loading}
               type="submit"
-              className="cn-btn cn-btn-primary"
+              className="cn-btn cn-btn-primary w-full sm:w-auto"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -322,7 +322,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
               <button
                 type="button"
                 onClick={cancelEdit}
-                className="cn-btn cn-btn-ghost"
+                className="cn-btn cn-btn-ghost w-full sm:w-auto"
               >
                 <X className="h-4 w-4" />
                 {t("forms.coachSessionManager.actions.cancel")}
@@ -412,11 +412,11 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                     </p>
                   ) : null}
 
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                     <button
                       type="button"
                       onClick={() => startEditing(session)}
-                      className="cn-btn cn-btn-outline !py-1.5 !text-[11px]"
+                      className="cn-btn cn-btn-outline w-full !py-1.5 !text-[11px] sm:w-auto"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       {t("common.edit")}
@@ -424,7 +424,7 @@ export function CoachSessionManager({ sessions }: CoachSessionManagerProps) {
                     <button
                       type="button"
                       onClick={() => removeSession(session.id)}
-                      className="cn-btn cn-btn-danger !py-1.5 !text-[11px]"
+                      className="cn-btn cn-btn-danger w-full !py-1.5 !text-[11px] sm:w-auto"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       {t("common.delete")}

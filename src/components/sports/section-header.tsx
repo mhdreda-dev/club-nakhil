@@ -24,14 +24,14 @@ export function SectionHeader({
         className,
       )}
     >
-      <div className="space-y-2">
+      <div className="min-w-0 flex-1 space-y-2">
         {eyebrow ? (
           <p className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-amber-200/90">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(245,200,101,0.7)]" />
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="font-heading text-2xl uppercase leading-tight tracking-[0.05em] text-white md:text-[1.75rem]">
+        <h2 className="font-heading text-xl uppercase leading-tight tracking-[0.05em] text-white sm:text-2xl md:text-[1.75rem]">
           {title}
         </h2>
         {subtitle ? (
@@ -40,7 +40,11 @@ export function SectionHeader({
           </p>
         ) : null}
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action ? (
+        <div className="w-full shrink-0 sm:w-auto [&>*]:w-full sm:[&>*]:w-auto">
+          {action}
+        </div>
+      ) : null}
     </div>
   );
 }

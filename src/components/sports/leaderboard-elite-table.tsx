@@ -157,7 +157,79 @@ export function LeaderboardEliteTable({
       </div>
 
       {/* Rankings container */}
-      <div className="overflow-hidden rounded-2xl border border-white/8 bg-club-surface/80 shadow-[0_22px_60px_rgba(0,0,0,0.45)] backdrop-blur-md">
+      <div className="space-y-3 md:hidden">
+        {leaderboard.map((entry, idx) => {
+          const isCurrentMember = entry.memberId === currentMemberId;
+          const memberTier = getTierInfo(entry.overallRating);
+
+          return (
+            <article
+              key={entry.memberId}
+              style={
+                {
+                  "--cn-stagger-delay": `${Math.min(idx * 25, 700)}ms`,
+                } as CSSProperties
+              }
+              className={cn(
+                "cn-feed-stagger rounded-2xl border p-4 shadow-[0_16px_40px_rgba(0,0,0,0.35)]",
+                isCurrentMember
+                  ? "border-red-300/30 bg-[linear-gradient(135deg,rgba(220,38,38,0.12),rgba(10,10,10,0.92))]"
+                  : "border-white/8 bg-club-surface/80",
+              )}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <RankBadge rank={entry.currentRank} />
+                  <Avatar name={entry.name} avatarUrl={entry.avatarUrl} size="sm" />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="truncate font-semibold text-white">{entry.name}</p>
+                      {isCurrentMember ? (
+                        <span className="inline-flex rounded-full border border-red-300/45 bg-red-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.2em] text-red-200">
+                          {t("sports.leaderboard.you")}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="truncate text-[11px] text-club-muted">
+                      {entry.city ?? t("sports.leaderboard.memberFallback")}
+                    </p>
+                  </div>
+                </div>
+                <TrendChip rankChange={entry.rankChange} />
+              </div>
+
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                <div className="rounded-xl border border-white/8 bg-black/20 px-3 py-2 text-center">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-club-muted">
+                    {t("sports.leaderboard.columns.tier")}
+                  </p>
+                  <p className={cn("mt-1 text-xs font-black uppercase", memberTier.badgeText)}>
+                    {memberTier.name}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/8 bg-black/20 px-3 py-2 text-center">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-club-muted">
+                    {t("sports.leaderboard.columns.ovr")}
+                  </p>
+                  <p className="mt-1 font-heading text-lg font-black text-cyan-100">
+                    {entry.overallRating}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/8 bg-black/20 px-3 py-2 text-center">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-club-muted">
+                    {t("sports.leaderboard.columns.pts")}
+                  </p>
+                  <p className="mt-1 font-heading text-lg font-black text-red-200">
+                    {entry.totalPoints}
+                  </p>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-2xl border border-white/8 bg-club-surface/80 shadow-[0_22px_60px_rgba(0,0,0,0.45)] backdrop-blur-md md:block">
         {/* Column header */}
         <div className="border-b border-white/8 px-4 py-3">
           <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.22em] text-club-muted">
