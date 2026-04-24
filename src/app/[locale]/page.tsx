@@ -1,17 +1,17 @@
-import { getAuthSession } from '@/lib/auth';
-import { Role } from '@prisma/client';
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
+
+import { getAuthSession } from "@/lib/auth";
+import { getDashboardPathByRole } from "@/lib/dashboard-path";
+import { normalizeLocale } from "@/lib/i18n";
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const session = await getAuthSession();
+  const resolvedLocale = normalizeLocale(locale);
 
-  if (session) {
-    const role = session.user?.role;
-    if (role === Role.ADMIN) redirect(`/${locale}/admin/dashboard`);
-    if (role === Role.COACH) redirect(`/${locale}/coach/dashboard`);
-    if (role === Role.MEMBER) redirect(`/${locale}/member/dashboard`);
+  if (session?.user?.role) {
+    redirect(getDashboardPathByRole(session.user.role));
   }
 
-  redirect(`/${locale}/login`);
+  redirect(`/${resolvedLocale}/login`);
 }

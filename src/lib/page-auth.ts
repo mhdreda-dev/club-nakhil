@@ -1,20 +1,9 @@
 import { AccountStatus, Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 
+import { getDashboardPathByRole } from "@/lib/dashboard-path";
 import { getAuthSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
-
-function dashboardPathByRole(role: Role) {
-  if (role === Role.ADMIN) {
-    return "/admin/dashboard";
-  }
-
-  if (role === Role.COACH) {
-    return "/coach/dashboard";
-  }
-
-  return "/member/dashboard";
-}
 
 export async function requirePageAuth(expectedRole?: Role) {
   const session = await getAuthSession();
@@ -47,7 +36,7 @@ export async function requirePageAuth(expectedRole?: Role) {
   }
 
   if (expectedRole && dbUser.role !== expectedRole) {
-    redirect(dashboardPathByRole(dbUser.role));
+    redirect(getDashboardPathByRole(dbUser.role));
   }
 
   return {

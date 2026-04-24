@@ -10,11 +10,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
   createTranslator,
   getDirection,
+  isLocale,
   localeCookieName,
   localeStorageKey,
   normalizeLocale,
@@ -48,6 +49,8 @@ export function TranslationsProvider({
   dictionary,
 }: TranslationsProviderProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [locale, setLocaleState] = useState(initialLocale);
 
   useEffect(() => {
@@ -63,6 +66,11 @@ export function TranslationsProvider({
   const setLocale = useCallback(
     (nextLocale: Locale) => {
       const resolvedLocale = normalizeLocale(nextLocale);
+      const queryString = searchParams.toString();
+      const currentPathname = pathname ?? "/";
+      const pathSegments = currentPathname.split("/");
+      const hasLocaleSegment = Boolean(pathSegments[1] && isLocale(pathSegments[1]));
+      let nextPath = currentPathname;
 
       document.cookie = `${localeCookieName}=${resolvedLocale}; path=/; max-age=31536000; samesite=lax`;
       window.localStorage.setItem(localeStorageKey, resolvedLocale);
@@ -72,11 +80,25 @@ export function TranslationsProvider({
       document.documentElement.dir = getDirection(resolvedLocale);
       document.body.classList.toggle("cn-rtl", resolvedLocale === "ar");
 
+      if (hasLocaleSegment) {
+        pathSegments[1] = resolvedLocale;
+        nextPath = pathSegments.join("/") || "/";
+      } else if (currentPathname === "/") {
+        nextPath = `/${resolvedLocale}/login`;
+      }
+
+      const nextHref = queryString ? `${nextPath}?${queryString}` : nextPath;
+
       startTransition(() => {
+        if (hasLocaleSegment || currentPathname === "/") {
+          router.push(nextHref);
+          return;
+        }
+
         router.refresh();
       });
     },
-    [router],
+    [pathname, router, searchParams],
   );
 
   const value = useMemo<TranslationsContextValue>(() => {

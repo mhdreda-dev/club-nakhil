@@ -77,6 +77,74 @@
       "invalidCredentials": "Identifiants invalides. Vérifiez votre e-mail et votre mot de passe.",
       "unauthorized": "Connectez-vous pour continuer.",
       "forbidden": "Vous n’avez pas accès à cette action."
+    },
+    "loginPage": {
+      "heroTag": "Plateforme privée de combat",
+      "heroTitleBefore": "Entrez dans l’arène",
+      "heroTitleAfter": "d’entraînement.",
+      "heroDescription": "Votre tableau de bord privé est prêt. Validez votre présence, consultez les notes du coach et suivez votre classement — accès réservé aux membres autorisés.",
+      "features": {
+        "ranked": "Classement",
+        "streaks": "Séries",
+        "badges": "Badges"
+      },
+      "copyright": "© Club Nakhil · Kickboxing · Maroc",
+      "accessBadge": "Accès membre officiel",
+      "welcomePrefix": "Bienvenue chez",
+      "subtitle": "Connectez-vous à votre espace privé d’entraînement Coach Rabah.",
+      "submit": "Entrer dans le tableau de bord",
+      "submitting": "Connexion...",
+      "demoCredentials": "Les identifiants de démonstration sont disponibles dans le script de seed et le README.",
+      "createAccount": "Nouveau membre ? Créer un compte",
+      "returnHome": "Retour à l’accueil",
+      "placeholders": {
+        "email": "membre@clubnakhil.ma",
+        "password": "••••••••"
+      }
+    },
+    "signupPage": {
+      "topLogin": "Déjà inscrit ? Se connecter",
+      "badge": "Auto-inscription",
+      "title": "Devenez membre de Club Nakhil",
+      "subtitle": "Créez votre compte membre. L’accès sera activé après validation par l’administration.",
+      "fields": {
+        "phone": "Numéro de téléphone",
+        "dateOfBirth": "Date de naissance",
+        "gender": "Genre",
+        "skillLevel": "Niveau",
+        "membershipPlan": "Formule d’adhésion",
+        "emergencyContact": "Contact d’urgence",
+        "profilePhoto": "Photo de profil (optionnelle)"
+      },
+      "placeholders": {
+        "fullName": "Saisissez votre nom complet",
+        "email": "Saisissez votre e-mail",
+        "phone": "Saisissez votre numéro de téléphone",
+        "emergencyContact": "Nom / téléphone du contact d’urgence",
+        "password": "Créez un mot de passe",
+        "confirmPassword": "Répétez le mot de passe"
+      },
+      "profileHelp": "JPG, PNG ou WEBP. Maximum 3 Mo.",
+      "selectedFile": "Fichier sélectionné : {name}",
+      "submit": "Créer mon compte",
+      "submitting": "Création du compte...",
+      "submitted": "Inscription envoyée",
+      "returnHome": "Retour à l’accueil",
+      "warnings": {
+        "avatarUpload": "Votre compte a été créé, mais la photo de profil n’a pas pu être envoyée."
+      },
+      "errors": {
+        "review": "Veuillez vérifier les champs obligatoires.",
+        "invalid": "Certaines informations sont manquantes ou invalides.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas.",
+        "image": "Veuillez envoyer une image valide de moins de 3 Mo.",
+        "imageFormat": "Veuillez choisir une image JPG, PNG ou WEBP.",
+        "emailExists": "Cet e-mail est déjà enregistré.",
+        "emailExistsField": "Un compte existe déjà avec cet e-mail.",
+        "timeout": "La requête a pris trop de temps. Veuillez réessayer.",
+        "network": "Nous n’avons pas pu envoyer votre inscription. Veuillez réessayer.",
+        "unavailable": "Impossible de finaliser l’inscription pour le moment."
+      }
     }
   },
   "layout": {

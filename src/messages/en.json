@@ -77,6 +77,74 @@
       "invalidCredentials": "Invalid credentials. Check your email and password.",
       "unauthorized": "You need to sign in to continue.",
       "forbidden": "You do not have access to this action."
+    },
+    "loginPage": {
+      "heroTag": "Private Combat Platform",
+      "heroTitleBefore": "Step Into the",
+      "heroTitleAfter": "Training Arena.",
+      "heroDescription": "Your private dashboard is ready. Check in for a session, review coach notes, and track your rank — authenticated access only.",
+      "features": {
+        "ranked": "Ranked",
+        "streaks": "Streaks",
+        "badges": "Badges"
+      },
+      "copyright": "© Club Nakhil · Kickboxing · Morocco",
+      "accessBadge": "Official Member Access",
+      "welcomePrefix": "Welcome to",
+      "subtitle": "Sign in to your private Coach Rabah training workspace.",
+      "submit": "Enter Dashboard",
+      "submitting": "Signing in…",
+      "demoCredentials": "Demo credentials are provided in the seed script and README.",
+      "createAccount": "New member? Create an account",
+      "returnHome": "Return to home",
+      "placeholders": {
+        "email": "member@clubnakhil.ma",
+        "password": "••••••••"
+      }
+    },
+    "signupPage": {
+      "topLogin": "Already registered? Login",
+      "badge": "Self-Registration",
+      "title": "Become a Club Nakhil Member",
+      "subtitle": "Create your member account. Access will be activated after admin approval.",
+      "fields": {
+        "phone": "Phone Number",
+        "dateOfBirth": "Date of Birth",
+        "gender": "Gender",
+        "skillLevel": "Skill Level",
+        "membershipPlan": "Membership Plan",
+        "emergencyContact": "Emergency Contact",
+        "profilePhoto": "Profile Photo (Optional)"
+      },
+      "placeholders": {
+        "fullName": "Enter your full name",
+        "email": "Enter your email",
+        "phone": "Enter phone number",
+        "emergencyContact": "Emergency contact name / phone",
+        "password": "Create password",
+        "confirmPassword": "Repeat password"
+      },
+      "profileHelp": "JPG, PNG, or WEBP. Max 3 MB.",
+      "selectedFile": "Selected file: {name}",
+      "submit": "Create My Account",
+      "submitting": "Creating Account...",
+      "submitted": "Registration Submitted",
+      "returnHome": "Back to Home",
+      "warnings": {
+        "avatarUpload": "Your account was created, but the profile image could not be uploaded."
+      },
+      "errors": {
+        "review": "Please review the required fields.",
+        "invalid": "Some information is missing or invalid.",
+        "passwordMismatch": "Passwords do not match.",
+        "image": "Please upload a valid image under 3 MB.",
+        "imageFormat": "Please choose a JPG, PNG, or WEBP image.",
+        "emailExists": "This email is already registered.",
+        "emailExistsField": "An account with this email already exists.",
+        "timeout": "The request took too long. Please try again.",
+        "network": "We couldn't send your registration. Please try again.",
+        "unavailable": "Unable to complete sign up right now."
+      }
     }
   },
   "layout": {
