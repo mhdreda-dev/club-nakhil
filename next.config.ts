@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // Emit browser source maps in production so `sentry-cli sourcemaps upload`
+  // has real .map files to ship. Without this, Turbopack only emits minified
+  // JS and Sentry stack traces stay unreadable. The postbuild upload step
+  // uses --delete-after-upload to avoid serving the maps publicly.
+  productionBrowserSourceMaps: true,
   // Sentry uses `onRequestError` from instrumentation; nothing extra needed.
 };
 
