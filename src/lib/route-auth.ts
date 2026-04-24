@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { setSentryUser } from "@/lib/sentry";
 import { getServerTranslator } from "@/lib/server-translations";
 
 export async function requireApiAuth(role?: Role) {
@@ -49,6 +50,14 @@ export async function requireApiAuth(role?: Role) {
       error: NextResponse.json({ message }, { status: 403 }),
     };
   }
+
+  // Enrich Sentry scope for any errors thrown later in this request.
+  setSentryUser({
+    ...session.user,
+    id: dbUser.id,
+    role: dbUser.role,
+    status: dbUser.status,
+  });
 
   return {
     session: {

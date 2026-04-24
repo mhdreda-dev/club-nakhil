@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
+    "@sentry/nextjs": "^9.47.1",
     "@supabase/supabase-js": "^2.103.3",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",

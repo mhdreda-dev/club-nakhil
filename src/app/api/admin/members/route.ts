@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createMemberProfileCreateData } from "@/features/profiles/member-profile";
 import { requireApiAuth } from "@/lib/route-auth";
+import { captureRouteError } from "@/lib/sentry";
 import {
   manualMemberCreateSchema,
   memberStatusFilterSchema,
@@ -246,7 +247,10 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    console.error(error);
+    captureRouteError(error, {
+      route: "/api/admin/members",
+      method: "POST",
+    });
 
     return NextResponse.json(
       {
