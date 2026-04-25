@@ -189,49 +189,44 @@ export async function POST(request: NextRequest) {
     const dateOfBirth = new Date(`${parsed.data.dateOfBirth}T00:00:00.000Z`);
     const profileImage = parsed.data.profileImage ? parsed.data.profileImage : null;
 
-    const member = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          name: parsed.data.fullName,
-          fullName: parsed.data.fullName,
-          email: parsed.data.email,
-          passwordHash,
-          role: Role.MEMBER,
-          status: parsed.data.status,
-          phone: parsed.data.phone,
-          dateOfBirth,
-          gender: parsed.data.gender,
-          address: parsed.data.address,
-          emergencyContact: parsed.data.emergencyContact,
-          sportLevel: parsed.data.sportLevel,
-          membershipType: parsed.data.membershipType,
-          profileImage,
+    // Nested write: a single Prisma call creates User + UserProfile +
+    // MemberProfile inside one engine-managed transaction. This works through
+    // PgBouncer transaction-pooling because the engine issues BEGIN/…/COMMIT
+    // on a single allocated connection without yielding to user code — the
+    // bug pattern we hit only applies to interactive `$transaction(async tx
+    // => …)` callbacks.
+    const member = await prisma.user.create({
+      data: {
+        name: parsed.data.fullName,
+        fullName: parsed.data.fullName,
+        email: parsed.data.email,
+        passwordHash,
+        role: Role.MEMBER,
+        status: parsed.data.status,
+        phone: parsed.data.phone,
+        dateOfBirth,
+        gender: parsed.data.gender,
+        address: parsed.data.address,
+        emergencyContact: parsed.data.emergencyContact,
+        sportLevel: parsed.data.sportLevel,
+        membershipType: parsed.data.membershipType,
+        profileImage,
+        profile: {
+          create: {
+            fullName: parsed.data.fullName,
+            displayName: parsed.data.fullName,
+            phone: parsed.data.phone,
+            dateOfBirth,
+            gender: parsed.data.gender,
+            address: parsed.data.address,
+            emergencyContact: parsed.data.emergencyContact,
+            avatarUrl: profileImage,
+            memberProfile: {
+              create: createMemberProfileCreateData(parsed.data.sportLevel),
+            },
+          },
         },
-      });
-
-      await tx.userProfile.create({
-        data: {
-          userId: user.id,
-          fullName: parsed.data.fullName,
-          displayName: parsed.data.fullName,
-          phone: parsed.data.phone,
-          dateOfBirth,
-          gender: parsed.data.gender,
-          address: parsed.data.address,
-          emergencyContact: parsed.data.emergencyContact,
-          avatarUrl: profileImage,
-          joinedAt: user.createdAt,
-        },
-      });
-
-      await tx.memberProfile.create({
-        data: {
-          userId: user.id,
-          ...createMemberProfileCreateData(parsed.data.sportLevel),
-        },
-      });
-
-      return user;
+      },
     });
 
     return NextResponse.json(

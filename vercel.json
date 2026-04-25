@@ -2,5 +2,11 @@
   "framework": "nextjs",
   "buildCommand": "npm run prisma:deploy && npm run build && (test -z \"$SENTRY_AUTH_TOKEN\" || npm run sentry:sourcemaps)",
   "installCommand": "npm install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/recompute-leaderboard",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }

@@ -1,15 +1,14 @@
 import { AccountStatus, Role } from "@prisma/client";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-import { authOptions } from "@/lib/auth";
+import { getAuthSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { setSentryUser } from "@/lib/sentry";
 import { getServerTranslator } from "@/lib/server-translations";
 
 export async function requireApiAuth(role?: Role) {
   const t = await getServerTranslator();
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   if (!session?.user?.id) {
     return {

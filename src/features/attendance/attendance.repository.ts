@@ -34,53 +34,102 @@ export async function findSessionByQrToken(qrToken: string) {
   });
 }
 
+/**
+ * Create an attendance row plus its corresponding points-log entry atomically,
+ * without using an interactive Prisma transaction.
+ *
+ * The previous implementation used `prisma.$transaction(async (tx) => …)`,
+ * which fails through Supabase PgBouncer in transaction-pooling mode (port
+ * 6543, `?pgbouncer=true`) because PgBouncer cannot pin a session-scoped
+ * connection for the duration of an interactive callback. The symptom is the
+ * "Transaction API error: Unable to start a transaction in the given time"
+ * Sentry alert.
+ *
+ * The PgBouncer-safe approach used here:
+ *
+ * 1. Try a fast-path read for an existing attendance row. If present, return
+ *    the duplicate result without touching writes.
+ * 2. Otherwise, issue both writes in a single ARRAY-form `$transaction(...)`.
+ *    Array transactions are translated by Prisma into one BEGIN/COMMIT block
+ *    on a single connection — no callback, no idle waits, fully supported by
+ *    PgBouncer transaction mode.
+ * 3. Treat the unique-constraint race (P2002 on the attendance row) as a
+ *    duplicate and recover gracefully.
+ */
 export async function createAttendanceRewardTransaction(
   input: AttendanceRewardTxInput,
 ): Promise<AttendanceRewardTxResult> {
-  return prisma.$transaction(async (tx) => {
-    const existingAttendance = await tx.attendance.findUnique({
-      where: {
-        sessionId_memberId: {
+  const existingAttendance = await prisma.attendance.findUnique({
+    where: {
+      sessionId_memberId: {
+        sessionId: input.sessionId,
+        memberId: input.memberId,
+      },
+    },
+    select: {
+      checkedInAt: true,
+    },
+  });
+
+  if (existingAttendance) {
+    return {
+      status: "duplicate",
+      checkedInAt: existingAttendance.checkedInAt,
+    };
+  }
+
+  try {
+    const [attendance] = await prisma.$transaction([
+      prisma.attendance.create({
+        data: {
           sessionId: input.sessionId,
           memberId: input.memberId,
         },
-      },
-      select: {
-        checkedInAt: true,
-      },
-    });
-
-    if (existingAttendance) {
-      return {
-        status: "duplicate",
-        checkedInAt: existingAttendance.checkedInAt,
-      };
-    }
-
-    const attendance = await tx.attendance.create({
-      data: {
-        sessionId: input.sessionId,
-        memberId: input.memberId,
-      },
-      select: {
-        checkedInAt: true,
-      },
-    });
-
-    await tx.pointsLog.create({
-      data: {
-        memberId: input.memberId,
-        sessionId: input.sessionId,
-        points: input.points,
-        reason: `ATTENDANCE_REWARD: ${input.sessionTitle}`,
-      },
-    });
+        select: {
+          checkedInAt: true,
+        },
+      }),
+      prisma.pointsLog.create({
+        data: {
+          memberId: input.memberId,
+          sessionId: input.sessionId,
+          points: input.points,
+          reason: `ATTENDANCE_REWARD: ${input.sessionTitle}`,
+        },
+      }),
+    ]);
 
     return {
       status: "created",
       checkedInAt: attendance.checkedInAt,
     };
-  });
+  } catch (error) {
+    // Race against a concurrent scan: another request inserted the same
+    // sessionId/memberId between our fast-path read and the create. Treat as
+    // duplicate and fall through to the existing-row read path.
+    if (isUniqueViolation(error)) {
+      const winningRow = await prisma.attendance.findUnique({
+        where: {
+          sessionId_memberId: {
+            sessionId: input.sessionId,
+            memberId: input.memberId,
+          },
+        },
+        select: {
+          checkedInAt: true,
+        },
+      });
+
+      if (winningRow) {
+        return {
+          status: "duplicate",
+          checkedInAt: winningRow.checkedInAt,
+        };
+      }
+    }
+
+    throw error;
+  }
 }
 
 export async function getMemberRewardSnapshot(memberId: string) {

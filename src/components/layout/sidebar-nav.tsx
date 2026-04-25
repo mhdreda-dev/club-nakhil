@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export type NavigationItem = {
@@ -10,13 +10,6 @@ export type NavigationItem = {
   label: string;
   badgeCount?: number;
   icon?: React.ReactNode;
-  /**
-   * When true, this link is prefetched eagerly on mount.
-   * Use sparingly — reserve for the single most-likely next click per role.
-   * All other links defer to hover/focus-triggered prefetch to avoid the
-   * "prefetch storm" on pages that render many sidebar entries at once.
-   */
-  priority?: boolean;
 };
 
 interface SidebarNavProps {
@@ -24,23 +17,44 @@ interface SidebarNavProps {
   onNavigate?: () => void;
 }
 
+// Hover/touch-triggered prefetch: avoids the first-render request storm
+// (one prefetch per nav item) while keeping navigation feeling instant —
+// once the user shows intent we restore Next's default static prefetch.
+function NavLink({
+  item,
+  isActive,
+  onNavigate,
+  className,
+  children,
+}: {
+  item: NavigationItem;
+  isActive: boolean;
+  onNavigate?: () => void;
+  className: string;
+  children: React.ReactNode;
+}) {
+  const [warm, setWarm] = useState(false);
+  const arm = () => {
+    if (!warm) setWarm(true);
+  };
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      onMouseEnter={arm}
+      onFocus={arm}
+      onTouchStart={arm}
+      prefetch={isActive ? false : warm ? null : false}
+      className={className}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export function SidebarNav({ items, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  // Track which hrefs we've already warmed to avoid duplicate router.prefetch
-  // calls on repeated hovers (Next dedupes internally, but this saves the
-  // round-trip through its cache too).
-  const prefetched = useRef<Set<string>>(new Set());
-
-  const warm = useCallback(
-    (href: string) => {
-      if (prefetched.current.has(href)) return;
-      prefetched.current.add(href);
-      router.prefetch(href);
-    },
-    [router],
-  );
 
   return (
     <nav className="space-y-1">
@@ -49,21 +63,12 @@ export function SidebarNav({ items, onNavigate }: SidebarNavProps) {
           pathname === item.href ||
           (item.href !== '/' && pathname.startsWith(`${item.href}/`));
 
-        // Only the active route and explicitly-flagged priority items
-        // prefetch on mount. Everything else waits for hover/focus — which
-        // Next's router.prefetch satisfies in <100ms on warm caches, and
-        // keeps the initial render from firing ~9 parallel route fetches.
-        const shouldEagerPrefetch = isActive || item.priority === true;
-
         return (
-          <Link
+          <NavLink
             key={item.href}
-            href={item.href}
-            prefetch={shouldEagerPrefetch}
-            onMouseEnter={shouldEagerPrefetch ? undefined : () => warm(item.href)}
-            onFocus={shouldEagerPrefetch ? undefined : () => warm(item.href)}
-            onTouchStart={shouldEagerPrefetch ? undefined : () => warm(item.href)}
-            onClick={onNavigate}
+            item={item}
+            isActive={isActive}
+            onNavigate={onNavigate}
             className={cn(
               // Base — always dark, never white
               'group flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200',
@@ -112,7 +117,7 @@ export function SidebarNav({ items, onNavigate }: SidebarNavProps) {
                 {item.badgeCount}
               </span>
             )}
-          </Link>
+          </NavLink>
         );
       })}
     </nav>

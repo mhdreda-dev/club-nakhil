@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { Role, type TrainingLevel, type TrainingType } from "@prisma/client";
 
 import { normalizeMemberProfile } from "@/features/profiles/member-profile";
@@ -16,7 +18,6 @@ import {
   updateUserName,
   updateUserProfileBase,
 } from "@/features/profiles/profiles.repository";
-import { recomputeMemberLeaderboardRanks } from "@/features/leaderboard/leaderboard.service";
 import { calculateMemberOverallRating } from "@/features/profiles/member-rating";
 import { getTierInfo } from "@/lib/tier";
 import type { NormalizedProfileUpdate } from "@/features/profiles/profiles.schemas";
@@ -196,7 +197,10 @@ function calculateStreak(attendanceHistory: { checkedInAt: Date }[]) {
   return streak;
 }
 
-export async function ensureProfile(userId: string) {
+// Per-request memoized. Layout calls getProfileHeader() AND
+// getProfileSidebarSummary() — without dedupe each one re-runs the heavy
+// User+Profile+CoachProfile+MemberProfile join.
+export const ensureProfile = cache(async (userId: string) => {
   const user = await findUserWithProfile(userId);
 
   if (!user) {
@@ -219,8 +223,24 @@ export async function ensureProfile(userId: string) {
   }
 
   return user;
-}
+});
 
+/**
+ * Sync a single member's stored metrics (attendance count, total points,
+ * streak, overall rating) against the source-of-truth tables.
+ *
+ * IMPORTANT: This function is intentionally scoped to a SINGLE user and never
+ * touches the global leaderboard. The global rank recompute is owned by:
+ *   - the Vercel Cron job at POST /api/cron/recompute-leaderboard
+ *   - the admin trigger at POST /api/admin/leaderboard/recompute
+ *
+ * Why: the previous implementation called `recomputeMemberLeaderboardRanks()`
+ * inline, which opened a Prisma interactive transaction. The production DB is
+ * fronted by PgBouncer in transaction pooling mode, which cannot service
+ * interactive transactions and surfaces "Transaction API error: Unable to
+ * start a transaction in the given time." in Sentry. All the per-user work
+ * here (reads + a single upsert) is safe through PgBouncer.
+ */
 export async function syncMemberMetrics(userId: string) {
   const user = await ensureProfile(userId);
 
@@ -247,8 +267,6 @@ export async function syncMemberMetrics(userId: string) {
     currentStreak,
     overallRating,
   });
-
-  await recomputeMemberLeaderboardRanks();
 }
 
 export async function getOwnProfile(userId: string) {

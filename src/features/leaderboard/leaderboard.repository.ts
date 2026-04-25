@@ -2,6 +2,11 @@ import { AccountStatus, Prisma, Role } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
+// Used only by the leaderboard read path. The recompute uses a single SQL
+// statement (see leaderboard.service.ts) so the previous tx-aware helpers
+// (`listRankableMemberProfiles`, `applyMemberRankSnapshots`) were removed —
+// they relied on the interactive `$transaction(async tx => …)` form that
+// PgBouncer in transaction-pooling mode cannot service.
 const rankingOrderBy: Prisma.MemberProfileOrderByWithRelationInput[] = [
   { overallRating: "desc" },
   { totalPoints: "desc" },
@@ -9,58 +14,6 @@ const rankingOrderBy: Prisma.MemberProfileOrderByWithRelationInput[] = [
   { updatedAt: "desc" },
   { userId: "asc" },
 ];
-
-export type MemberRankSnapshot = {
-  userId: string;
-  currentRank: number;
-  previousRank: number | null;
-  rankChange: number;
-};
-
-export async function listRankableMemberProfiles(tx: Prisma.TransactionClient) {
-  return tx.memberProfile.findMany({
-    where: {
-      userProfile: {
-        user: {
-          role: Role.MEMBER,
-          status: AccountStatus.ACTIVE,
-        },
-      },
-    },
-    select: {
-      userId: true,
-      currentRank: true,
-      previousRank: true,
-      overallRating: true,
-      totalPoints: true,
-      attendanceCount: true,
-      updatedAt: true,
-    },
-    orderBy: rankingOrderBy,
-  });
-}
-
-export async function applyMemberRankSnapshots(
-  tx: Prisma.TransactionClient,
-  snapshots: MemberRankSnapshot[],
-  leaderboardUpdatedAt: Date,
-) {
-  await Promise.all(
-    snapshots.map((snapshot) =>
-      tx.memberProfile.update({
-        where: {
-          userId: snapshot.userId,
-        },
-        data: {
-          currentRank: snapshot.currentRank,
-          previousRank: snapshot.previousRank,
-          rankChange: snapshot.rankChange,
-          leaderboardUpdatedAt,
-        },
-      }),
-    ),
-  );
-}
 
 export async function countMembersMissingLeaderboardSnapshot() {
   return prisma.memberProfile.count({

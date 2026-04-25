@@ -1,9 +1,20 @@
 import { redirect } from "next/navigation";
 
 import { LocaleRedirect } from "@/components/locale-redirect";
+import { getAuthSession } from "@/lib/get-session";
+import { getDashboardPathByRole } from "@/lib/dashboard-path";
 import { getSavedLocaleFromCookie } from "@/lib/locale-routing";
+import type { Role } from "@prisma/client";
 
 export default async function RootPage() {
+  // Authenticated users skip the locale → /login → dashboard chain entirely.
+  // Cuts redirectCount from 2 → 1 for the most common entry point.
+  const session = await getAuthSession();
+
+  if (session?.user?.role) {
+    redirect(getDashboardPathByRole(session.user.role as Role));
+  }
+
   const savedLocale = await getSavedLocaleFromCookie();
 
   if (savedLocale) {

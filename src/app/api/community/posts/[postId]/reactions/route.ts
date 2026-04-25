@@ -69,30 +69,36 @@ export async function POST(
 
     const reactionType = reactionTypeFromKey(parsed.data.reaction);
 
-    const reactionSummary = await prisma.$transaction(async (tx) => {
-      const existingReaction = await tx.communityReaction.findUnique({
-        where: {
-          postId_userId_reactionType: {
-            postId: post.id,
-            userId: auth.session.user.id,
-            reactionType,
-          },
+    // PgBouncer-safe reaction toggle:
+    //   1. Resolve current state with a single read.
+    //   2. Issue the toggle write + the regroup count in an array-form
+    //      `$transaction([...])`. Array transactions are translated into one
+    //      BEGIN/…/COMMIT block on a single connection — no interactive
+    //      callback, no idle waits, fully supported by PgBouncer transaction
+    //      mode. This avoids the "Transaction API error: Unable to start a
+    //      transaction in the given time" failure pattern.
+    const existingReaction = await prisma.communityReaction.findUnique({
+      where: {
+        postId_userId_reactionType: {
+          postId: post.id,
+          userId: auth.session.user.id,
+          reactionType,
         },
-        select: {
-          id: true,
-        },
-      });
+      },
+      select: {
+        id: true,
+      },
+    });
 
-      let reacted = false;
+    const reacted = !existingReaction;
 
-      if (existingReaction) {
-        await tx.communityReaction.delete({
+    const toggleOp = existingReaction
+      ? prisma.communityReaction.delete({
           where: {
             id: existingReaction.id,
           },
-        });
-      } else {
-        await tx.communityReaction.create({
+        })
+      : prisma.communityReaction.create({
           data: {
             postId: post.id,
             userId: auth.session.user.id,
@@ -100,40 +106,35 @@ export async function POST(
           },
         });
 
-        reacted = true;
-      }
-
-      const grouped = await tx.communityReaction.groupBy({
-        by: ["reactionType"],
-        where: {
-          postId: post.id,
-        },
-        _count: {
-          _all: true,
-        },
-      });
-
-      const reactions = emptyReactionCounts();
-
-      for (const row of grouped) {
-        if (row.reactionType === CommunityReactionType.LIKE) {
-          reactions.like = row._count._all;
-          continue;
-        }
-
-        if (row.reactionType === CommunityReactionType.FIRE) {
-          reactions.fire = row._count._all;
-          continue;
-        }
-
-        reactions.clap = row._count._all;
-      }
-
-      return {
-        reactions,
-        reacted,
-      };
+    const groupOp = prisma.communityReaction.groupBy({
+      by: ["reactionType"],
+      where: {
+        postId: post.id,
+      },
+      _count: {
+        _all: true,
+      },
     });
+
+    const [, grouped] = await prisma.$transaction([toggleOp, groupOp]);
+
+    const reactions = emptyReactionCounts();
+
+    for (const row of grouped) {
+      if (row.reactionType === CommunityReactionType.LIKE) {
+        reactions.like = row._count._all;
+        continue;
+      }
+
+      if (row.reactionType === CommunityReactionType.FIRE) {
+        reactions.fire = row._count._all;
+        continue;
+      }
+
+      reactions.clap = row._count._all;
+    }
+
+    const reactionSummary = { reactions, reacted };
 
     return NextResponse.json({
       message: "Reaction updated.",

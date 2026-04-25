@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
 import { CalendarDays, Flame, Medal, Sparkles, Star, Trophy } from "lucide-react";
+import { after } from "next/server";
 
 import { MetricCard } from "@/components/sports/metric-card";
 import { PlayerRatingCard } from "@/components/sports/player-rating-card";
@@ -16,11 +17,46 @@ import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
 
+// Toggle with PERF_TIMINGS=1 in env to print server timings in the dev console
+// without polluting production logs.
+const PERF_TIMINGS = process.env.PERF_TIMINGS === "1";
+function timeStart(label: string) {
+  if (PERF_TIMINGS) console.time(label);
+}
+function timeEnd(label: string) {
+  if (PERF_TIMINGS) console.timeEnd(label);
+}
+
 export default async function MemberDashboardPage() {
+  timeStart("dashboard:total");
+  timeStart("dashboard:auth+i18n");
+  // requirePageAuth + getServerTranslations are both wrapped in React cache(),
+  // so the layout's earlier calls (with the same args) are reused for free.
   const session = await requirePageAuth(Role.MEMBER);
   const { intlLocale, t } = await getServerTranslations();
-  await syncMemberMetrics(session.user.id);
+  timeEnd("dashboard:auth+i18n");
 
+  // Push the per-user metric sync off the critical path. The dashboard reads
+  // whatever is currently persisted in MemberProfile; the next request sees
+  // freshly synced numbers.
+  //
+  // The global leaderboard recompute is NOT triggered from here. It runs on a
+  // Vercel Cron (POST /api/cron/recompute-leaderboard) and an admin trigger.
+  // This page must never open a transaction against the pooled DATABASE_URL
+  // (PgBouncer transaction mode does not support interactive transactions).
+  after(async () => {
+    timeStart("dashboard:after:sync");
+    try {
+      await syncMemberMetrics(session.user.id);
+    } catch (error) {
+      // Non-blocking: the dashboard already responded. Log + swallow.
+      console.error("[dashboard:after] syncMemberMetrics failed", error);
+    } finally {
+      timeEnd("dashboard:after:sync");
+    }
+  });
+
+  timeStart("dashboard:queries");
   const [attendanceCount, points, badges, upcomingSessions, notes, memberProfile] = await Promise.all([
     prisma.attendance.count({
       where: {
@@ -89,6 +125,7 @@ export default async function MemberDashboardPage() {
       },
     }),
   ]);
+  timeEnd("dashboard:queries");
 
   const safeMemberProfile = normalizeMemberProfile(memberProfile);
   const totalPoints = points._sum.points ?? 0;
@@ -141,6 +178,8 @@ export default async function MemberDashboardPage() {
         memberProfile.leaderboardUpdatedAt,
       )
     : null;
+
+  timeEnd("dashboard:total");
 
   return (
     <div className="space-y-6">
