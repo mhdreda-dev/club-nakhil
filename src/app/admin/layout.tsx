@@ -20,6 +20,9 @@ export default async function AdminLayout({
     },
   });
 
+  // Only the members page prefetches on mount — admins spend most of their
+  // time approving pending sign-ups, so that's the hot path. Other links
+  // warm up on hover/focus inside SidebarNav.
   const adminNavItems = [
     { href: "/admin/dashboard", label: t("nav.dashboard") },
     { href: "/admin/activity-feed", label: t("nav.activityFeed") },
@@ -27,6 +30,7 @@ export default async function AdminLayout({
       href: "/admin/members",
       label: t("nav.members"),
       badgeCount: pendingCount,
+      priority: true,
     },
   ];
 

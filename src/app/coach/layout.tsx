@@ -12,11 +12,14 @@ export default async function CoachLayout({
   const session = await requirePageAuth(Role.COACH);
   const { t } = await getServerTranslations();
 
+  // `priority: true` opts the link into mount-time prefetch. Everything else
+  // is hover/focus-warmed inside SidebarNav so we don't fan out parallel
+  // prefetches on the coach dashboard load.
   const coachNavItems = [
     { href: "/coach/dashboard", label: t("nav.dashboard") },
     { href: "/coach/members", label: t("nav.members") },
     { href: "/coach/sessions", label: t("nav.sessions") },
-    { href: "/coach/attendance", label: t("nav.attendance") },
+    { href: "/coach/attendance", label: t("nav.attendance"), priority: true },
     { href: "/coach/announcements", label: t("nav.announcements") },
     { href: "/coach/ratings", label: t("nav.ratings") },
     { href: "/coach/activity-feed", label: t("nav.activityFeed") },

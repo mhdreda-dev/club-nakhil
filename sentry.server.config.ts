@@ -14,11 +14,63 @@ if (dsn) {
     environment: process.env.SENTRY_ENVIRONMENT ?? process.env.VERCEL_ENV ?? process.env.NODE_ENV,
     release: process.env.SENTRY_RELEASE ?? process.env.VERCEL_GIT_COMMIT_SHA,
 
-    // Keep performance overhead minimal: 10% in production, 100% locally.
-    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+    // Disable event ingestion on Vercel Preview deployments — keeps
+    // quota for production and real staging, still captures runtime errors
+    // locally (VERCEL_ENV unset) and in Production.
+    enabled: process.env.VERCEL_ENV !== "preview",
 
-    // Record console.error / console.warn as breadcrumbs, but do not spam.
-    integrations: [],
+    // Smart route-based sampling. Cheap routes (static, health, tunnel) are
+    // dropped entirely; auth / admin / registration are sampled higher because
+    // they're the paths that actually move money + members.
+    tracesSampler: (ctx) => {
+      // Honor upstream parent decisions so distributed traces stay coherent.
+      if (typeof ctx.parentSampled === "boolean") return ctx.parentSampled;
+
+      const attrs = ctx.attributes ?? {};
+      const target =
+        (attrs["http.target"] as string | undefined) ??
+        (attrs["http.route"] as string | undefined) ??
+        (attrs["url.path"] as string | undefined) ??
+        ctx.name ??
+        "";
+
+      // Never trace the Sentry tunnel itself (infinite loop risk + noise).
+      if (target.startsWith("/monitoring")) return 0;
+
+      // Static chunks, images, favicons — no signal, huge volume.
+      if (
+        target.startsWith("/_next/") ||
+        target.startsWith("/static/") ||
+        target === "/favicon.ico" ||
+        target === "/robots.txt"
+      ) {
+        return 0;
+      }
+
+      // Full fidelity in dev so we can see everything locally.
+      if (process.env.NODE_ENV !== "production") return 1.0;
+
+      // High-value routes: auth, admin actions, QR/registration flows.
+      if (
+        target.startsWith("/api/auth") ||
+        target.startsWith("/api/admin") ||
+        target.startsWith("/api/registration") ||
+        target.startsWith("/api/attendance") ||
+        target.startsWith("/api/payments")
+      ) {
+        return 0.3;
+      }
+
+      // Everything else: light background sampling.
+      return 0.05;
+    },
+
+    // Server-side integrations — Prisma gives query spans + error code tagging,
+    // httpIntegration keeps outgoing HTTP as breadcrumbs with URL + status.
+    integrations: [
+      Sentry.prismaIntegration(),
+      Sentry.httpIntegration({ breadcrumbs: true }),
+    ],
 
     // Only send PII when an explicit opt-in flag is set.
     sendDefaultPii: false,

@@ -37,6 +37,10 @@ export function BrandLogo({
     <Link
       href={href}
       aria-label={t("brand.homeAriaLabel")}
+      // Logo is rendered in every authenticated layout but clicks back to "/"
+      // are rare from inside the app. Skip the mount-time prefetch — clicking
+      // will still work, just without the eager warmup.
+      prefetch={false}
       className={cn(
         "group inline-flex items-center gap-3 transition",
         className,

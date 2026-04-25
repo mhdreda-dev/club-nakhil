@@ -13,7 +13,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org \"$SENTRY_ORG\" --project \"$SENTRY_PROJECT\" --release \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" .next && sentry-cli sourcemaps upload --org \"$SENTRY_ORG\" --project \"$SENTRY_PROJECT\" --release \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" .next && find .next -name '*.map' -type f -delete"
+    "sentry:sourcemaps": "sentry-cli releases new \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" && sentry-cli sourcemaps inject --release \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" .next && sentry-cli sourcemaps upload --release \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" .next && sentry-cli releases set-commits \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" --auto --ignore-missing && sentry-cli releases finalize \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" && sentry-cli deploys new --release \"${SENTRY_RELEASE:-${VERCEL_GIT_COMMIT_SHA:-dev}}\" --env \"${VERCEL_ENV:-production}\" && find .next -name '*.map' -type f -delete"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

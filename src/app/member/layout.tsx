@@ -5,9 +5,12 @@ import { getProfileHeader, getProfileSidebarSummary } from "@/features/profiles/
 import { requirePageAuth } from "@/lib/page-auth";
 import { getServerTranslations } from "@/lib/server-translations";
 
+// `priority: true` makes the link prefetch on mount. Only the single most
+// likely "next click" gets this flag so the sidebar doesn't fire 9 parallel
+// prefetches on page load. All other links prefetch on hover/focus.
 const getMemberNavItems = (t: Awaited<ReturnType<typeof getServerTranslations>>["t"]) => [
   { href: "/member/dashboard", label: t("nav.dashboard") },
-  { href: "/member/activity-feed", label: t("nav.activityFeed") },
+  { href: "/member/activity-feed", label: t("nav.activityFeed"), priority: true },
   { href: "/member/leaderboard", label: t("nav.leaderboard") },
   { href: "/member/profile", label: t("layout.member.nav.profile") },
   { href: "/member/sessions", label: t("layout.member.nav.sessions") },

@@ -242,6 +242,7 @@ export function PremiumLoginForm({ locale }: PremiumLoginFormProps) {
 
             <Link
               href={`/${locale}/signup`}
+              prefetch={false}
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-200 transition hover:text-cyan-100"
             >
               {t("auth.loginPage.createAccount")}
@@ -249,6 +250,7 @@ export function PremiumLoginForm({ locale }: PremiumLoginFormProps) {
 
             <Link
               href={`/${locale}`}
+              prefetch={false}
               className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-red-200 transition hover:text-red-100"
             >
               <ArrowLeft

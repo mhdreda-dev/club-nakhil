@@ -397,6 +397,7 @@ export function PremiumSignupForm({ locale }: PremiumSignupFormProps) {
             </div>
             <Link
               href={`/${locale}/login`}
+              prefetch={false}
               className="cn-btn cn-btn-ghost justify-center"
             >
               {t("auth.signupPage.topLogin")}
@@ -710,6 +711,7 @@ export function PremiumSignupForm({ locale }: PremiumSignupFormProps) {
 
           <Link
             href={`/${locale}`}
+            prefetch={false}
             className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-red-200 transition hover:text-red-100"
           >
             <ArrowLeft

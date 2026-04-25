@@ -19,8 +19,33 @@ if (dsn) {
       process.env.NODE_ENV,
     release: process.env.NEXT_PUBLIC_SENTRY_RELEASE,
 
-    // Low default sampling to keep the site fast and stay inside the free tier.
-    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+    // Disable event ingestion on Vercel Preview deployments.
+    // NEXT_PUBLIC_VERCEL_ENV is automatically inlined by Vercel at build.
+    enabled: process.env.NEXT_PUBLIC_VERCEL_ENV !== "preview",
+
+    // Route-based sampling on the client keeps performance traces cheap
+    // while still catching user-visible slowness on auth + admin pages.
+    tracesSampler: (ctx) => {
+      if (typeof ctx.parentSampled === "boolean") return ctx.parentSampled;
+
+      const attrs = ctx.attributes ?? {};
+      const path =
+        (attrs["url.path"] as string | undefined) ??
+        (typeof window !== "undefined" ? window.location.pathname : "") ??
+        "";
+
+      if (process.env.NODE_ENV !== "production") return 1.0;
+
+      if (
+        path.startsWith("/admin") ||
+        path.startsWith("/register") ||
+        path.startsWith("/login")
+      ) {
+        return 0.25;
+      }
+
+      return 0.05;
+    },
 
     // Session Replay intentionally disabled — re-enable here if/when needed.
     replaysSessionSampleRate: 0,

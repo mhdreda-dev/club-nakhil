@@ -74,11 +74,11 @@ export default function PendingApprovalPage() {
           ) : null}
 
           <div className="mt-7 grid gap-3 sm:grid-cols-2">
-            <Link href="/login" className="cn-btn cn-btn-primary w-full !py-3">
+            <Link href="/login" prefetch={false} className="cn-btn cn-btn-primary w-full !py-3">
               <LogIn className="h-4 w-4" />
               {t("pendingApproval.backToLogin")}
             </Link>
-            <Link href="/" className="cn-btn cn-btn-ghost w-full !py-3">
+            <Link href="/" prefetch={false} className="cn-btn cn-btn-ghost w-full !py-3">
               <Home className="h-4 w-4" />
               {t("pendingApproval.returnHome")}
             </Link>

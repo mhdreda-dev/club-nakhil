@@ -84,7 +84,13 @@ export default async function AdminDashboardPage() {
         title={t("pages.adminDashboard.title")}
         subtitle={t("pages.adminDashboard.subtitle")}
         action={
-          <Link href="/admin/members" className="cn-btn cn-btn-primary !py-2.5">
+          <Link
+            href="/admin/members"
+            // Already prefetched by the sidebar (priority flag) — skip the
+            // duplicate fetch this CTA would otherwise trigger on mount.
+            prefetch={false}
+            className="cn-btn cn-btn-primary !py-2.5"
+          >
             {t("pages.adminDashboard.openManager")}
             <ArrowRight className="h-4 w-4" />
           </Link>
@@ -132,7 +138,11 @@ export default async function AdminDashboardPage() {
               {t("pages.adminDashboard.newApprovalsSubtitle")}
             </p>
           </div>
-          <Link href="/admin/members?status=PENDING" className="cn-btn cn-btn-outline !py-2">
+          <Link
+            href="/admin/members?status=PENDING"
+            prefetch={false}
+            className="cn-btn cn-btn-outline !py-2"
+          >
             {t("pages.adminDashboard.reviewPending")}
           </Link>
         </div>
