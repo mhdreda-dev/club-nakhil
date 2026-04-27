@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 export type NavigationItem = {
@@ -17,35 +17,33 @@ interface SidebarNavProps {
   onNavigate?: () => void;
 }
 
-// Hover/touch-triggered prefetch: avoids the first-render request storm
-// (one prefetch per nav item) while keeping navigation feeling instant —
-// once the user shows intent we restore Next's default static prefetch.
 function NavLink({
   item,
   isActive,
   onNavigate,
+  onIntent,
   className,
   children,
 }: {
   item: NavigationItem;
   isActive: boolean;
   onNavigate?: () => void;
+  onIntent: (href: string) => void;
   className: string;
   children: React.ReactNode;
 }) {
-  const [warm, setWarm] = useState(false);
-  const arm = () => {
-    if (!warm) setWarm(true);
+  const trigger = () => {
+    if (!isActive) onIntent(item.href);
   };
 
   return (
     <Link
       href={item.href}
       onClick={onNavigate}
-      onMouseEnter={arm}
-      onFocus={arm}
-      onTouchStart={arm}
-      prefetch={isActive ? false : warm ? null : false}
+      onMouseEnter={trigger}
+      onFocus={trigger}
+      onTouchStart={trigger}
+      prefetch={false}
       className={className}
     >
       {children}
@@ -55,6 +53,15 @@ function NavLink({
 
 export function SidebarNav({ items, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const prefetchedRef = useRef<Set<string>>(new Set());
+
+  const handleIntent = (href: string) => {
+    if (href === pathname) return;
+    if (prefetchedRef.current.has(href)) return;
+    prefetchedRef.current.add(href);
+    router.prefetch(href);
+  };
 
   return (
     <nav className="space-y-1">
@@ -69,6 +76,7 @@ export function SidebarNav({ items, onNavigate }: SidebarNavProps) {
             item={item}
             isActive={isActive}
             onNavigate={onNavigate}
+            onIntent={handleIntent}
             className={cn(
               // Base — always dark, never white
               'group flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200',
