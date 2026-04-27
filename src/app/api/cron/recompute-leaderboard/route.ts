@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { recomputeMemberLeaderboardRanks } from "@/features/leaderboard/leaderboard.service";
+import { invalidatePrefix } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -26,6 +27,13 @@ export async function POST(request: NextRequest) {
   }
 
   const result = await recomputeMemberLeaderboardRanks();
+
+  // After a successful recompute, the persisted ranks change — flush every
+  // leaderboard cache entry so members see the new ordering on the next read.
+  // Best-effort: invalidatePrefix swallows its own errors.
+  if (result.status === "ok") {
+    await invalidatePrefix("leaderboard:");
+  }
 
   return NextResponse.json(result, {
     status: result.status === "failed" ? 500 : 200,

@@ -7,6 +7,7 @@ import {
   AttendanceSessionNotFoundError,
   scanAttendanceAndReward,
 } from "@/features/attendance/attendance.service";
+import { CACHE_KEYS, invalidate } from "@/lib/cache";
 import { requireApiAuth } from "@/lib/route-auth";
 
 export async function POST(request: NextRequest) {
@@ -31,6 +32,13 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await scanAttendanceAndReward(auth.session.user.id, parsed.data.qrToken);
+
+    // Best-effort cache invalidation — never blocks the response. The cache
+    // module swallows its own errors.
+    await invalidate([
+      CACHE_KEYS.dashboardMember(auth.session.user.id),
+      CACHE_KEYS.leaderboardMember(auth.session.user.id),
+    ]);
 
     return NextResponse.json({
       success: true,

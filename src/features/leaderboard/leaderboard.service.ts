@@ -5,6 +5,7 @@ import {
   getPersistedMemberLeaderboardRow,
   listPersistedLeaderboardRows,
 } from "@/features/leaderboard/leaderboard.repository";
+import { CACHE_KEYS, CACHE_TTL, getOrSet } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 
 export type LeaderboardTrend = "up" | "down" | "same";
@@ -168,6 +169,12 @@ export async function getLeaderboardHealth() {
   return { missingSnapshotCount };
 }
 
+type CachedLeaderboardTop = {
+  leaderboard: LeaderboardEntry[];
+  topThree: LeaderboardEntry[];
+  leaderboardUpdatedAt: string | null;
+};
+
 export async function getMemberLeaderboardSnapshot(options?: {
   limit?: number;
   currentMemberId?: string;
@@ -178,36 +185,58 @@ export async function getMemberLeaderboardSnapshot(options?: {
   // truth; pages just read whatever has been persisted. New members appear
   // after the next cron tick (default ≤ 5 minutes).
   const limit = options?.limit ?? 25;
-  const rows = await listPersistedLeaderboardRows(limit);
-  const leaderboard = rows.map(toLeaderboardEntry);
-  const topThree = leaderboard.slice(0, 3);
+
+  // Top-N is identical for every reader — cache it under a global key.
+  // Per-member overlay is fetched (and cached) under its own key.
+  const topData = await getOrSet<CachedLeaderboardTop>(
+    CACHE_KEYS.leaderboardTop(limit),
+    CACHE_TTL.LEADERBOARD,
+    async () => {
+      const rows = await listPersistedLeaderboardRows(limit);
+      const leaderboard = rows.map(toLeaderboardEntry);
+      return {
+        leaderboard,
+        topThree: leaderboard.slice(0, 3),
+        leaderboardUpdatedAt: rows[0]?.leaderboardUpdatedAt?.toISOString() ?? null,
+      };
+    },
+  );
 
   let currentMember: LeaderboardEntry | null = null;
 
   if (options?.currentMemberId) {
-    const currentMemberRow = await getPersistedMemberLeaderboardRow(options.currentMemberId);
-
-    if (currentMemberRow?.currentRank) {
-      currentMember = {
-        memberId: currentMemberRow.userId,
-        name: currentMemberRow.userProfile.displayName || currentMemberRow.userProfile.fullName,
-        avatarUrl: currentMemberRow.userProfile.avatarUrl,
-        city: currentMemberRow.userProfile.city,
-        overallRating: Math.round(currentMemberRow.overallRating),
-        totalPoints: currentMemberRow.totalPoints,
-        attendanceCount: currentMemberRow.attendanceCount,
-        currentRank: currentMemberRow.currentRank,
-        previousRank: currentMemberRow.previousRank,
-        rankChange: currentMemberRow.rankChange,
-        trend: getRankTrend(currentMemberRow.rankChange),
-      };
-    }
+    const memberId = options.currentMemberId;
+    currentMember = await getOrSet<LeaderboardEntry | null>(
+      CACHE_KEYS.leaderboardMember(memberId),
+      CACHE_TTL.LEADERBOARD,
+      async () => {
+        const currentMemberRow = await getPersistedMemberLeaderboardRow(memberId);
+        if (!currentMemberRow?.currentRank) {
+          return null;
+        }
+        return {
+          memberId: currentMemberRow.userId,
+          name:
+            currentMemberRow.userProfile.displayName ||
+            currentMemberRow.userProfile.fullName,
+          avatarUrl: currentMemberRow.userProfile.avatarUrl,
+          city: currentMemberRow.userProfile.city,
+          overallRating: Math.round(currentMemberRow.overallRating),
+          totalPoints: currentMemberRow.totalPoints,
+          attendanceCount: currentMemberRow.attendanceCount,
+          currentRank: currentMemberRow.currentRank,
+          previousRank: currentMemberRow.previousRank,
+          rankChange: currentMemberRow.rankChange,
+          trend: getRankTrend(currentMemberRow.rankChange),
+        };
+      },
+    );
   }
 
   return {
-    leaderboard,
-    topThree,
+    leaderboard: topData.leaderboard,
+    topThree: topData.topThree,
     currentMember,
-    leaderboardUpdatedAt: rows[0]?.leaderboardUpdatedAt?.toISOString() ?? null,
+    leaderboardUpdatedAt: topData.leaderboardUpdatedAt,
   };
 }

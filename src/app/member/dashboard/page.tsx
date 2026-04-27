@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { Role, type TrainingType } from "@prisma/client";
 import { CalendarDays, Flame, Medal, Sparkles, Star, Trophy } from "lucide-react";
 import { after } from "next/server";
 
@@ -9,6 +9,7 @@ import { SectionHeader } from "@/components/sports/section-header";
 import { Card } from "@/components/ui/card";
 import { normalizeMemberProfile } from "@/features/profiles/member-profile";
 import { syncMemberMetrics } from "@/features/profiles/profiles.service";
+import { CACHE_KEYS, CACHE_TTL, getOrSet } from "@/lib/cache";
 import { formatSessionDate } from "@/lib/format";
 import { translateTrainingType } from "@/lib/i18n";
 import { requirePageAuth } from "@/lib/page-auth";
@@ -16,6 +17,149 @@ import { prisma } from "@/lib/prisma";
 import { getServerTranslations } from "@/lib/server-translations";
 
 export const dynamic = "force-dynamic";
+
+type CachedDashboard = {
+  attendanceCount: number;
+  totalPoints: number;
+  badgeCount: number;
+  upcomingSessions: Array<{
+    id: string;
+    title: string;
+    sessionDate: string;
+    startTime: string;
+    endTime: string;
+    trainingType: TrainingType;
+    coach: { name: string };
+  }>;
+  notes: Array<{
+    id: string;
+    note: string;
+    coach: { name: string };
+  }>;
+  memberProfile: {
+    currentRank: number | null;
+    previousRank: number | null;
+    rankChange: number;
+    overallRating: number;
+    currentStreak: number;
+    leaderboardUpdatedAt: string | null;
+  } | null;
+};
+
+async function loadMemberDashboardData(memberId: string): Promise<CachedDashboard> {
+  return getOrSet<CachedDashboard>(
+    CACHE_KEYS.dashboardMember(memberId),
+    CACHE_TTL.DASHBOARD,
+    async () => {
+      const [
+        attendanceCount,
+        points,
+        badges,
+        upcomingSessions,
+        notes,
+        memberProfile,
+      ] = await Promise.all([
+        prisma.attendance.count({
+          where: {
+            memberId,
+          },
+        }),
+        prisma.pointsLog.aggregate({
+          where: {
+            memberId,
+          },
+          _sum: {
+            points: true,
+          },
+        }),
+        prisma.memberBadge.findMany({
+          where: {
+            memberId,
+          },
+          include: {
+            badge: true,
+          },
+        }),
+        prisma.trainingSession.findMany({
+          where: {
+            sessionDate: {
+              gte: new Date(),
+            },
+          },
+          include: {
+            coach: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          orderBy: [{ sessionDate: "asc" }, { startTime: "asc" }],
+          take: 5,
+        }),
+        prisma.progressNote.findMany({
+          where: {
+            memberId,
+          },
+          include: {
+            coach: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 4,
+        }),
+        prisma.memberProfile.findUnique({
+          where: {
+            userId: memberId,
+          },
+          select: {
+            currentRank: true,
+            previousRank: true,
+            rankChange: true,
+            overallRating: true,
+            currentStreak: true,
+            leaderboardUpdatedAt: true,
+          },
+        }),
+      ]);
+
+      return {
+        attendanceCount,
+        totalPoints: points._sum.points ?? 0,
+        badgeCount: badges.length,
+        upcomingSessions: upcomingSessions.map((session) => ({
+          id: session.id,
+          title: session.title,
+          sessionDate: session.sessionDate.toISOString(),
+          startTime: session.startTime,
+          endTime: session.endTime,
+          trainingType: session.trainingType,
+          coach: { name: session.coach.name },
+        })),
+        notes: notes.map((note) => ({
+          id: note.id,
+          note: note.note,
+          coach: { name: note.coach.name },
+        })),
+        memberProfile: memberProfile
+          ? {
+              currentRank: memberProfile.currentRank,
+              previousRank: memberProfile.previousRank,
+              rankChange: memberProfile.rankChange,
+              overallRating: memberProfile.overallRating,
+              currentStreak: memberProfile.currentStreak,
+              leaderboardUpdatedAt:
+                memberProfile.leaderboardUpdatedAt?.toISOString() ?? null,
+            }
+          : null,
+      };
+    },
+  );
+}
 
 // Toggle with PERF_TIMINGS=1 in env to print server timings in the dev console
 // without polluting production logs.
@@ -57,78 +201,29 @@ export default async function MemberDashboardPage() {
   });
 
   timeStart("dashboard:queries");
-  const [attendanceCount, points, badges, upcomingSessions, notes, memberProfile] = await Promise.all([
-    prisma.attendance.count({
-      where: {
-        memberId: session.user.id,
-      },
-    }),
-    prisma.pointsLog.aggregate({
-      where: {
-        memberId: session.user.id,
-      },
-      _sum: {
-        points: true,
-      },
-    }),
-    prisma.memberBadge.findMany({
-      where: {
-        memberId: session.user.id,
-      },
-      include: {
-        badge: true,
-      },
-    }),
-    prisma.trainingSession.findMany({
-      where: {
-        sessionDate: {
-          gte: new Date(),
-        },
-      },
-      include: {
-        coach: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: [{ sessionDate: "asc" }, { startTime: "asc" }],
-      take: 5,
-    }),
-    prisma.progressNote.findMany({
-      where: {
-        memberId: session.user.id,
-      },
-      include: {
-        coach: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 4,
-    }),
-    prisma.memberProfile.findUnique({
-      where: {
-        userId: session.user.id,
-      },
-      select: {
-        currentRank: true,
-        previousRank: true,
-        rankChange: true,
-        overallRating: true,
-        currentStreak: true,
-        leaderboardUpdatedAt: true,
-      },
-    }),
-  ]);
+  const cached = await loadMemberDashboardData(session.user.id);
   timeEnd("dashboard:queries");
 
+  const attendanceCount = cached.attendanceCount;
+  const totalPoints = cached.totalPoints;
+  // The downstream JSX only uses `badges.length`; keep the shape so JSX stays
+  // unchanged while avoiding caching an unbounded array of badge objects.
+  const badges: { length: number } = { length: cached.badgeCount };
+  const upcomingSessions = cached.upcomingSessions.map((session) => ({
+    ...session,
+    sessionDate: new Date(session.sessionDate),
+  }));
+  const notes = cached.notes;
+  const memberProfile = cached.memberProfile
+    ? {
+        ...cached.memberProfile,
+        leaderboardUpdatedAt: cached.memberProfile.leaderboardUpdatedAt
+          ? new Date(cached.memberProfile.leaderboardUpdatedAt)
+          : null,
+      }
+    : null;
+
   const safeMemberProfile = normalizeMemberProfile(memberProfile);
-  const totalPoints = points._sum.points ?? 0;
   const badgeCount = Math.max(safeMemberProfile.badgeCount, badges.length);
   const roundedRating = Math.round(safeMemberProfile.overallRating);
   const hasTrackedPerformance =
