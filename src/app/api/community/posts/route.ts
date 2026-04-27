@@ -23,8 +23,15 @@ import {
   communityPostCreateSchema,
   validateCommunityPostImage,
 } from "@/features/community/community.schemas";
+import { invalidatePrefix } from "@/lib/cache";
 import { prisma } from "@/lib/prisma";
 import { requireApiAuth } from "@/lib/route-auth";
+
+// Normal user posts auto-expire from the feed after this many hours. Pinned
+// posts (pinnedByCoach: true) bypass the filter and stay visible until they
+// are explicitly unpinned or moderated.
+const FEED_TTL_HOURS = 24;
+const FEED_TTL_MS = FEED_TTL_HOURS * 60 * 60 * 1000;
 
 export const runtime = "nodejs";
 
@@ -62,15 +69,23 @@ export async function GET(request: NextRequest) {
     ? Math.min(Math.max(Math.floor(limitParam), 1), 100)
     : 40;
 
-  const where = canIncludeHidden
-    ? {
-        status: {
-          in: [CommunityPostStatus.VISIBLE, CommunityPostStatus.HIDDEN],
-        },
-      }
-    : {
-        status: CommunityPostStatus.VISIBLE,
-      };
+  // Posts older than FEED_TTL_HOURS are filtered out unless they are pinned
+  // by a coach. The cleanup cron (see /api/cron/cleanup-community-posts) is
+  // the eventual hard-delete; this filter is the user-facing guarantee, so
+  // the feed is correct even if the cron has not run yet.
+  const feedCutoff = new Date(Date.now() - FEED_TTL_MS);
+
+  const statusFilter = canIncludeHidden
+    ? { in: [CommunityPostStatus.VISIBLE, CommunityPostStatus.HIDDEN] }
+    : CommunityPostStatus.VISIBLE;
+
+  const where = {
+    status: statusFilter,
+    OR: [
+      { pinnedByCoach: true },
+      { createdAt: { gte: feedCutoff } },
+    ],
+  };
 
   const posts = await prisma.communityPost.findMany({
     where,
@@ -163,6 +178,11 @@ export async function POST(request: NextRequest) {
         },
         include: communityPostInclude,
       });
+
+      // Best-effort cache invalidation. No-op if no community keys exist yet
+      // (community feed caching lands in Step 2 of the audit). When that
+      // wraps, this call already covers post-creation invalidation.
+      await invalidatePrefix("community:");
 
       return NextResponse.json(
         {
