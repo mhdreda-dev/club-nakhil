@@ -10,7 +10,7 @@ import {
   getUserProfileAvatar,
   updateUserProfileAvatar,
 } from "@/features/profiles/profiles.repository";
-import { ensureProfile } from "@/features/profiles/profiles.service";
+import { ensureProfile, invalidateProfileSummary } from "@/features/profiles/profiles.service";
 
 export class AvatarUploadValidationError extends Error {
   readonly issues: string[];
@@ -64,6 +64,10 @@ export async function uploadOwnAvatar(userId: string, file: File) {
     avatarPath,
     avatarUrl,
   });
+
+  // The cached layout/sidebar payload includes avatarUrl. Drop it so the
+  // next layout render shows the new avatar without waiting for the TTL.
+  await invalidateProfileSummary(userId);
 
   if (
     currentAvatar.avatarPath &&

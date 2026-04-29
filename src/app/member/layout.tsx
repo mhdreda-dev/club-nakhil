@@ -5,9 +5,21 @@ import { getProfileHeader, getProfileSidebarSummary } from "@/features/profiles/
 import { requirePageAuth } from "@/lib/page-auth";
 import { getServerTranslations } from "@/lib/server-translations";
 
+// Concurrent renders on the same Lambda would share static console.time
+// labels and produce "No such label" warnings + nonsense durations. Each
+// render gets a short unique tag so its timers stay isolated.
 const _PERF = process.env.PERF_TIMINGS === "1";
-const _lt = (l: string) => { if (_PERF) console.time(`[layout] ${l}`); };
-const _le = (l: string) => { if (_PERF) console.timeEnd(`[layout] ${l}`); };
+function makeLayoutTimer() {
+  const tag = Math.random().toString(16).slice(2, 8);
+  return {
+    start: (label: string) => {
+      if (_PERF) console.time(`[layout] ${label}#${tag}`);
+    },
+    end: (label: string) => {
+      if (_PERF) console.timeEnd(`[layout] ${label}#${tag}`);
+    },
+  };
+}
 
 // `priority: true` makes the link prefetch on mount. Only the single most
 // likely "next click" gets this flag so the sidebar doesn't fire 9 parallel
@@ -29,26 +41,27 @@ export default async function MemberLayout({
 }: {
   children: React.ReactNode;
 }) {
-  _lt("total");
+  const lt = makeLayoutTimer();
+  lt.start("total");
 
-  _lt("auth");
+  lt.start("auth");
   const session = await requirePageAuth(Role.MEMBER);
-  _le("auth");
+  lt.end("auth");
 
-  _lt("i18n");
+  lt.start("i18n");
   const { t } = await getServerTranslations();
-  _le("i18n");
+  lt.end("i18n");
 
-  _lt("profiles");
+  lt.start("profiles");
   const [profileHeader, sidebarProfileSummary] = await Promise.all([
     getProfileHeader(session.user.id),
     getProfileSidebarSummary(session.user.id),
   ]);
-  _le("profiles");
+  lt.end("profiles");
 
   const navItems = getMemberNavItems(t);
 
-  _le("total");
+  lt.end("total");
 
   return (
     <AppShell

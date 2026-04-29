@@ -27,8 +27,14 @@ import {
   updateUserProfileBase,
 } from "@/features/profiles/profiles.repository";
 import { calculateMemberOverallRating } from "@/features/profiles/member-rating";
+import { CACHE_KEYS, CACHE_TTL, getOrSet, invalidate } from "@/lib/cache";
 import { getTierInfo } from "@/lib/tier";
 import type { NormalizedProfileUpdate } from "@/features/profiles/profiles.schemas";
+
+// The shape returned by findUserProfileSummary. Pulled out so the Redis
+// payload type is explicit — we only ship plain primitives + small nested
+// objects, no Date / Decimal / Prisma classes that would break JSON.
+type ProfileSummaryPayload = Awaited<ReturnType<typeof findUserProfileSummary>>;
 
 export type ProfileDTO = {
   userId: string;
@@ -238,13 +244,36 @@ export const ensureProfile = cache(async (userId: string) => {
 
 // Narrow per-request memoized fetch — only the fields needed by layout/sidebar.
 // ~3-4× cheaper than ensureProfile (no coachProfile join, no full memberProfile row).
+//
+// Two-tier cache:
+//   1. React cache() — per-request dedupe so layout's getProfileHeader and
+//      getProfileSidebarSummary share one fetch.
+//   2. Redis (60s TTL) — cross-request dedupe so a hot member route hits the
+//      DB at most once per minute per user instead of on every render
+//      (~600ms findUserProfileSummary latency on cold path).
+//
+// Invalidation is explicit: updateOwnProfile and updateUserProfileAvatar both
+// call invalidateProfileSummary(userId) after the write. A 60s TTL on top
+// keeps the worst-case staleness bounded if an invalidation path is missed.
 export const ensureProfileSummary = cache(async (userId: string) => {
   const t = _tag();
   _pt("ensureProfileSummary", t);
-  const result = await findUserProfileSummary(userId);
+  const result = await getOrSet<ProfileSummaryPayload>(
+    CACHE_KEYS.profileSummary(userId),
+    CACHE_TTL.PROFILE_SUMMARY,
+    () => findUserProfileSummary(userId),
+  );
   _pe("ensureProfileSummary", t);
   return result;
 });
+
+/**
+ * Drop the cached profile summary for a user. Call after any write that can
+ * change displayName, avatar, city, bio, or the cached member metrics.
+ */
+export async function invalidateProfileSummary(userId: string): Promise<void> {
+  await invalidate(CACHE_KEYS.profileSummary(userId));
+}
 
 /**
  * Sync a single member's stored metrics (attendance count, total points,
@@ -446,6 +475,10 @@ export async function updateOwnProfile(userId: string, role: Role, input: Normal
   if (role === Role.MEMBER) {
     await syncMemberMetrics(userId);
   }
+
+  // Drop the layout/sidebar cache so the next render reflects the edits
+  // immediately instead of waiting up to 60s for the TTL.
+  await invalidateProfileSummary(userId);
 
   return getOwnProfile(userId);
 }

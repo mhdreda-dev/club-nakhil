@@ -152,6 +152,7 @@ export const CACHE_TTL = {
   LEADERBOARD: 60 * 5,        // 5 minutes
   DASHBOARD: 60,               // 60 seconds
   UPCOMING_SESSIONS: 600,      // 10 minutes — same result for every member
+  PROFILE_SUMMARY: 60,         // 60 seconds — header + sidebar payload, low PII
 } as const;
 
 export const CACHE_KEYS = {
@@ -159,4 +160,9 @@ export const CACHE_KEYS = {
   leaderboardMember: (memberId: string) => `leaderboard:member:${memberId}`,
   dashboardMember: (memberId: string) => `dashboard:member:${memberId}`,
   upcomingSessions: () => `upcoming-sessions`,
+  // Used by getProfileHeader / getProfileSidebarSummary on every member-layout
+  // render. Holds the same shape as findUserProfileSummary's narrow select —
+  // only display name, avatar, city, bio, and a few member-profile metrics.
+  // No emails, phone numbers, or addresses.
+  profileSummary: (userId: string) => `profile:summary:${userId}`,
 } as const;
