@@ -258,7 +258,13 @@ export const ensureProfileSummary = cache(async (userId: string) => {
  * here (reads + a single upsert) is safe through PgBouncer.
  */
 export async function syncMemberMetrics(userId: string) {
-  const user = await ensureProfile(userId);
+  // Use the narrow select instead of ensureProfile's full 5-table JOIN.
+  // syncMemberMetrics only needs the role — no reason to fetch coachProfile,
+  // the full memberProfile row, or every UserProfile column.
+  // In after() the React cache() scope is reset, so ensureProfile would re-run
+  // findUserWithProfile (~770ms) on every invocation. findUserProfileSummary
+  // does a single-table lookup with a tiny projection (~50ms).
+  const user = await findUserProfileSummary(userId);
 
   if (!user || user.role !== Role.MEMBER) {
     return;
