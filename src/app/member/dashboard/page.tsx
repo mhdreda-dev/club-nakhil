@@ -49,10 +49,12 @@ type CachedUpcomingSession = {
 };
 
 async function loadMemberDashboardData(memberId: string): Promise<CachedDashboard> {
-  return getOrSet<CachedDashboard>(
+  if (PERF_TIMINGS) console.time("dashboard:data");
+  const result = await getOrSet<CachedDashboard>(
     CACHE_KEYS.dashboardMember(memberId),
     CACHE_TTL.DASHBOARD,
     async () => {
+      if (PERF_TIMINGS) console.time("dashboard:data:factory");
       const [attendanceCount, points, badgeCount, notes, memberProfile] =
         await Promise.all([
           prisma.attendance.count({ where: { memberId } }),
@@ -85,6 +87,7 @@ async function loadMemberDashboardData(memberId: string): Promise<CachedDashboar
             },
           }),
         ]);
+      if (PERF_TIMINGS) console.timeEnd("dashboard:data:factory");
 
       return {
         attendanceCount,
@@ -109,15 +112,19 @@ async function loadMemberDashboardData(memberId: string): Promise<CachedDashboar
       };
     },
   );
+  if (PERF_TIMINGS) console.timeEnd("dashboard:data");
+  return result;
 }
 
 // Upcoming sessions are identical for every member — cache once globally
 // instead of duplicating the same rows inside every per-member cache entry.
 async function loadUpcomingSessions(): Promise<CachedUpcomingSession[]> {
-  return getOrSet<CachedUpcomingSession[]>(
+  if (PERF_TIMINGS) console.time("dashboard:sessions");
+  const result = await getOrSet<CachedUpcomingSession[]>(
     CACHE_KEYS.upcomingSessions(),
     CACHE_TTL.UPCOMING_SESSIONS,
     async () => {
+      if (PERF_TIMINGS) console.time("dashboard:sessions:factory");
       const sessions = await prisma.trainingSession.findMany({
         where: { sessionDate: { gte: new Date() } },
         select: {
@@ -132,6 +139,7 @@ async function loadUpcomingSessions(): Promise<CachedUpcomingSession[]> {
         orderBy: [{ sessionDate: "asc" }, { startTime: "asc" }],
         take: 5,
       });
+      if (PERF_TIMINGS) console.timeEnd("dashboard:sessions:factory");
       return sessions.map((s) => ({
         id: s.id,
         title: s.title,
@@ -143,6 +151,8 @@ async function loadUpcomingSessions(): Promise<CachedUpcomingSession[]> {
       }));
     },
   );
+  if (PERF_TIMINGS) console.timeEnd("dashboard:sessions");
+  return result;
 }
 
 // Toggle with PERF_TIMINGS=1 in env to print server timings in the dev console
@@ -157,12 +167,14 @@ function timeEnd(label: string) {
 
 export default async function MemberDashboardPage() {
   timeStart("dashboard:total");
-  timeStart("dashboard:auth+i18n");
   // requirePageAuth + getServerTranslations are both wrapped in React cache(),
   // so the layout's earlier calls (with the same args) are reused for free.
+  timeStart("dashboard:auth");
   const session = await requirePageAuth(Role.MEMBER);
+  timeEnd("dashboard:auth");
+  timeStart("dashboard:i18n");
   const { intlLocale, t } = await getServerTranslations();
-  timeEnd("dashboard:auth+i18n");
+  timeEnd("dashboard:i18n");
 
   // Push the per-user metric sync off the critical path. The dashboard reads
   // whatever is currently persisted in MemberProfile; the next request sees

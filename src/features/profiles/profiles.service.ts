@@ -2,6 +2,10 @@ import { cache } from "react";
 
 import { Role, type TrainingLevel, type TrainingType } from "@prisma/client";
 
+const _PERF = process.env.PERF_TIMINGS === "1";
+const _pt = (l: string) => { if (_PERF) console.time(`[profile] ${l}`); };
+const _pe = (l: string) => { if (_PERF) console.timeEnd(`[profile] ${l}`); };
+
 import { normalizeMemberProfile } from "@/features/profiles/member-profile";
 import {
   createDefaultProfileForUser,
@@ -201,7 +205,9 @@ function calculateStreak(attendanceHistory: { checkedInAt: Date }[]) {
 // getProfileSidebarSummary() — without dedupe each one re-runs the heavy
 // User+Profile+CoachProfile+MemberProfile join.
 export const ensureProfile = cache(async (userId: string) => {
+  _pt("ensureProfile");
   const user = await findUserWithProfile(userId);
+  _pe("ensureProfile");
 
   if (!user) {
     throw new Error("User not found");
@@ -285,7 +291,9 @@ export async function getOwnProfile(userId: string) {
 }
 
 export async function getProfileHeader(userId: string) {
+  _pt("getProfileHeader");
   const user = await ensureProfile(userId);
+  _pe("getProfileHeader");
 
   if (!user?.profile) {
     return null;
@@ -298,7 +306,9 @@ export async function getProfileHeader(userId: string) {
 }
 
 export async function getProfileSidebarSummary(userId: string): Promise<ProfileSidebarSummary | null> {
+  _pt("getProfileSidebarSummary");
   const user = await ensureProfile(userId);
+  _pe("getProfileSidebarSummary");
 
   if (!user?.profile) {
     return null;

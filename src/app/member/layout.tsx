@@ -5,6 +5,10 @@ import { getProfileHeader, getProfileSidebarSummary } from "@/features/profiles/
 import { requirePageAuth } from "@/lib/page-auth";
 import { getServerTranslations } from "@/lib/server-translations";
 
+const _PERF = process.env.PERF_TIMINGS === "1";
+const _lt = (l: string) => { if (_PERF) console.time(`[layout] ${l}`); };
+const _le = (l: string) => { if (_PERF) console.timeEnd(`[layout] ${l}`); };
+
 // `priority: true` makes the link prefetch on mount. Only the single most
 // likely "next click" gets this flag so the sidebar doesn't fire 9 parallel
 // prefetches on page load. All other links prefetch on hover/focus.
@@ -25,15 +29,26 @@ export default async function MemberLayout({
 }: {
   children: React.ReactNode;
 }) {
+  _lt("total");
+
+  _lt("auth");
   const session = await requirePageAuth(Role.MEMBER);
+  _le("auth");
+
+  _lt("i18n");
   const { t } = await getServerTranslations();
-  
+  _le("i18n");
+
+  _lt("profiles");
   const [profileHeader, sidebarProfileSummary] = await Promise.all([
     getProfileHeader(session.user.id),
     getProfileSidebarSummary(session.user.id),
   ]);
+  _le("profiles");
 
   const navItems = getMemberNavItems(t);
+
+  _le("total");
 
   return (
     <AppShell
