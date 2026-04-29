@@ -32,6 +32,32 @@ export async function findUserWithProfile(userId: string) {
   return result;
 }
 
+export async function findUserProfileSummary(userId: string) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      role: true,
+      sportLevel: true,
+      profile: {
+        select: {
+          displayName: true,
+          avatarUrl: true,
+          city: true,
+          bio: true,
+          memberProfile: {
+            select: {
+              totalPoints: true,
+              overallRating: true,
+              currentRank: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export async function createDefaultProfileForUser(user: {
   id: string;
   role: Role;
@@ -257,6 +283,7 @@ export async function getMemberStats(userId: string) {
       orderBy: {
         checkedInAt: "desc",
       },
+      take: 366,
     }),
     prisma.memberBadge.count({
       where: {

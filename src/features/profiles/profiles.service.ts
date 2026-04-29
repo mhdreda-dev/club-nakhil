@@ -13,6 +13,7 @@ import {
   ensureMemberProfileRecord,
   getCoachStats,
   findUserWithProfile,
+  findUserProfileSummary,
   getMemberProfileExtras,
   getMemberStats,
   updateCoachProfile,
@@ -231,6 +232,15 @@ export const ensureProfile = cache(async (userId: string) => {
   return user;
 });
 
+// Narrow per-request memoized fetch — only the fields needed by layout/sidebar.
+// ~3-4× cheaper than ensureProfile (no coachProfile join, no full memberProfile row).
+export const ensureProfileSummary = cache(async (userId: string) => {
+  _pt("ensureProfileSummary");
+  const result = await findUserProfileSummary(userId);
+  _pe("ensureProfileSummary");
+  return result;
+});
+
 /**
  * Sync a single member's stored metrics (attendance count, total points,
  * streak, overall rating) against the source-of-truth tables.
@@ -292,7 +302,7 @@ export async function getOwnProfile(userId: string) {
 
 export async function getProfileHeader(userId: string) {
   _pt("getProfileHeader");
-  const user = await ensureProfile(userId);
+  const user = await ensureProfileSummary(userId);
   _pe("getProfileHeader");
 
   if (!user?.profile) {
@@ -307,7 +317,7 @@ export async function getProfileHeader(userId: string) {
 
 export async function getProfileSidebarSummary(userId: string): Promise<ProfileSidebarSummary | null> {
   _pt("getProfileSidebarSummary");
-  const user = await ensureProfile(userId);
+  const user = await ensureProfileSummary(userId);
   _pe("getProfileSidebarSummary");
 
   if (!user?.profile) {
