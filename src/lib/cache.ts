@@ -149,12 +149,14 @@ export async function invalidatePrefix(prefix: string): Promise<void> {
 }
 
 export const CACHE_TTL = {
-  LEADERBOARD: 60 * 5, // 5 minutes
-  DASHBOARD: 60, // 60 seconds
+  LEADERBOARD: 60 * 5,        // 5 minutes
+  DASHBOARD: 60,               // 60 seconds
+  UPCOMING_SESSIONS: 600,      // 10 minutes — same result for every member
 } as const;
 
 export const CACHE_KEYS = {
   leaderboardTop: (limit: number) => `leaderboard:top:${limit}`,
   leaderboardMember: (memberId: string) => `leaderboard:member:${memberId}`,
   dashboardMember: (memberId: string) => `dashboard:member:${memberId}`,
+  upcomingSessions: () => `upcoming-sessions`,
 } as const;

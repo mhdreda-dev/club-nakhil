@@ -22,15 +22,7 @@ type CachedDashboard = {
   attendanceCount: number;
   totalPoints: number;
   badgeCount: number;
-  upcomingSessions: Array<{
-    id: string;
-    title: string;
-    sessionDate: string;
-    startTime: string;
-    endTime: string;
-    trainingType: TrainingType;
-    coach: { name: string };
-  }>;
+  // upcomingSessions moved to a global cache key — same data for every member
   notes: Array<{
     id: string;
     note: string;
@@ -46,100 +38,58 @@ type CachedDashboard = {
   } | null;
 };
 
+type CachedUpcomingSession = {
+  id: string;
+  title: string;
+  sessionDate: string; // ISO string — Date does not survive Redis JSON round-trip
+  startTime: string;
+  endTime: string;
+  trainingType: TrainingType;
+  coach: { name: string };
+};
+
 async function loadMemberDashboardData(memberId: string): Promise<CachedDashboard> {
   return getOrSet<CachedDashboard>(
     CACHE_KEYS.dashboardMember(memberId),
     CACHE_TTL.DASHBOARD,
     async () => {
-      const [
-        attendanceCount,
-        points,
-        badges,
-        upcomingSessions,
-        notes,
-        memberProfile,
-      ] = await Promise.all([
-        prisma.attendance.count({
-          where: {
-            memberId,
-          },
-        }),
-        prisma.pointsLog.aggregate({
-          where: {
-            memberId,
-          },
-          _sum: {
-            points: true,
-          },
-        }),
-        prisma.memberBadge.findMany({
-          where: {
-            memberId,
-          },
-          include: {
-            badge: true,
-          },
-        }),
-        prisma.trainingSession.findMany({
-          where: {
-            sessionDate: {
-              gte: new Date(),
+      const [attendanceCount, points, badgeCount, notes, memberProfile] =
+        await Promise.all([
+          prisma.attendance.count({ where: { memberId } }),
+          prisma.pointsLog.aggregate({
+            where: { memberId },
+            _sum: { points: true },
+          }),
+          // count() instead of findMany+include: no badge rows fetched,
+          // no Badge table JOIN — returns a single integer.
+          prisma.memberBadge.count({ where: { memberId } }),
+          prisma.progressNote.findMany({
+            where: { memberId },
+            select: {
+              id: true,
+              note: true,
+              coach: { select: { name: true } },
             },
-          },
-          include: {
-            coach: {
-              select: {
-                name: true,
-              },
+            orderBy: { createdAt: "desc" },
+            take: 4,
+          }),
+          prisma.memberProfile.findUnique({
+            where: { userId: memberId },
+            select: {
+              currentRank: true,
+              previousRank: true,
+              rankChange: true,
+              overallRating: true,
+              currentStreak: true,
+              leaderboardUpdatedAt: true,
             },
-          },
-          orderBy: [{ sessionDate: "asc" }, { startTime: "asc" }],
-          take: 5,
-        }),
-        prisma.progressNote.findMany({
-          where: {
-            memberId,
-          },
-          include: {
-            coach: {
-              select: {
-                name: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          take: 4,
-        }),
-        prisma.memberProfile.findUnique({
-          where: {
-            userId: memberId,
-          },
-          select: {
-            currentRank: true,
-            previousRank: true,
-            rankChange: true,
-            overallRating: true,
-            currentStreak: true,
-            leaderboardUpdatedAt: true,
-          },
-        }),
-      ]);
+          }),
+        ]);
 
       return {
         attendanceCount,
         totalPoints: points._sum.points ?? 0,
-        badgeCount: badges.length,
-        upcomingSessions: upcomingSessions.map((session) => ({
-          id: session.id,
-          title: session.title,
-          sessionDate: session.sessionDate.toISOString(),
-          startTime: session.startTime,
-          endTime: session.endTime,
-          trainingType: session.trainingType,
-          coach: { name: session.coach.name },
-        })),
+        badgeCount,
         notes: notes.map((note) => ({
           id: note.id,
           note: note.note,
@@ -157,6 +107,40 @@ async function loadMemberDashboardData(memberId: string): Promise<CachedDashboar
             }
           : null,
       };
+    },
+  );
+}
+
+// Upcoming sessions are identical for every member — cache once globally
+// instead of duplicating the same rows inside every per-member cache entry.
+async function loadUpcomingSessions(): Promise<CachedUpcomingSession[]> {
+  return getOrSet<CachedUpcomingSession[]>(
+    CACHE_KEYS.upcomingSessions(),
+    CACHE_TTL.UPCOMING_SESSIONS,
+    async () => {
+      const sessions = await prisma.trainingSession.findMany({
+        where: { sessionDate: { gte: new Date() } },
+        select: {
+          id: true,
+          title: true,
+          sessionDate: true,
+          startTime: true,
+          endTime: true,
+          trainingType: true,
+          coach: { select: { name: true } },
+        },
+        orderBy: [{ sessionDate: "asc" }, { startTime: "asc" }],
+        take: 5,
+      });
+      return sessions.map((s) => ({
+        id: s.id,
+        title: s.title,
+        sessionDate: s.sessionDate.toISOString(),
+        startTime: s.startTime,
+        endTime: s.endTime,
+        trainingType: s.trainingType,
+        coach: { name: s.coach.name },
+      }));
     },
   );
 }
@@ -201,7 +185,11 @@ export default async function MemberDashboardPage() {
   });
 
   timeStart("dashboard:queries");
-  const cached = await loadMemberDashboardData(session.user.id);
+  // Two independent cache reads — run in parallel.
+  const [cached, cachedSessions] = await Promise.all([
+    loadMemberDashboardData(session.user.id),
+    loadUpcomingSessions(),
+  ]);
   timeEnd("dashboard:queries");
 
   const attendanceCount = cached.attendanceCount;
@@ -209,9 +197,9 @@ export default async function MemberDashboardPage() {
   // The downstream JSX only uses `badges.length`; keep the shape so JSX stays
   // unchanged while avoiding caching an unbounded array of badge objects.
   const badges: { length: number } = { length: cached.badgeCount };
-  const upcomingSessions = cached.upcomingSessions.map((session) => ({
-    ...session,
-    sessionDate: new Date(session.sessionDate),
+  const upcomingSessions = cachedSessions.map((s) => ({
+    ...s,
+    sessionDate: new Date(s.sessionDate),
   }));
   const notes = cached.notes;
   const memberProfile = cached.memberProfile
