@@ -2,9 +2,12 @@ import { cache } from "react";
 
 import { Role, type TrainingLevel, type TrainingType } from "@prisma/client";
 
+// Concurrent renders on the same Lambda would collide on a static label and
+// produce nonsense durations. Generate a tag per call site invocation.
 const _PERF = process.env.PERF_TIMINGS === "1";
-const _pt = (l: string) => { if (_PERF) console.time(`[profile] ${l}`); };
-const _pe = (l: string) => { if (_PERF) console.timeEnd(`[profile] ${l}`); };
+const _tag = () => Math.random().toString(16).slice(2, 8);
+const _pt = (l: string, t: string) => { if (_PERF) console.time(`[profile] ${l}#${t}`); };
+const _pe = (l: string, t: string) => { if (_PERF) console.timeEnd(`[profile] ${l}#${t}`); };
 
 import { normalizeMemberProfile } from "@/features/profiles/member-profile";
 import {
@@ -206,9 +209,10 @@ function calculateStreak(attendanceHistory: { checkedInAt: Date }[]) {
 // getProfileSidebarSummary() — without dedupe each one re-runs the heavy
 // User+Profile+CoachProfile+MemberProfile join.
 export const ensureProfile = cache(async (userId: string) => {
-  _pt("ensureProfile");
+  const t = _tag();
+  _pt("ensureProfile", t);
   const user = await findUserWithProfile(userId);
-  _pe("ensureProfile");
+  _pe("ensureProfile", t);
 
   if (!user) {
     throw new Error("User not found");
@@ -235,9 +239,10 @@ export const ensureProfile = cache(async (userId: string) => {
 // Narrow per-request memoized fetch — only the fields needed by layout/sidebar.
 // ~3-4× cheaper than ensureProfile (no coachProfile join, no full memberProfile row).
 export const ensureProfileSummary = cache(async (userId: string) => {
-  _pt("ensureProfileSummary");
+  const t = _tag();
+  _pt("ensureProfileSummary", t);
   const result = await findUserProfileSummary(userId);
-  _pe("ensureProfileSummary");
+  _pe("ensureProfileSummary", t);
   return result;
 });
 
@@ -307,9 +312,10 @@ export async function getOwnProfile(userId: string) {
 }
 
 export async function getProfileHeader(userId: string) {
-  _pt("getProfileHeader");
+  const t = _tag();
+  _pt("getProfileHeader", t);
   const user = await ensureProfileSummary(userId);
-  _pe("getProfileHeader");
+  _pe("getProfileHeader", t);
 
   if (!user?.profile) {
     return null;
@@ -322,9 +328,10 @@ export async function getProfileHeader(userId: string) {
 }
 
 export async function getProfileSidebarSummary(userId: string): Promise<ProfileSidebarSummary | null> {
-  _pt("getProfileSidebarSummary");
+  const t = _tag();
+  _pt("getProfileSidebarSummary", t);
   const user = await ensureProfileSummary(userId);
-  _pe("getProfileSidebarSummary");
+  _pe("getProfileSidebarSummary", t);
 
   if (!user?.profile) {
     return null;

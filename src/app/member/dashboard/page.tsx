@@ -1,6 +1,5 @@
 import { Role, type TrainingType } from "@prisma/client";
 import { CalendarDays, Flame, Medal, Sparkles, Star, Trophy } from "lucide-react";
-import { after } from "next/server";
 
 import { MetricCard } from "@/components/sports/metric-card";
 import { PlayerRatingCard } from "@/components/sports/player-rating-card";
@@ -8,7 +7,6 @@ import { RankTrendBadge } from "@/components/sports/rank-trend-badge";
 import { SectionHeader } from "@/components/sports/section-header";
 import { Card } from "@/components/ui/card";
 import { normalizeMemberProfile } from "@/features/profiles/member-profile";
-import { syncMemberMetrics } from "@/features/profiles/profiles.service";
 import { CACHE_KEYS, CACHE_TTL, getOrSet } from "@/lib/cache";
 import { formatSessionDate } from "@/lib/format";
 import { translateTrainingType } from "@/lib/i18n";
@@ -49,12 +47,13 @@ type CachedUpcomingSession = {
 };
 
 async function loadMemberDashboardData(memberId: string): Promise<CachedDashboard> {
-  if (PERF_TIMINGS) console.time("dashboard:data");
+  const tag = Math.random().toString(16).slice(2, 8);
+  if (PERF_TIMINGS) console.time(`dashboard:data#${tag}`);
   const result = await getOrSet<CachedDashboard>(
     CACHE_KEYS.dashboardMember(memberId),
     CACHE_TTL.DASHBOARD,
     async () => {
-      if (PERF_TIMINGS) console.time("dashboard:data:factory");
+      if (PERF_TIMINGS) console.time(`dashboard:data:factory#${tag}`);
       const [attendanceCount, points, badgeCount, notes, memberProfile] =
         await Promise.all([
           prisma.attendance.count({ where: { memberId } }),
@@ -87,7 +86,7 @@ async function loadMemberDashboardData(memberId: string): Promise<CachedDashboar
             },
           }),
         ]);
-      if (PERF_TIMINGS) console.timeEnd("dashboard:data:factory");
+      if (PERF_TIMINGS) console.timeEnd(`dashboard:data:factory#${tag}`);
 
       return {
         attendanceCount,
@@ -112,19 +111,20 @@ async function loadMemberDashboardData(memberId: string): Promise<CachedDashboar
       };
     },
   );
-  if (PERF_TIMINGS) console.timeEnd("dashboard:data");
+  if (PERF_TIMINGS) console.timeEnd(`dashboard:data#${tag}`);
   return result;
 }
 
 // Upcoming sessions are identical for every member — cache once globally
 // instead of duplicating the same rows inside every per-member cache entry.
 async function loadUpcomingSessions(): Promise<CachedUpcomingSession[]> {
-  if (PERF_TIMINGS) console.time("dashboard:sessions");
+  const tag = Math.random().toString(16).slice(2, 8);
+  if (PERF_TIMINGS) console.time(`dashboard:sessions#${tag}`);
   const result = await getOrSet<CachedUpcomingSession[]>(
     CACHE_KEYS.upcomingSessions(),
     CACHE_TTL.UPCOMING_SESSIONS,
     async () => {
-      if (PERF_TIMINGS) console.time("dashboard:sessions:factory");
+      if (PERF_TIMINGS) console.time(`dashboard:sessions:factory#${tag}`);
       const sessions = await prisma.trainingSession.findMany({
         where: { sessionDate: { gte: new Date() } },
         select: {
@@ -139,7 +139,7 @@ async function loadUpcomingSessions(): Promise<CachedUpcomingSession[]> {
         orderBy: [{ sessionDate: "asc" }, { startTime: "asc" }],
         take: 5,
       });
-      if (PERF_TIMINGS) console.timeEnd("dashboard:sessions:factory");
+      if (PERF_TIMINGS) console.timeEnd(`dashboard:sessions:factory#${tag}`);
       return sessions.map((s) => ({
         id: s.id,
         title: s.title,
@@ -151,58 +151,68 @@ async function loadUpcomingSessions(): Promise<CachedUpcomingSession[]> {
       }));
     },
   );
-  if (PERF_TIMINGS) console.timeEnd("dashboard:sessions");
+  if (PERF_TIMINGS) console.timeEnd(`dashboard:sessions#${tag}`);
   return result;
 }
 
 // Toggle with PERF_TIMINGS=1 in env to print server timings in the dev console
 // without polluting production logs.
+//
+// Fluid Compute reuses Lambda instances across concurrent requests. Static
+// console.time labels collide when two renders overlap on the same instance
+// — one request's timeEnd terminates another request's timer, producing
+// nonsense numbers. Each render generates a short unique tag and prefixes
+// every label with it so timers stay scoped to one request.
 const PERF_TIMINGS = process.env.PERF_TIMINGS === "1";
-function timeStart(label: string) {
-  if (PERF_TIMINGS) console.time(label);
-}
-function timeEnd(label: string) {
-  if (PERF_TIMINGS) console.timeEnd(label);
+function makeRequestTimer() {
+  // 6 hex chars is plenty to disambiguate concurrent renders without filling
+  // logs; we don't need crypto strength here.
+  const tag = Math.random().toString(16).slice(2, 8);
+  return {
+    start: (label: string) => {
+      if (PERF_TIMINGS) console.time(`${label}#${tag}`);
+    },
+    end: (label: string) => {
+      if (PERF_TIMINGS) console.timeEnd(`${label}#${tag}`);
+    },
+  };
 }
 
 export default async function MemberDashboardPage() {
-  timeStart("dashboard:total");
+  const t0 = makeRequestTimer();
+  t0.start("dashboard:total");
   // requirePageAuth + getServerTranslations are both wrapped in React cache(),
   // so the layout's earlier calls (with the same args) are reused for free.
-  timeStart("dashboard:auth");
+  t0.start("dashboard:auth");
   const session = await requirePageAuth(Role.MEMBER);
-  timeEnd("dashboard:auth");
-  timeStart("dashboard:i18n");
+  t0.end("dashboard:auth");
+  t0.start("dashboard:i18n");
   const { intlLocale, t } = await getServerTranslations();
-  timeEnd("dashboard:i18n");
+  t0.end("dashboard:i18n");
 
-  // Push the per-user metric sync off the critical path. The dashboard reads
-  // whatever is currently persisted in MemberProfile; the next request sees
-  // freshly synced numbers.
-  //
-  // The global leaderboard recompute is NOT triggered from here. It runs on a
-  // Vercel Cron (POST /api/cron/recompute-leaderboard) and an admin trigger.
-  // This page must never open a transaction against the pooled DATABASE_URL
-  // (PgBouncer transaction mode does not support interactive transactions).
-  after(async () => {
-    timeStart("dashboard:after:sync");
-    try {
-      await syncMemberMetrics(session.user.id);
-    } catch (error) {
-      // Non-blocking: the dashboard already responded. Log + swallow.
-      console.error("[dashboard:after] syncMemberMetrics failed", error);
-    } finally {
-      timeEnd("dashboard:after:sync");
-    }
-  });
+  // The dashboard is intentionally a READ-ONLY page. It does NOT call
+  // syncMemberMetrics — not inline, not in after(). Reasons:
+  //   1. The fresh counts (attendance, points, badges) come from the cached
+  //      dashboard data factory below, which already queries the source-of-
+  //      truth tables directly. Stale numbers cannot appear here.
+  //   2. The persisted MemberProfile fields (overallRating, currentStreak,
+  //      currentRank…) are refreshed by:
+  //        - the profile page (`/member/profile` calls syncMemberMetrics)
+  //        - the profile-update server action
+  //        - the leaderboard cron (`/api/cron/recompute-leaderboard`)
+  //        - the admin trigger (`/api/admin/leaderboard/recompute`)
+  //   3. Running the sync inside after() held 8-10 PgBouncer connections for
+  //      ~1.8s post-response, exhausting the pool and pushing the *next*
+  //      request's TTFB to ~1.8s. Removing it from this hot path is the only
+  //      way to guarantee dashboard TTFB < 500ms under sustained load.
 
-  timeStart("dashboard:queries");
+  t0.start("dashboard:queries");
   // Two independent cache reads — run in parallel.
   const [cached, cachedSessions] = await Promise.all([
     loadMemberDashboardData(session.user.id),
     loadUpcomingSessions(),
   ]);
-  timeEnd("dashboard:queries");
+  t0.end("dashboard:queries");
 
   const attendanceCount = cached.attendanceCount;
   const totalPoints = cached.totalPoints;
@@ -274,7 +284,7 @@ export default async function MemberDashboardPage() {
       )
     : null;
 
-  timeEnd("dashboard:total");
+  t0.end("dashboard:total");
 
   return (
     <div className="space-y-6">

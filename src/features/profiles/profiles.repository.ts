@@ -2,8 +2,9 @@ import { AccountStatus, Prisma, Role, TrainingLevel } from "@prisma/client";
 import { subDays } from "date-fns";
 
 const _PERF = process.env.PERF_TIMINGS === "1";
-const _rt = (l: string) => { if (_PERF) console.time(`[repo] ${l}`); };
-const _re = (l: string) => { if (_PERF) console.timeEnd(`[repo] ${l}`); };
+const _tag = () => Math.random().toString(16).slice(2, 8);
+const _rt = (l: string, t: string) => { if (_PERF) console.time(`[repo] ${l}#${t}`); };
+const _re = (l: string, t: string) => { if (_PERF) console.timeEnd(`[repo] ${l}#${t}`); };
 
 import { createMemberProfileCreateData } from "@/features/profiles/member-profile";
 import { prisma } from "@/lib/prisma";
@@ -23,12 +24,13 @@ export type UserWithProfile = Prisma.UserGetPayload<{
 }>;
 
 export async function findUserWithProfile(userId: string) {
-  _rt("findUserWithProfile");
+  const t = _tag();
+  _rt("findUserWithProfile", t);
   const result = await prisma.user.findUnique({
     where: { id: userId },
     include: profileInclude,
   });
-  _re("findUserWithProfile");
+  _re("findUserWithProfile", t);
   return result;
 }
 
